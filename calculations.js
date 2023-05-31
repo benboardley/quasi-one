@@ -3,6 +3,7 @@
     // Call the function to create the chart
     imageGUI();
     exampleFlow();
+    outputGraph();
   };
 
   function calcSum(P , T , M1 , A1 , gamma , alpha1 , beta1 , w , Fx , m2 , A2 , Q , xi , nu , f , alpha2 , beta2 , N){
@@ -349,4 +350,83 @@ function exampleFlow(){
         document.getElementById("beta2").value = 9;
         document.getElementById("subelements").value = 9;
     }  
+}
+
+function outputGraph(){
+var ctx = document.getElementById('outputChart').getContext('2d');
+
+  // Get the values of M1 and M2
+    var P = parseFloat(document.getElementById("P").value) || 1;
+    var T = parseFloat(document.getElementById("T").value) || 1;
+    var M1 = parseFloat(document.getElementById("M1").value) || 0;
+    var A1 = parseFloat(document.getElementById("A1").value) || 0;
+    var gamma = parseFloat(document.getElementById("gamma").value) || 0;
+    var alpha1 = parseFloat(document.getElementById("alpha1").value) || 0;
+    var beta1 = parseFloat(document.getElementById("beta1").value) || 0;
+    var w = parseFloat(document.getElementById("w").value) || 0;
+    var Fx = parseFloat(document.getElementById("Fx").value) || 0;
+    var m2 = parseFloat(document.getElementById("m2").value) || 0;
+    var A2 = parseFloat(document.getElementById("A2").value) || 0;
+    var Q = parseFloat(document.getElementById("Q").value) || 0;
+    var xi = parseFloat(document.getElementById("xi").value) || 0;
+    var nu = parseFloat(document.getElementById("nu").value) || 0;
+    var f = parseFloat(document.getElementById("f").value) || 0;
+    var alpha2 = parseFloat(document.getElementById("alpha2").value) || 0;
+    var beta2 = parseFloat(document.getElementById("beta2").value) || 0;
+    var N = parseFloat(document.getElementById("subelements").value) || 0;
+    X = []
+    Y = []
+    for(var i = 0; i < 100; i++){
+        var sum = calcSum(P , T , M1 , A1 , gamma , alpha1 , beta1 , w , Fx , m2 , A2 , Q , xi , nu , f , alpha2 , beta2 , N);
+        X.push(i);
+        Y.push(sum)
+    }
+
+  // Generate the scatter plot data
+  var dataPoints = [{
+    x: X,
+    y: Y
+  }];
+
+  // Create the chart
+  var myChart = new Chart(ctx, {
+    type: 'scatter',
+    data: {
+      datasets: [{
+        label: 'M1 vs M2',
+        data: dataPoints,
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 1,
+        pointRadius: 6,
+        pointHoverRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: {
+          type: 'linear',
+          position: 'bottom',
+          title: {
+            display: true,
+            text: 'M1'
+          }
+        },
+        y: {
+          type: 'linear',
+          position: 'left',
+          title: {
+            display: true,
+            text: 'M2'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          display: false
+        }
+      }
+    }
+  });
 }

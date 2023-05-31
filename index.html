@@ -11,7 +11,7 @@
 </head>
 <body>
     <div class="input-container">
-        <form>
+        <form class="inputFields">
             <div class="InputIn">
                 <h4 class="InputHeaders">Inlet Conditions</h4>
                 <div class="label-input-row">
@@ -106,21 +106,21 @@
                 <input type="text" id="subelements" min="1" step="1" value="1">
                 </div>
             </div>
-            <div class="exampleFlows">
-                <h4>Example Flows</h4>
-                <select class="selectFlow" onchange="exampleFlow()">
-                  <option>Isentropic flow with area change</option>
-                  <option>Flow across a normal shock</option>
-                  <option>Fanno flow</option>
-                  <option>Rayleigh flow</option>
-                  <option>Sudden expansion</option>
-                  <option>Sudden Contraction</option>
-                  <option>Two-stream mixing layer</option>
-                  <option>Simultaneous friction and heat transfer</option>
-                  <option>Simultaneous area change and friction</option>
-                </select>
-              </div>
         </form>
+        <div class="exampleFlows">
+            <h4>Example Flows</h4>
+            <select class="selectFlow" onchange="exampleFlow()">
+              <option>Isentropic flow with area change</option>
+              <option>Flow across a normal shock</option>
+              <option>Fanno flow</option>
+              <option>Rayleigh flow</option>
+              <option>Sudden expansion</option>
+              <option>Sudden Contraction</option>
+              <option>Two-stream mixing layer</option>
+              <option>Simultaneous friction and heat transfer</option>
+              <option>Simultaneous area change and friction</option>
+            </select>
+        </div>
     </div>
     <div class="Gui">
         <canvas id="myChart"></canvas>
@@ -159,6 +159,7 @@
               <input type="text" id="deltaS">
             </div>
         </div>
+        <canvas id="outputChart"></canvas>
     </div>
 </body>
 

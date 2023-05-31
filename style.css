@@ -23,7 +23,7 @@ body {
   
   .input-container {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: flex-start;
     margin: 20px;
     width: 40%;
@@ -68,6 +68,10 @@ body {
   
   .exampleFlows {
     margin-top: 10px;
+  }
+  .inputFields{
+    display: flex;
+    flex-direction: row;
   }
   
   .Gui {
@@ -114,5 +118,16 @@ body {
       align-self: center;
       margin-top: 20px;
     }
+    .inputFields{
+        display: flex;
+        flex-direction: column;
+      }
   }
-  
+@media (max-width: 800px) {
+  body {
+    background-color: #f2f2f2;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+}
