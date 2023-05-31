@@ -67,8 +67,8 @@
   function imageGUI() {
     var ctx = document.getElementById('myChart').getContext('2d');
     var A1 = parseFloat(document.getElementById("A1").value) || 1;
-    var A2 = parseFloat(document.getElementById("A2").value) || 2;
-  
+    var A2 = parseFloat(document.getElementById("A2").value) || 4;
+    
     var center = A2 / 2;
     var top = center + A1 / 2;
     var bottom = center - A1 / 2;
@@ -77,77 +77,101 @@
     var line2 = [];
     var dottedLine = [];  // Dotted line dataset
     heights = [A1, A2]
-    for (var i = 1; i <= 6; i++) {
-      line1[i - 1] = top + ((A2 - top) / 6) * i;
-      line2[i - 1] = (top / 6) * (6 - i);
+    for (var i = 0; i <= 2; i++) {
+      line1[i] = top + ((A2 - top) / 2) * i;
+      line2[i] = (bottom / 2) * (2 - i);
       dottedLine[i - 1] = (line1[i - 1] + line2[i - 1]) / 2;  // Calculate dotted line as average of line1 and line2
     }
-    for (var i = 0; i < 5; i++) {
-        var verticalLine = [
-          { x: i + 1, y: top + ((bottom - top) / 6) * heights[i] }
-        ];
+    
+    var verticalLines = []; // Array to store all vertical lines
+    for (var i = 0; i < 3; i++) {
+      verticalLines[i] = [
+        { x: i + 1, y: top + ((bottom - top) / 6) * heights[i] }
+      ];
     }
+  
     if (typeof myChart !== 'undefined') {
-        myChart.destroy();
-      }
+      myChart.destroy();
+    }
+  
     var myChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: [1, 2, 3, 4, 5, 6],
-        datasets: [
-          {
-            data: line1,
-            borderColor: 'rgba(255, 99, 132, 1)',
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderWidth: 1,
-            pointRadius: 0,
-            pointHoverRadius: 0
-          },
-          {
-            data: line2,
-            borderColor: 'rgba(255, 99, 132, 1)',
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderWidth: 1,
-            pointRadius: 0,
-            pointHoverRadius: 0
-          }
-        ]
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-            display: false
-          },
-          x: {
-            display: false
-          }
-        },
-        animation: {
-            duration: 0 // Set animation duration to 0 to disable animation
-          },
-        plugins: {
-          legend: {
-            display: false
-          },
-          annotations: {
-            topArrow: {
-              type: 'line',
-              mode: 'vertical',
-              scaleID: 'x',
-              value: 1, // x position for the arrow pointing into the top
-              borderColor: 'red', // Red color for the arrow
+        type: 'line',
+        data: {
+          labels: [1, 2, 3],
+          datasets: [
+            {
+              data: line1,
+              borderColor: 'black',
+              backgroundColor: 'black',
               borderWidth: 1,
-              borderDash: [5, 5], // Optional: Make the arrow dashed
-              label: {
-                enabled: false
-              }
+              pointRadius: 0,
+              pointHoverRadius: 0
+            },
+            {
+              data: line2,
+              borderColor: 'black',
+              backgroundColor: 'black',
+              borderWidth: 1,
+              pointRadius: 0,
+              pointHoverRadius: 0
             }
+          ]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              display: false
+            },
+            x: {
+              display: false
+            }
+          },
+          animation: {
+            duration: 0 // general animation time
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            annotation: {
+              annotations: [
+                {
+                  type: 'line',
+                  mode: 'vertical',
+                  scaleID: 'x',
+                  value: 0,
+                  borderColor: false,
+                  borderWidth: 1,
+                  yMin: bottom,
+                  yMax: top,
+                  label: {
+                    enabled: true,
+                    content: 'Inlet',
+                    position: 'top'
+                  }
+                },
+                {
+                  type: 'line',
+                  mode: 'vertical',
+                  scaleID: 'x',
+                  value: 2,
+                  borderColor: 'black',
+                  borderWidth: 1,
+                  label: {
+                    enabled: true,
+                    content: 'Outlet',
+                    position: 'top'
+                  }
+                }
+              ]
+            }
+          }
         }
-        }
-      }
-    });
+      });
+      
   }
+  
 
 function exampleFlow(){
     var selectElement = document.querySelector('.selectFlow');
