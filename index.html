@@ -6,90 +6,160 @@
   <!-- Additional meta tags, stylesheets, or scripts -->
   <script src="./calculations.js"></script>
   <link rel="stylesheet" type="text/css" href="./style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.0/dist/chartjs-plugin-annotation.min.js"></script>
 </head>
 <body>
-    <form class="input-container">
-        <div id="InputIn">
-            <label for="P">P=</label>
-            <input type="number" id="P">
+    <div class="input-container">
+        <form>
+            <div class="InputIn">
+                <h4 class="InputHeaders">Inlet Conditions</h4>
+                <div class="label-input-row">
+                <label for="P">P=</label>
+                <input type="text" id="P">
+                </div>
 
-            <label for="T">T=</label>
-            <input type="number" id="T">
+                <div class="label-input-row">
+                <label for="T">T=</label>
+                <input type="text" id="T">
+                </div>
 
-            <label for="M1">M<sub>1</sub>=</label>
-            <input type="number" id="M1">
+                <div class="label-input-row">
+                <label for="M1">M<sub>1</sub>=</label>
+                <input type="text" id="M1">
+                </div>
 
-            <label for="A1">A<sub>1</sub>=</label>
-            <input type="number" id="A1">
+                <div class="label-input-row">
+                <label for="A1">A<sub>1</sub>=</label>
+                <input type="text" id="A1" oninput="imageGUI()">
+                </div>
 
-            <label for="gamma">&gamma;=</label>
-            <input type="number" id="gamma">
+                <div class="label-input-row">
+                <label for="gamma">&gamma;=</label>
+                <input type="text" id="gamma">
+                </div>
 
-            <label for="alpha1">&alpha;<sub>1</sub>=</label>
-            <input type="number" id="alpha1">
+                <div class="label-input-row">
+                <label for="alpha1">&alpha;<sub>1</sub>=</label>
+                <input type="text" id="alpha1">
+                </div>
 
-            <label for="beta1">&beta;<sub>1</sub>=</label>
-            <input type="number" id="beta1">
-        </div>
-        <div id="InputOut">
-            <label for="w">w=</label>
-            <input type="number" id="w">
+                <div class="label-input-row">
+                <label for="beta1">&beta;<sub>1</sub>=</label>
+                <input type="text" id="beta1">
+                </div>
+            </div>
+            <div class="InputOut">
+                <h4 class="InputHeaders">Outlet Conditions</h4>
+                <div class="label-input-row">
+                <label for="w">w=</label>
+                <input type="text" id="w">
+                </div>
 
-            <label for="Fx">F<sub>x</sub>=</label>
-            <input type="number" id="Fx">
+                <div class="label-input-row">
+                <label for="Fx">F<sub>x</sub>=</label>
+                <input type="text" id="Fx">
+                </div>
 
-            <label for="m2">m<sub>2</sub>=</label>
-            <input type="number" id="m2">
+                <div class="label-input-row">
+                <label for="m2">m<sub>2</sub>=</label>
+                <input type="text" id="m2">
+                </div>
 
-            <label for="Q">Q=</label>
-            <input type="number" id="Q">
+                <div class="label-input-row">
+                <label for="Q">Q=</label>
+                <input type="text" id="Q">
+                </div>
 
-            <label for="A2">A<sub>2</sub>=</label>
-            <input type="number" id="A2">
+                <div class="label-input-row">
+                <label for="A2">A<sub>2</sub>=</label>
+                <input type="text" id="A2" oninput="imageGUI()">
+                </div>
 
-            <label for="xi">&xi;=</label>
-            <input type="number" id="xi">
+                <div class="label-input-row">
+                <label for="xi">&xi;=</label>
+                <input type="text" id="xi">
+                </div>
 
-            <label for="nu">&nu;=</label>
-            <input type="number" id="nu">
+                <div class="label-input-row">
+                <label for="nu">&nu;=</label>
+                <input type="text" id="nu">
+                </div>
 
-            <label for="f">f=</label>
-            <input type="number" id="f">
+                <div class="label-input-row">
+                <label for="f">f=</label>
+                <input type="text" id="f">
+                </div>
 
-            <label for="alpha2">&alpha;<sub>2</sub>=</label>
-            <input type="number" id="alpha2">
+                <div class="label-input-row">
+                <label for="alpha2">&alpha;<sub>2</sub>=</label>
+                <input type="text" id="alpha2">
+                </div>
 
-            <label for="beta2">&beta;<sub>2</sub>=</label>
-            <input type="number" id="beta2">
+                <div class="label-input-row">
+                <label for="beta2">&beta;<sub>2</sub>=</label>
+                <input type="text" id="beta2">
+                </div>
 
-
-            <label for="subelements">N=</label>
-            <input type="number" id="subelements" min="1" step="1" value="1">
-        </div>
-        <button id = "calculate" onclick="calculate(event)">Calculate</button>
-    </form>
+                <div class="label-input-row">
+                <label for="subelements">N=</label>
+                <input type="text" id="subelements" min="1" step="1" value="1">
+                </div>
+            </div>
+            <div class="exampleFlows">
+                <h4>Example Flows</h4>
+                <select class="selectFlow" onchange="exampleFlow()">
+                  <option>Isentropic flow with area change</option>
+                  <option>Flow across a normal shock</option>
+                  <option>Fanno flow</option>
+                  <option>Rayleigh flow</option>
+                  <option>Sudden expansion</option>
+                  <option>Sudden Contraction</option>
+                  <option>Two-stream mixing layer</option>
+                  <option>Simultaneous friction and heat transfer</option>
+                  <option>Simultaneous area change and friction</option>
+                </select>
+              </div>
+        </form>
+    </div>
+    <div class="Gui">
+        <canvas id="myChart"></canvas>
+    </div>
     <div class="output-container">
+        <button id="calculate" onclick="calculateFlow(event)">Calculate</button>
         <div class="outputLabels">
-            <label for="M2">M<sub>2</sub>=</label>
-            <input type="number" id="M2">
+            <h4>Results</h4>
+            <div class="label-input-row">
+              <label for="M2">M<sub>2</sub>=</label>
+              <input type="text" id="M2">
+            </div>
 
-            <label for="PT2">P<sub>T<sub>2</sub></sub>=</label>
-            <input type="number" id="PT2">
+            <div class="label-input-row">
+              <label for="PT2">P<sub>T<sub>2</sub></sub>=</label>
+              <input type="text" id="PT2" name="Label">
+            </div>
 
-            <label for="P2">P<sub>2</sub>=</label>
-            <input type="number" id="P2">
+            <div class="label-input-row">
+              <label for="P2">P<sub>2</sub>=</label>
+              <input type="text" id="P2">
+            </div>
 
-            <label for="TT2">T<sub>T<sub>2</sub></sub>=</label>
-            <input type="number" id="TT2">
+            <div class="label-input-row">
+              <label for="TT2">T<sub>T<sub>2</sub></sub>=</label>
+              <input type="text" id="TT2">
+            </div>
 
-            <label for="T2">T<sub>2</sub>=</label>
-            <input type="number" id="T2">
+            <div class="label-input-row">
+              <label for="T2">T<sub>2</sub>=</label>
+              <input type="text" id="T2">
+            </div>
 
-            <label for="deltaS">&Delta;s</label>
-            <input type="number" id="deltaS">
-            
-          </div>
-
+            <div class="label-input-row">
+              <label for="deltaS">&Delta;s=</label>
+              <input type="text" id="deltaS">
+            </div>
+        </div>
     </div>
 </body>
+
 </html>
