@@ -1,0 +1,21 @@
+Plan for Web Calculator
+
+Week 1:
+Day 1 - Create Basic Input -> Output Format
+Day 2 - Add in Iterations/ Subelements, add equations
+Day 3 - Add Middle Image GUI
+Day 4 - Add Pre-set Problems
+
+Week 2:
+Day 1 - Add Units
+Day 2 - Add Graph GUI
+Day 3 - Full system Test + Styling
+Day 4 - Add variable Descriptions
+Day 5 - Done?
+
+Week 3:
+Day 1 -
+Day 2 -
+Day 3 -
+Day 4 -
+Day 5 -

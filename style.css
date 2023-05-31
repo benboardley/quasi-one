@@ -1,0 +1,38 @@
+body {
+    background-color: lightblue;
+    display: flex;
+    justify-content: space-between; /* Aligns elements with space between them */
+  }
+  
+  .input-container {
+    display: flex;
+    flex-direction: row;
+    width: 25%;
+  }
+  
+  .output-container {
+    display: flex;
+    flex-direction: column;
+    width: 25%;
+    align-items: flex-end; /* Aligns elements to the right */
+  }
+  .outputLabels {
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+  }
+  #InputIn {
+    display: flex;
+    flex-direction: column;
+    width: 10%;
+  }
+  
+  #InputOut {
+    display: flex;
+    flex-direction: column;
+    width: 10%; /* Aligns elements to the right */
+  }
+
+  #calculate{
+    height: 20px;
+  }

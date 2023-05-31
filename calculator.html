@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>quasi one</title>
+  <!-- Additional meta tags, stylesheets, or scripts -->
+  <script src="./calculations.js"></script>
+  <link rel="stylesheet" type="text/css" href="./style.css">
+</head>
+<body>
+    <form class="input-container">
+        <div id="InputIn">
+            <label for="P">P=</label>
+            <input type="number" id="P">
+
+            <label for="T">T=</label>
+            <input type="number" id="T">
+
+            <label for="M1">M<sub>1</sub>=</label>
+            <input type="number" id="M1">
+
+            <label for="A1">A<sub>1</sub>=</label>
+            <input type="number" id="A1">
+
+            <label for="gamma">&gamma;=</label>
+            <input type="number" id="gamma">
+
+            <label for="alpha1">&alpha;<sub>1</sub>=</label>
+            <input type="number" id="alpha1">
+
+            <label for="beta1">&beta;<sub>1</sub>=</label>
+            <input type="number" id="beta1">
+        </div>
+        <div id="InputOut">
+            <label for="w">w=</label>
+            <input type="number" id="w">
+
+            <label for="Fx">F<sub>x</sub>=</label>
+            <input type="number" id="Fx">
+
+            <label for="m2">m<sub>2</sub>=</label>
+            <input type="number" id="m2">
+
+            <label for="Q">Q=</label>
+            <input type="number" id="Q">
+
+            <label for="A2">A<sub>2</sub>=</label>
+            <input type="number" id="A2">
+
+            <label for="xi">&xi;=</label>
+            <input type="number" id="xi">
+
+            <label for="nu">&nu;=</label>
+            <input type="number" id="nu">
+
+            <label for="f">f=</label>
+            <input type="number" id="f">
+
+            <label for="alpha2">&alpha;<sub>2</sub>=</label>
+            <input type="number" id="alpha2">
+
+            <label for="beta2">&beta;<sub>2</sub>=</label>
+            <input type="number" id="beta2">
+
+
+            <label for="subelements">N=</label>
+            <input type="number" id="subelements" min="1" step="1" value="1">
+        </div>
+        <button id = "calculate" onclick="calculate(event)">Calculate</button>
+    </form>
+    <div class="output-container">
+        <div class="outputLabels">
+            <label for="M2">M<sub>2</sub>=</label>
+            <input type="number" id="M2">
+
+            <label for="PT2">P<sub>T<sub>2</sub></sub>=</label>
+            <input type="number" id="PT2">
+
+            <label for="P2">P<sub>2</sub>=</label>
+            <input type="number" id="P2">
+
+            <label for="TT2">T<sub>T<sub>2</sub></sub>=</label>
+            <input type="number" id="TT2">
+
+            <label for="T2">T<sub>2</sub>=</label>
+            <input type="number" id="T2">
+
+            <label for="deltaS">&Delta;s</label>
+            <input type="number" id="deltaS">
+            
+          </div>
+
+    </div>
+</body>
+</html>
