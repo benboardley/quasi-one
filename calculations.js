@@ -100,21 +100,23 @@
           labels: [1, 2, 3],
           datasets: [
             {
-              data: line1,
+              data: line2,
               borderColor: 'black',
-              backgroundColor: 'black',
+              backgroundColor: 'white',
+              fill: true,
               borderWidth: 1,
               pointRadius: 0,
               pointHoverRadius: 0
             },
             {
-              data: line2,
+              data: line1,
               borderColor: 'black',
-              backgroundColor: 'black',
+              backgroundColor: 'gray',
+              fill: true,
               borderWidth: 1,
               pointRadius: 0,
               pointHoverRadius: 0
-            }
+            },
           ]
         },
         options: {
@@ -141,8 +143,8 @@
                   mode: 'vertical',
                   scaleID: 'x',
                   value: 0,
-                  borderColor: false,
-                  borderWidth: 1,
+                  borderColor: 'transparent',
+                  borderWidth: 0,
                   yMin: bottom,
                   yMax: top,
                   label: {
@@ -156,14 +158,27 @@
                   mode: 'vertical',
                   scaleID: 'x',
                   value: 2,
-                  borderColor: 'black',
-                  borderWidth: 1,
+                  borderColor: 'transparent',
+                  borderWidth: 0,
                   label: {
                     enabled: true,
                     content: 'Outlet',
                     position: 'top'
                   }
-                }
+                },
+                {
+                  type: 'line',
+                  mode: 'vertical',
+                  scaleID: 'x',
+                  value: 1,
+                  borderColor: 'transparent',
+                  borderWidth: 0,
+                  label: {
+                    enabled: true,
+                    content: 'Flow ->',
+                    position: 'top'
+                  }
+                },
               ]
             }
           }

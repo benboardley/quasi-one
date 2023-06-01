@@ -8,6 +8,8 @@
   <link rel="stylesheet" type="text/css" href="./style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.0/dist/chartjs-plugin-annotation.min.js"></script>
+  <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+  <script defer src="https://pyscript.net/latest/pyscript.js"></script>
 </head>
 <body>
     <div class="title">
@@ -54,6 +56,9 @@
                 <input type="text" id="beta1">
                 </div>
             </div>
+            <div class="Gui">
+              <canvas id="myChart"></canvas>
+          </div>
             <div class="InputOut">
                 <h4 class="InputHeaders">Outlet Conditions</h4>
                 <div class="label-input-row">
@@ -126,9 +131,6 @@
               <option>Simultaneous area change and friction</option>
             </select>
         </div>
-    </div>
-    <div class="Gui">
-        <canvas id="myChart"></canvas>
     </div>
     <div class="output-container">
         <button id="calculate" onclick="calculateFlow(event)">Calculate</button>

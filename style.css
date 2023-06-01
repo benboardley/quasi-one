@@ -47,7 +47,6 @@ body {
     flex-direction: column;
     align-items: flex-start;
     margin: 20px;
-    width: 40%;
   }
   
   .output-container {
