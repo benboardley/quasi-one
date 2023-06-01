@@ -1,0 +1,357 @@
+<head>
+  <meta charset="UTF-8">
+  <title>quasi one</title>
+  <!-- Additional meta tags, stylesheets, or scripts -->
+  <script src="./calculations.js"></script>
+  <link rel="stylesheet" type="text/css" href="./style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.0/dist/chartjs-plugin-annotation.min.js"></script>
+ <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+ <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
+   <py-config>
+    packages = ["numpy", "scipy"] 
+  </py-config>
+  <py-script>
+    ################################################################################
+    # history
+    # v1.0 04/25/22 - stripped code down to reduce bloat
+    # v1.1 08/10/22 - used new entropy component formulation (Ip,wrev,Ik,Iq)
+    # v1.2 08/17/22 - updating printing format
+    # v1.3 09/23/22 - fixed bug in calculating P3P1 for isentropic flow
+    #                   fixed bug for isentropic flow when M1 = 1
+    # v1.4 09/25/22 - added exact solution for isentropic flow of k->inf
+    # v1.5 09/27/22 - added exact solution for quartic functions
+    #                   removed previous cubic approximation for ds=0
+    #                   added quartic approx for ds=0 using L2-norm to project
+    #                   higher-order terms onto quartic over domain defined by
+    #                   monoatomic gas and k->1 gas solutions
+    #                   added Lagrange interpolating polynomial
+    # v1.6 09/28/22 - tuned boundary estimates for k=1.4 using Lagrange interpolating
+    #                   polynomial to reduce the error for a range of Mach numbers
+    #                   the placement of the boundaries is no longer rigorous but
+    #                   looks to be an improvement over the monoatomic and polyatomic
+    #                   solutions (error reduction by reducing the size of the domain
+    #                   over which to approximate the 6th order term)
+    #               - also added collocation method for arbitrary k value gases
+    #                   this uses Lagrange interpolation polynomials to shrink the
+    #                   domain size used in the collocation method
+    #                   This looks to have a significant improvement over just using
+    #                   the Lagrange interpolation polynomials themselves as the
+    #                   solution for any arbitrary k-valued gas
+    # v1.7 10/01/22 - added triatomic isentropic flow approximation - uses same
+    #                   projection technique as diatomic gas
+    #               - fixed some random bugs here and there
+    #               - reworked arbitrary gas isentropic flow approximation
+    ################################################################################
+    # TO DO
+    # 
+    # 1 check out isentropic flow for k-> 1, something weird seems possible there
+    # 2 work on isentropic flow near M=1, monatomic gas soln can fail and there 
+    #       should be some "back-up" logic/algorithm so an accurate solution ma
+    #       be computed
+    ################################################################################
+    import scipy.optimize as scopt
+    import scipy.special as spec
+    import sys
+    import numpy as np
+    import warnings
+
+    #mimic argparse
+    class Args:
+        def __init__(self, AR=1.0, Ad=0.0, cd=0.0, cf=0.0, Af=0.0, M1=0.0, xi=0.5, nu=0.0,
+                    qr=0.0, k=1.4, twr=1.0, isentropic=False, b1=1.0, b2=1.0, a1=1.0, a2=1.0, debug=False):
+            self.AR = AR
+            self.Ad = Ad
+            self.cd = cd
+            self.cf = cf
+            self.Af = Af
+            self.M1 = M1
+            self.xi = xi
+            self.nu = nu
+            self.qr = qr
+            self.k = k
+            self.twr = twr
+            self.isentropic = isentropic
+            self.b1 = b1
+            self.b2 = b2
+            self.a1 = a1
+            self.a2 = a2
+            self.debug = debug
+    def main():
+      from js import P, T , M1 , A1 , gamma , alpha1 , beta1 , w , Fx , m2 , A2 , Q , xi , nu , f , alpha2 , beta2 , N
+      ver = str('v1.7')
+      date = str('10/01/22')
+
+      args = Args(AR=A2/A1, M1=M1, xi = xi, nu = nu, k = gamma, b1 = beta1, b2 = beta2, a1 = alpha1, a2 = alpha2 )
+      print("TEST")
+      if( args.isentropic ):
+          args = isentropic(args)
+          args = coefsBiquadratic(args)
+
+      else:
+          args = coefsBiquadratic(args)
+          args = solveBiquadratic(args)
+
+      args = postProcess(args)
+
+      printOutput(args) #-> updateResults
+      
+      return()
+    def coefsBiquadratic(args):
+      '''
+      calculate the 2nd and zeroth order coefficients of the bi-quadratic polynomial
+      '''
+      M1 = args.M1
+      k  = args.k
+      AR = args.AR
+      Ad = args.Ad
+      cd = args.cd
+      cf = args.cf
+      Af = args.Af
+      nu = args.nu
+      qr = args.qr
+      xi = args.xi
+      beta1 = args.b1
+      beta2 = args.b2
+      alpha1 = args.a1
+      alpha2 = args.a2
+
+      TR = np.float64(bool(k-1))*(1 + args.qr) + np.float64(not bool(k-1))*1
+
+      G = (k-1)/2
+
+      f1 = 1 + G * M1*M1
+
+      try:
+          Lambda = np.complex128(\
+                      ((1 + beta1*k*(1-cf/4*Af - cd/2*Ad)*M1**2 + (1-xi+nu*(f1**(k/(k-1))-1))*(AR-1) ) \
+                      /(alpha1/alpha2*M1*np.sqrt(f1*TR))) \
+                      )
+          Lambda *= Lambda
+      except:
+          Lambda = np.complex128(\
+                      ((1 + beta1*k*(1-cf/4*Af - cd/2*Ad)*M1**2 + (1-xi+nu*(np.exp(-M1**2)-1))*(AR-1) ) \
+                      /(alpha1/alpha2*M1*np.sqrt(f1*TR))) \
+                      )
+          Lambda *= Lambda
+
+
+      b = (Lambda - 2*k*beta2*(1+xi*(1/AR-1))*(1+cf/4*Af/AR)) \
+              /(Lambda * G  -(k*beta2*(1+cf/4*Af/AR))**2)
+      c = -(1+xi*(1/AR-1))**2 \
+              /(Lambda * G  -(k*beta2*(1+cf/4*Af/AR))**2)
+
+      det = (b/2)*(b/2)-c
+
+      args.Lambda = np.real(Lambda)
+      args.b = np.real(b)
+      args.c = np.real(c)
+      args.det = np.real(det)
+
+      return(args)
+
+    def solveBiquadratic(args):
+        '''
+        Solution to mass, momentum, and energy balance equations.
+        Mass balance is simple inlet nad outlet balance
+        Momentum balance as 1 friction force and 1 drag force
+        Energy balance has 1 heat addition term
+        Gravity and other sources of Potential Energy have been ignored.
+        Uses calorically perfect ideal gas assumption.
+        '''
+
+        b = args.b
+        c = args.c
+        det = args.det
+
+        roots = np.array([-b/2+np.sqrt(det),-b/2-np.sqrt(det)],dtype=np.complex128)
+
+        # reject non-physical roots and replace with nans
+        args.M2 = np.sqrt(rejectNonphysicalRoots(roots,keepNans=True))
+
+        return(args)
+
+    def postProcess(args):
+        '''
+        standard post-processing routine for all solutions
+        '''
+        M2 = args.M2
+
+        M1 = args.M1
+        k  = args.k
+        AR = args.AR
+        xi = args.xi
+        nu = args.nu
+        qr = args.qr
+        cf = args.cf
+        Af = args.Af
+        cd = args.cd
+        Ad = args.Ad
+        TwTo1 = args.twr
+        alpha1 = args.a1
+        alpha2 = args.a2
+        beta1 = args.b1
+        beta2 = args.b2
+
+        G = (k-1)/2
+
+        f1 = 1 + G * M1*M1
+        f2 = 1 + G * M2*M2
+
+        TR = np.float64(bool(k-1))*(1 + qr) + np.float64(not bool(k-1))*1
+
+        try:
+            PR = alpha1/alpha2 * np.sqrt(TR) * M1/M2 * 1./AR * (f1/f2)**(-(k+1)/(2*(k-1)))
+
+            dsR  = k/(k-1) *np.log(TR) - np.log(PR)
+
+            P2P1  = alpha1/alpha2 * np.sqrt(TR) * M1/M2 * 1./AR * np.sqrt(f1/f2)
+
+            P3P1 = ((1 - xi - nu) + xi * P2P1 + nu * f1**(k/(k-1)))*np.ones_like(M2)
+
+        except:
+            PR = alpha1/alpha2*np.sqrt(TR) * M1/M2 * 1/AR * np.exp(0.5*(M2*M2-M1*M1))
+
+            dsR = - np.log(PR)
+
+            P2P1  = alpha1/alpha2*np.sqrt(TR) * M1/M2 * 1./AR * np.sqrt(f1/f2)
+
+            P3P1 = ((1-xi-nu) + xi*P2P1 + nu * np.exp(M1*M1/2))*np.ones_like(M2)
+
+        T2T1  = TR*(f1/f2)
+        p2p1  = P2P1/T2T1
+        v2v1  = 1/p2p1
+        M2M1  = M2/M1
+        V2V1  = M2M1 *np.sqrt(T2T1)
+
+        args.V2V1  = V2V1
+        args.v2v1  = v2v1
+        args.p2p1  = p2p1
+        args.PR    = PR
+        args.TR    = TR*np.ones_like(M2)
+        args.P2P1  = P2P1
+        args.T2T1  = TR * (f1/f2)
+        args.dsR   = dsR
+        args.dsRKE = dsR/(k/2*M1*M1)
+        args.dsRKE2= dsR/(k/2*M2*M2)
+        args.P3P1  = P3P1
+        args.wpv    = -np.log(P2P1*V2V1*AR)
+        args.wrev    = -np.log(V2V1*AR)
+
+        try:
+            args.CP    = (P2P1 - 1)/(args.f1**(k/(k-1))-1)
+            args.wloss = (1 - PR)/(1 - args.f1**(-k/(k-1)))
+            args.zloss = f1**(k/(k-1))*(1 - PR)/(k/2*M1**2)
+            args.Iq    = k/4*(M2**2+M1**2)*np.log(TR) \
+                            + k/(k-1)*(np.log(TR) - 1/TwTo1*(TR-1))
+            args.Theta = k/(k-1)* 1/TwTo1*(TR-1)*np.ones_like(M2)
+
+        except:
+            args.CP    = (P2P1-1)/np.exp(-M1**2/2)
+            args.wloss = (1 - PR)/(1 - np.exp(-M1**2/2))
+            args.zloss = np.exp(M1**2/2)*(1 - PR)/(k/2*M1*M1)
+            args.Theta = k/(k-1+1e-16)* 1/TwTo1*(TR-1)*np.ones_like(M2)
+
+
+        def get_approx(M2,M1,TR):
+            trapezoid = (M1**2 + M2**2/TR)/2*(TR-1)
+            midpoint  = (M1 + M2)**2/(TR+1)/2*(TR-1)
+            #return( 2/3*midpoint + 1/3*trapezoid)
+            #return(trapezoid)
+            return(midpoint)
+
+
+        args.ek    = k/(k-1+1e-16)*np.log(f2/f1) + k/2*get_approx(M2,M1,TR)
+        args.Iq    = k/2*get_approx(M2,M1,TR) \
+                        + k/(k-1+1e-16)*(np.log(TR) - 1/TwTo1*(TR-1))
+
+        args.we    = args.wpv - args.ek
+        args.I     = args.we - args.wrev + args.Iq
+        args.f1    = f1
+        args.f2    = f2
+        args.CPinc = (P2P1 - 1)/(k/2*M1*M1)
+
+        return(args)
+    def rejectNonphysicalRoots(roots,keepNans=False):
+
+      # set any roots with negative real part to nan
+      roots[np.real(roots)<0] = np.nan
+
+      # set any roots with non-zero imaginary part to nan 
+      roots[~np.isclose(np.imag(roots),0,atol=1e-6)] = np.nan
+
+
+      # sort values from lowest to highest
+      roots.sort()
+
+      # remove any nans from roots, cast as real, and return
+      if( keepNans):
+          return(np.real(roots))
+      else:
+          return(np.real(roots[~np.isnan(roots)]))
+    def printOutput(args):
+      '''
+      take previous calculations and output them to screen for user
+      '''
+
+      # if not isentropic then make these values an array with 2 elements of the same value
+      # this is done for later printing
+      # does not affect the values if they are already an array with 2 elements
+      args.Lambda = args.Lambda * np.ones((2,),dtype=np.float64)
+      args.b = args.b * np.ones((2,),dtype=np.float64)
+      args.c = args.c * np.ones((2,),dtype=np.float64)
+      args.det = args.det * np.ones((2,),dtype=np.float64)
+
+      print("{0:20s} {1: >13s} {2: >13s}".format('Outputs','Root 1','Root 2'))
+      print("-"*48)
+      if( args.isentropic ):
+          print("{0:20s} {1: .6e} {2: .6e}".format("xi (ds=0)",args.xi[0],args.xi[1]))
+
+      print("{0:20s} {1: .6e} {2: .6e}".format("M2",args.M2[0],args.M2[1]))
+      print("{0:20s} {1: .6e} {2: .6e}".format("M2/M1",args.M2[0]/args.M1,args.M2[1]/args.M1))
+      print("{0:20s} {1: .6e} {2: .6e}".format("ds/R",args.dsR[0],args.dsR[1]))
+      print("{0:20s} {1: .6e} {2: .6e}".format("(ds/R)/(k/2*M1**2)",args.dsRKE[0],args.dsRKE[1]))
+      print("{0:20s} {1: .6e} {2: .6e}".format("(Po1-Po2)/(Po1-P1)",args.wloss[0],args.wloss[1]))
+      print("{0:20s} {1: .6e} {2: .6e}".format("Po2/Po1",args.PR[0],args.PR[1]))
+      print("{0:20s} {1: .6e} {2: .6e}".format("P2/P1",args.P2P1[0],args.P2P1[1]))
+      print("{0:20s} {1: .6e} {2: .6e}".format("(P2-P1)/(Po1-P1)",args.CP[0],args.CP[1]))
+      print("{0:20s} {1: .6e} {2: .6e}".format("To2/To1",args.TR[0],args.TR[1]))
+      print("{0:20s} {1: .6e} {2: .6e}".format("T2/T1",args.T2T1[0],args.T2T1[1]))
+      if( args.debug ):
+          print("\n\n",end='')
+          print("{0:20s} {1: >13s} {2: >13s}".format('Debug','Root 1','Root 2'))
+          print("-"*48)
+          if( args.isentropic):
+              print("{0:20s} {1: 13d} {2: 13d}".format("iter",args.iter[0],args.iter[1]))
+              print("{0:20s} {1: 13d} {2: 13d}".format("nfev",args.nfev[0],args.nfev[1]))
+              print("{0:20s} {1: .6e} {2: .6e}".format("M2 (apprx)",args.initialM2[0],args.initialM2[1]))
+              print("{0:20s} {1: .6e} {2: .6e}".format("M2 (k->1 )",args.infinatomicM2[0],args.infinatomicM2[1]))
+              print("{0:20s} {1: .6e} {2: .6e}".format("M2 (k~7/5)",args.diatomicM2[0],args.diatomicM2[1]))
+              print("{0:20s} {1: .6e} {2: .6e}".format("M2 (k=5/3)",args.monatomicM2[0],args.monatomicM2[1]))
+
+          print("{0:20s} {1: .6e} {2: .6e}".format("V2V1",args.V2V1[0],args.V2V1[1]))
+          print("{0:20s} {1: .6e} {2: .6e}".format("v2v1",args.v2v1[0],args.v2v1[1]))
+          print("{0:20s} {1: .6e} {2: .6e}".format("p2p1",args.p2p1[0],args.p2p1[1]))
+          print("{0:20s} {1: .6e} {2: .6e}".format("wpv",args.wpv[0],args.wpv[1]))
+          print("{0:20s} {1: .6e} {2: .6e}".format("ek",args.ek[0],args.ek[1]))
+          print("{0:20s} {1: .6e} {2: .6e}".format("Iq",args.Iq[0],args.Iq[1]))
+          print("{0:20s} {1: .6e} {2: .6e}".format("we",args.we[0],args.we[1]))
+          print("{0:20s} {1: .6e} {2: .6e}".format("wrev",args.wrev[0],args.wrev[1]))
+          print("{0:20s} {1: .6e} {2: .6e}".format("I",args.I[0],args.I[1]))
+          print("{0:20s} {1: .6e} {2: .6e}".format("Theta",args.Theta[0],args.Theta[1]))
+          print("{0:20s} {1: .6e} {2: .6e}".format("I+Theta",args.I[0]+args.Theta[0],args.I[1]+args.Theta[1]))
+          print("{0:20s} {1: .6e} {2: .6e}".format("dsR/(k/2*M2**2)",args.dsRKE2[0],args.dsRKE2[1]))
+          print("{0:20s} {1: .6e} {2: .6e}".format("(Po1-Po2)/q",args.zloss[0],args.zloss[1]))
+          print("{0:20s} {1: .6e} {2: .6e}".format("(P2-P1)/q",args.CPinc[0],args.CPinc[1]))
+          print("{0:20s} {1: .6e} {2: .6e}".format("P3/P1",args.P3P1[0],args.P3P1[1]))
+          print("{0:20s} {1: .6e} {2: .6e}".format("P3/P2",args.P3P1[0]/args.P2P1[0],args.P3P1[1]/args.P2P1[1]))
+          print("{0:20s} {1: .6e} {2: .6e}".format("P3/Po1",args.P3P1[0]/args.f1,args.P3P1[1]/args.f1))
+          print("{0:20s} {1: .6e} {2: .6e}".format("Lambda",args.Lambda[0],args.Lambda[1]))
+          print("{0:20s} {1: .6e} {2: .6e}".format("b",args.b[0],args.b[1]))
+          print("{0:20s} {1: .6e} {2: .6e}".format("c",args.c[0],args.c[1]))
+          print("{0:20s} {1: .6e} {2: .6e}".format("determinant",args.det[0],args.det[1]))
+
+      return()
+  </py-script>
+</head>
