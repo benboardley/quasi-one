@@ -162,3 +162,45 @@ I could also begin to develop the functionality with the first option throughout
       else:
           return(np.real(roots[~np.isnan(roots)]))
   </py-script>
+
+
+
+
+  usage: uniflow.py [-h] [--area-ratio AR] [--drag-area-ratio AD] [--drag-coefficient CD] [-friction-coefficient CF]
+                  [--friction-area-ratio AF] [--inlet-mach M1] [-xi XI] [-nu NU] [--heat-transfer-ratio QR] [--cp/cv K]
+                  [--TwTo1 TWR] [--isentropic] [--inlet-momentum-flux-correction-factor B1]
+                  [--outlet-momentum-flux-correction-factor B2] [--inlet-mass-flux-correction-factor A1]
+                  [--outlet-mass-flux-correction-factor A2] [--debug]
+
+Steady Quasi-1D Compressible Flow.Assumes Calorically Perfect Ideal Gas
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --area-ratio AR, -ar AR
+                        Exit Area / Inlet Area
+  --drag-area-ratio AD, -ad AD
+                        Drag Area / Inlet Area
+  --drag-coefficient CD, --drag-coef CD, -cd CD
+                        Drag Coefficient
+  -friction-coefficient CF, --friction-coef CF, -cf CF
+                        Friction Coefficient
+  --friction-area-ratio AF, -af AF
+                        Friction Surface Area / Inlet Area
+  --inlet-mach M1, -m1 M1
+                        Inlet Mach Number
+  -xi XI                Wall-pressure weighting for exit-static-to-inlet-static pressure ratio
+  -nu NU                Wall-pressure weighting for inlet-stagnation-to-inlet-static pressure ratio
+  --heat-transfer-ratio QR, -qr QR
+                        heat transfer / inlet specific total enthalpy (q/ho)
+  --cp/cv K, -k K       Ratio of Specific Heats
+  --TwTo1 TWR, -twr TWR
+                        Ratio of wall temperature to inlet stagnation temperature
+  --isentropic, -s      Force entropy change to zero
+  --inlet-momentum-flux-correction-factor B1, --beta1 B1, -b1 B1
+                        inlet momentum flux correction factor
+  --outlet-momentum-flux-correction-factor B2, --beta2 B2, -b2 B2
+                        inlet momentum flux correction factor
+  --inlet-mass-flux-correction-factor A1, --alpha1 A1, -a1 A1
+                        inlet momentum flux correction factor
+                        inlet momentum flux correction factor
+  --debug               debug mode

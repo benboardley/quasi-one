@@ -47,8 +47,8 @@ window.onload = function() {
   //-------------Filler While creating Calculation Code------------------------------------
 function calcSum(P , T , M1 , A1 , gamma , alpha1 , beta1 , w , Fx , m2 , A2 , Q , xi , nu , f , alpha2 , beta2 , N){
     var sum = P + T + M1 + A1 + gamma + alpha1 + beta1 + w + Fx + m2 + A2 + Q + xi + nu + f + alpha2 + beta2 + N;
-   // js_test = pyscript.interpreter.globals.get('testVars');
-   // js_test();
+    js_test = pyscript.interpreter.globals.get('main');
+    js_test();
     M2 = sum;
     PT2 = sum;
     TT2 = sum;
