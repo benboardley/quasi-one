@@ -278,7 +278,7 @@ function postProcess(args) {
       myChart.destroy();
     }
   
-    var myChart = new Chart(ctx, {
+    myChart = new Chart(ctx, {
         type: 'line',
         data: {
           labels: [1, 2, 3],
@@ -286,7 +286,7 @@ function postProcess(args) {
             {
               data: line2,
               borderColor: 'black',
-              backgroundColor: 'white',
+              backgroundColor: A1<A2?'white':'gray',
               fill: true,
               borderWidth: 1,
               pointRadius: 0,
@@ -389,7 +389,7 @@ function exampleFlow(){
         document.getElementById("w").value = 1;
         document.getElementById("Fx").value = 1;
         document.getElementById("m2").value = 1;
-        document.getElementById("A2").value = 1;
+        document.getElementById("A2").value = 3;
         document.getElementById("Q").value = 1;
         document.getElementById("xi").value = 1;
         document.getElementById("nu").value = 1;
@@ -572,7 +572,8 @@ function exampleFlow(){
         document.getElementById("alpha2").value = 9;
         document.getElementById("beta2").value = 9;
         document.getElementById("subelements").value = 9;
-    }  
+    }
+    imageGUI();
 }
 
 
