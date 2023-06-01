@@ -1,7 +1,7 @@
 Plan for Web Calculator
 
 Week 1:
-Day 1 - Create Basic Input -> Output Format
+Day 1 - Create Basic Input -> Output Format --
 Day 2 - Add in Iterations/ Subelements, add equations
 Day 3 - Add Middle Image GUI
 Day 4 - Add Pre-set Problems
@@ -35,3 +35,130 @@ hosted (I am not sure how we would get access to where the code and such is stor
 
 Personally, as of right now I think github pages would be the best, If you would like me to look into pywebio I am also able to do that as I know python might be easier for the two of you to interpret.
 I could also begin to develop the functionality with the first option throughout this week and we could reevaluate during out meeting, we could aslo figure out how to host it on the internet after the website is developed.
+
+    try {
+    var P = parseFloat(document.getElementById("P").value);
+    var T = parseFloat(document.getElementById("T").value);
+    var M1 = parseFloat(document.getElementById("M1").value);
+    var A1 = parseFloat(document.getElementById("A1").value);
+    var gamma = parseFloat(document.getElementById("gamma").value);
+    var alpha1 = parseFloat(document.getElementById("alpha1").value);
+    var beta1 = parseFloat(document.getElementById("beta1").value);
+    var w = parseFloat(document.getElementById("w").value);
+    var Fx = parseFloat(document.getElementById("Fx").value);
+    var m2 = parseFloat(document.getElementById("m2").value);
+    var A2 = parseFloat(document.getElementById("A2").value);
+    var Q = parseFloat(document.getElementById("Q").value);
+    var psi = parseFloat(document.getElementById("psi").value);
+    var nu = parseFloat(document.getElementById("nu").value);
+    var f = parseFloat(document.getElementById("f").value);
+    var alpha2 = parseFloat(document.getElementById("alpha2").value);
+    var beta2 = parseFloat(document.getElementById("beta2").value);
+    var N = parseFloat(document.getElementById("subelements").value);
+
+    var sum = P + T + M1 + A1 + gamma + alpha1 + beta1 + w + Fx + m2 + A2 + Q + psi + nu + f + alpha2 + beta2 + N;
+    var M2 = sum;
+    var PT2 = sum;
+    var TT2 = sum;
+    var P2 = sum;
+    var T2 = sum;
+    var deltaS = sum;
+
+    document.getElementById("M2").value = M2;
+    document.getElementById("PT2").value = PT2;
+    document.getElementById("TT2").value = TT2;
+    document.getElementById("P2").value = P2;
+    document.getElementById("T2").value = T2;
+    document.getElementById("deltaS").value = deltaS;}
+
+    catch(error){
+        console.log(error);
+        debugger;
+    }
+
+-----------------------------------------------------------------------------------------------------------------
+  <py-config>
+    packages = ["numpy"] 
+  </py-config>
+  <py-script>
+    #"scipy", "scipy.optimize", "scipy.special", "fractions", "warnings", "argparse", 
+    import argparse
+    import sys
+    import numpy as np
+    import scipy.optimize as scopt
+    import scipy.special as spec
+    import fractions as frac
+    import warnings
+    TR = 0
+    G = 0
+    f1 = 0
+    Lambda = 0
+    b = 0
+    c = 0
+    det = 0
+    def testVars():
+      from js import P, T , M1 , A1 , gamma , alpha1 , beta1 , w , Fx , m2 , A2 , Q , xi , nu , f , alpha2 , beta2 , N, k, qr, Af, AR, f1, TR, cf, cd, Ad
+
+      TR = np.float64(bool(k-1))*(1 + qr) + np.float64(not bool(k-1))*1
+
+      G = (k-1)/2
+
+      f1 = 1 + G * M1*M1
+
+      try:
+          Lambda = np.complex128(\
+                      ((1 + beta1*k*(1-cf/4*Af - cd/2*Ad)*M1**2 + (1-xi+nu*(f1**(k/(k-1))-1))*(AR-1) ) \
+                      /(alpha1/alpha2*M1*np.sqrt(f1*TR))) \
+                      )
+          Lambda *= Lambda
+      except:
+          Lambda = np.complex128(\
+                      ((1 + beta1*k*(1-cf/4*Af - cd/2*Ad)*M1**2 + (1-xi+nu*(np.exp(-M1**2)-1))*(AR-1) ) \
+                      /(alpha1/alpha2*M1*np.sqrt(f1*TR))) \
+                      )
+          Lambda *= Lambda
+
+
+      b = (Lambda - 2*k*beta2*(1+xi*(1/AR-1))*(1+cf/4*Af/AR)) \
+              /(Lambda * G  -(k*beta2*(1+cf/4*Af/AR))**2)
+
+      c = -(1+xi*(1/AR-1))**2 \
+              /(Lambda * G  -(k*beta2*(1+cf/4*Af/AR))**2)
+
+      det = (b/2)*(b/2)-c
+      print(det)
+      solveBiquadratic()
+    def solveBiquadratic():
+      '''
+      Solution to mass, momentum, and energy balance equations.
+      Mass balance is simple inlet nad outlet balance
+      Momentum balance as 1 friction force and 1 drag force
+      Energy balance has 1 heat addition term
+      Gravity and other sources of Potential Energy have been ignored.
+      Uses calorically perfect ideal gas assumption.
+      '''
+
+      roots = np.array([-b/2+np.sqrt(det),-b/2-np.sqrt(det)],dtype=np.complex128)
+
+      # reject non-physical roots and replace with nans
+      global M2
+      M2 = np.sqrt(rejectNonphysicalRoots(roots,keepNans=True))
+      print(M2)
+    def rejectNonphysicalRoots(roots,keepNans=False):
+
+      # set any roots with negative real part to nan
+      roots[np.real(roots)<0] = np.nan
+
+      # set any roots with non-zero imaginary part to nan 
+      roots[~np.isclose(np.imag(roots),0,atol=1e-6)] = np.nan
+
+
+      # sort values from lowest to highest
+      roots.sort()
+
+      # remove any nans from roots, cast as real, and return
+      if( keepNans):
+          return(np.real(roots))
+      else:
+          return(np.real(roots[~np.isnan(roots)]))
+  </py-script>

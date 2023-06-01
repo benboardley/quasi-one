@@ -17,6 +17,8 @@ body {
   .credits{
     color: gray;
     font-style: italic;
+    font-size: small;
+    margin-top: 0px;
   }
 
 .content{
