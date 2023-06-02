@@ -36,6 +36,14 @@ var det = 0;
 var Lambda = 0;
 var TwTo1 = 1;
 var isent = false;
+var M2;
+var PR;
+var TR;
+var P2P1;
+var T2T1;
+var dsR;
+
+
 window.onload = function() {
     // Call the function to create the chart
     imageGUI();
@@ -44,19 +52,78 @@ window.onload = function() {
   };
 
   // -----------------------------CALCULATIONS USING PYSCRIPT FOR NOW IGNORE THIS-------------------------------------------------
+/*--------------Available Values--------------------
+            self.AR = AR
+            self.Ad = Ad
+            self.cd = cd
+            self.cf = cf
+            self.Af = Af
+            self.M1 = M1
+            self.xi = xi
+            self.nu = nu
+            self.qr = qr
+            self.k = k
+            self.twr = twr
+            self.isentropic = isentropic
+            self.b1 = b1
+            self.b2 = b2
+            self.a1 = a1
+            self.a2 = a2
+            self.debug = debug
 
+            # Add result properties here allows for easy access in the javascript
+            self.M2 = [0.0, 0.0]
+            self.dsR = [0.0, 0.0]
+            self.dsRKE = [0.0, 0.0]
+            self.wloss = [0.0, 0.0]
+            self.PR = [0.0, 0.0]
+            self.P2P1 = [0.0, 0.0]
+            self.CP = [0.0, 0.0]
+            self.TR = [0.0, 0.0]
+            self.T2T1 = [0.0, 0.0]
+            self.iter = [0, 0]
+            self.nfev = [0, 0]
+            self.initialM2 = [0.0, 0.0]
+            self.infinatomicM2 = [0.0, 0.0]
+            self.diatomicM2 = [0.0, 0.0]
+            self.monatomicM2 = [0.0, 0.0]
+            self.V2V1 = [0.0, 0.0]
+            self.v2v1 = [0.0, 0.0]
+            self.p2p1 = [0.0, 0.0]
+            self.wpv = [0.0, 0.0]
+            self.ek = [0.0, 0.0]
+            self.Iq = [0.0, 0.0]
+            self.we = [0.0, 0.0]
+            self.wrev = [0.0, 0.0]
+            self.I = [0.0, 0.0]
+            self.Theta = [0.0, 0.0]
+            self.dsRKE2 = [0.0, 0.0]
+            self.zloss = [0.0, 0.0]
+            self.CPinc = [0.0, 0.0]
+            self.P3P1 = [0.0, 0.0]
+            self.f1 = [0.0, 0.0]
+            self.Lambda = [0.0, 0.0]
+            self.b = [0.0, 0.0]
+            self.c = [0.0, 0.0]
+            self.det = [0.0, 0.0]
+*/
   //-------------Filler While creating Calculation Code------------------------------------
 function calcSum(P , T , M1 , A1 , gamma , alpha1 , beta1 , w , Fx , m2 , A2 , Q , xi , nu , f , alpha2 , beta2 , N){
-    var sum = P + T + M1 + A1 + gamma + alpha1 + beta1 + w + Fx + m2 + A2 + Q + xi + nu + f + alpha2 + beta2 + N;
+  //  var sum = P + T + M1 + A1 + gamma + alpha1 + beta1 + w + Fx + m2 + A2 + Q + xi + nu + f + alpha2 + beta2 + N;
     js_test = pyscript.interpreter.globals.get('main');
     js_test();
-    M2 = sum;
-    PT2 = sum;
-    TT2 = sum;
-    P2 = sum;
-    T2 = sum;
-    deltaS = sum;
-    return sum;
+    js_args = pyscript.interpreter.globals.get('args')
+    console.log("STUFF")
+    let jsArray = js_args.M2.toJs();
+    console.log(jsArray[0]);
+    console.log(js_args.M2)
+    M2 = js_args.M2.toJs();
+    PR = js_args.PR.toJs();
+    TR = js_args.TR.toJs();
+    P2P1 = js_args.P2P1.toJs();
+    T2T1 = js_args.T2T1.toJs();
+    dsR = js_args.dsR.toJs();
+  //  return sum;
   }
 
 //Variables missing: Af, AD, CD, Cf, TWR, qr
@@ -204,7 +271,7 @@ function postProcess(args) {
       cf = parseFloat(document.getElementById("cf").value) || 0;
       twr = parseFloat(document.getElementById("twr").value) || 0;
       qr = parseFloat(document.getElementById("qr").value) || 0;
-      Af = parseFloat(document.getElementById("Af").value) || 0
+      Af = parseFloat(document.getElementById("Af").value) || 0;
       Ad = parseFloat(document.getElementById("Ad").value) || 0;
 
       M1 = parseFloat(document.getElementById("M1").value) || 0;
@@ -226,33 +293,28 @@ function postProcess(args) {
       isent = document.getElementById("isentropic").value;
       console.log(isentropic)
       calcSum(P , T , M1 , A1 , gamma , alpha1 , beta1 , w , Fx , m2 , A2 , Q , xi , nu , f , alpha2 , beta2 , N);
-      //var M2 = sum;
-      //var PT2 = sum;
-      //var TT2 = sum;
-      //var P2 = sum;
-      //var T2 = sum;
-      //var deltaS = sum;
 
       for(var i = 1; i < N; i++){
         var sum = calcSum(P2 , T2 , M2 , A1 , gamma , alpha1 , beta1 , w , Fx , m2 , A2 , Q , xi , nu , f , alpha2 , beta2 , N);
-      //  var M2 = sum;
-      //  var PT2 = sum;
-      //  var TT2 = sum;
-      //  var P2 = sum;
-      //  var T2 = sum;
-      //  var deltaS = sum;
         console.log(i);
       }
       //console.log(pyscript.interpreter.globals.get('M2'));
-      document.getElementById("M2").value = M2;
-      document.getElementById("PT2").value = PT2;
-      document.getElementById("TT2").value = TT2;
-      document.getElementById("P2").value = P2;
-      document.getElementById("T2").value = T2;
-      document.getElementById("deltaS").value = deltaS;
+      document.getElementById("M2").value = M2[0];
+      document.getElementById("M2Second").value = M2[1];
+      document.getElementById("P2P1").value = P2P1[0];
+      document.getElementById("P2P1Second").value = P2P1[1];
+      document.getElementById("T2T1").value = T2T1[0];
+      document.getElementById("T2T1Second").value = T2T1[1];
+      document.getElementById("PR").value = PR[0];
+      document.getElementById("PRSecond").value = PR[1];
+      document.getElementById("TR").value = TR[0];
+      document.getElementById("TRSecond").value = TR[1];
+      document.getElementById("deltaSR").value = dsR[0];
+      document.getElementById("deltaSRSecond").value = dsR[1];
     } catch (error) {
       console.log(error);
     }
+    outputGraph();
   }
 
   //--------------------------------------Inlet->Outlet Graphic ----------------------------------
@@ -619,38 +681,49 @@ function exampleFlow(){
     imageGUI();
 }
 
-
+var myChart2;
 //-----------------------------Graph for a input vs output---------------------------------------------
 function outputGraph(){
-var ctx = document.getElementById('outputChart').getContext('2d');
+    var ctx = document.getElementById('outputChart').getContext('2d');
 
   // Get the values of M1 and M2
-    var P = parseFloat(document.getElementById("P").value) || 1;
-    var T = parseFloat(document.getElementById("T").value) || 1;
-    var M1 = parseFloat(document.getElementById("M1").value) || 0;
-    var A1 = parseFloat(document.getElementById("A1").value) || 0;
-    var gamma = parseFloat(document.getElementById("gamma").value) || 0;
-    var alpha1 = parseFloat(document.getElementById("alpha1").value) || 0;
-    var beta1 = parseFloat(document.getElementById("beta1").value) || 0;
-    var w = parseFloat(document.getElementById("w").value) || 0;
-    var Fx = parseFloat(document.getElementById("Fx").value) || 0;
-    var m2 = parseFloat(document.getElementById("m2").value) || 0;
-    var A2 = parseFloat(document.getElementById("A2").value) || 0;
-    var Q = parseFloat(document.getElementById("Q").value) || 0;
-    var xi = parseFloat(document.getElementById("xi").value) || 0;
-    var nu = parseFloat(document.getElementById("nu").value) || 0;
-    var f = parseFloat(document.getElementById("f").value) || 0;
-    var alpha2 = parseFloat(document.getElementById("alpha2").value) || 0;
-    var beta2 = parseFloat(document.getElementById("beta2").value) || 0;
-    var N = parseFloat(document.getElementById("subelements").value) || 0;
+    cd = parseFloat(document.getElementById("cd").value) || 0;
+    cf = parseFloat(document.getElementById("cf").value) || 0;
+    twr = parseFloat(document.getElementById("twr").value) || 0;
+    qr = parseFloat(document.getElementById("qr").value) || 0;
+    Af = parseFloat(document.getElementById("Af").value) || 0
+    Ad = parseFloat(document.getElementById("Ad").value) || 0;
+    //var P = parseFloat(document.getElementById("P").value) || 1;
+    //var T = parseFloat(document.getElementById("T").value) || 1;
+    M1 = parseFloat(document.getElementById("M1").value) || 0;
+    A1 = parseFloat(document.getElementById("A1").value) || 0;
+    gamma = parseFloat(document.getElementById("gamma").value) || 0;
+    alpha1 = parseFloat(document.getElementById("alpha1").value) || 0;
+    beta1 = parseFloat(document.getElementById("beta1").value) || 0;
+    w = parseFloat(document.getElementById("w").value) || 0;
+    //var Fx = parseFloat(document.getElementById("Fx").value) || 0;
+    m2 = parseFloat(document.getElementById("m2").value) || 0;
+    A2 = parseFloat(document.getElementById("A2").value) || 0;
+    //var Q = parseFloat(document.getElementById("Q").value) || 0;
+    xi = parseFloat(document.getElementById("xi").value) || 0;
+    nu = parseFloat(document.getElementById("nu").value) || 0;
+    //var f = parseFloat(document.getElementById("f").value) || 0;
+    alpha2 = parseFloat(document.getElementById("alpha2").value) || 0;
+    beta2 = parseFloat(document.getElementById("beta2").value) || 0;
+    N = parseFloat(document.getElementById("subelements").value) || 0;
     X = []
     Y = []
-    for(var i = 0; i < 100; i++){
-        var sum = calcSum(P , T , M1 , A1 , gamma , alpha1 , beta1 , w , Fx , m2 , A2 , Q , xi , nu , f , alpha2 , beta2 , N);
-        X.push(i);
-        Y.push(sum)
+    if (typeof myChart2 !== 'undefined') {
+      myChart2.destroy();
     }
-
+    for(var i = 0; i < 100; i++){
+        //var sum = calcSum(P , T , M1 , A1 , gamma , alpha1 , beta1 , w , Fx , m2 , A2 , Q , xi , nu , f , alpha2 , beta2 , N);
+        X.push(i);
+        Y.push(i)
+    }
+    console.log("OUTPUT CHART")
+    console.log(X)
+    console.log(Y)
   // Generate the scatter plot data
   var dataPoints = [{
     x: X,
@@ -658,7 +731,7 @@ var ctx = document.getElementById('outputChart').getContext('2d');
   }];
 
   // Create the chart
-  var myChart = new Chart(ctx, {
+  myChart2 = new Chart(ctx, {
     type: 'scatter',
     data: {
       datasets: [{

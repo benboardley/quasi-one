@@ -42,18 +42,14 @@
             self.a1 = a1
             self.a2 = a2
             self.debug = debug
-    TR = 0
-    G = 0
-    f1 = 0
-    Lambda = 0
-    b = 0
-    c = 0
-    det = 0
+
+
+    args = None
     def main():
+      global args
       from js import cd, cf, twr, qr, Af, Ad, M1 , A1 , gamma , alpha1 , beta1 , Fx , m2 , A2 , xi , nu , alpha2 , beta2 , N, isent
       ver = str('v1.7')
       date = str('10/01/22')
-      print(isentropic == 'True')
       args = Args(AR=A2/A1, Ad = Ad, Af = Af, qr = qr, twr= twr, cd = cd, cf = cf, M1=M1, xi = xi, nu = nu, k = gamma, b1 = beta1, b2 = beta2, a1 = alpha1, a2 = alpha2 , isentropic=(isent == 'True'))
 
       if( args.isentropic ):
@@ -65,8 +61,8 @@
           args = solveBiquadratic(args)
 
       args = postProcess(args)
-
-      printOutput(args) #-> updateResults
+    #      print(args.M2)
+    #      printOutput(args) #-> updateResults
       
       return()
     def coefsBiquadratic(args):
@@ -780,7 +776,7 @@
     <div class="content">
     <div class="input-container">
         <form class="inputFields">
-            <div class="InputIn">
+            <div class="Inlet">
                 <h4 class="InputHeaders">Inlet Conditions</h4>
               <!--  <div class="label-input-row">
                 <label for="P">P=</label>
@@ -839,11 +835,25 @@
                 <option>True</option>
                 </select>
                 </div>
+                <div class="exampleFlows">
+                <h4>Example Flows</h4>
+                <select class="selectFlow" onchange="exampleFlow()">
+                <option>Isentropic flow with area change</option>
+                <option>Flow across a normal shock</option>
+                <option>Fanno flow</option>
+                <option>Rayleigh flow</option>
+                <option>Sudden expansion</option>
+                <option>Sudden Contraction</option>
+                <option>Two-stream mixing layer</option>
+                <option>Simultaneous friction and heat transfer</option>
+                <option>Simultaneous area change and friction</option>
+                </select>
+        </div>
             </div>
             <div class="Gui">
               <canvas id="myChart"></canvas>
           </div>
-            <div class="InputOut">
+            <div class="Outlet">
                 <h4 class="InputHeaders">Outlet Conditions</h4>
                 <div class="label-input-row">
                 <label for="w">w=</label>
@@ -916,53 +926,47 @@
                 </div>
             </div>
         </form>
-        <div class="exampleFlows">
-            <h4>Example Flows</h4>
-            <select class="selectFlow" onchange="exampleFlow()">
-              <option>Isentropic flow with area change</option>
-              <option>Flow across a normal shock</option>
-              <option>Fanno flow</option>
-              <option>Rayleigh flow</option>
-              <option>Sudden expansion</option>
-              <option>Sudden Contraction</option>
-              <option>Two-stream mixing layer</option>
-              <option>Simultaneous friction and heat transfer</option>
-              <option>Simultaneous area change and friction</option>
-            </select>
-        </div>
     </div>
     <div class="output-container">
         <button id="calculate" onclick="calculateFlow(event)">Calculate</button>
         <div class="outputLabels">
-            <h4>Results</h4>
+            <div class="label-input-row"> <!-- This is the new row -->
+                <h4>Roots</h4>
+            </div>
             <div class="label-input-row">
-              <label for="M2">M<sub>2</sub>=</label>
+              <label for="M2">M<sub>2</sub>=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
               <input type="text" id="M2">
+              <input type="text" id="M2Second">
             </div>
 
             <div class="label-input-row">
-              <label for="PT2">P<sub>T<sub>2</sub></sub>=</label>
-              <input type="text" id="PT2" name="Label">
+              <label for="P2P1">P<sub>2</sub>/P<sub>1</sub>=&nbsp;&nbsp;&nbsp;&nbsp;</label>
+              <input type="text" id="P2P1">
+              <input type="text" id="P2P1Second">
             </div>
 
             <div class="label-input-row">
-              <label for="P2">P<sub>2</sub>=</label>
-              <input type="text" id="P2">
+              <label for="T2T1">T<sub>2</sub>/T<sub>1</sub>=&nbsp;&nbsp;&nbsp;&nbsp;</label>
+              <input type="text" id="T2T1">
+              <input type="text" id="T2T1Second">
             </div>
 
             <div class="label-input-row">
-              <label for="TT2">T<sub>T<sub>2</sub></sub>=</label>
-              <input type="text" id="TT2">
+              <label for="TR">T<sub>o2</sub>/T<sub>o1</sub>=</label>
+              <input type="text" id="TR">
+              <input type="text" id="TRSecond">
             </div>
 
             <div class="label-input-row">
-              <label for="T2">T<sub>2</sub>=</label>
-              <input type="text" id="T2">
+              <label for="PR">P<sub>o2</sub>/P<sub>o1</sub>=</label>
+              <input type="text" id="PR">
+              <input type="text" id="PRSecond">
             </div>
 
             <div class="label-input-row">
-              <label for="deltaS">&Delta;s=</label>
-              <input type="text" id="deltaS">
+              <label for="deltaSR">&Delta;s/R=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+              <input type="text" id="deltaSR">
+              <input type="text" id="deltaSRSecond">
             </div>
         </div>
         <canvas id="outputChart"></canvas>
