@@ -279,9 +279,9 @@ function postProcess(args) {
       gamma = parseFloat(document.getElementById("gamma").value) || 0;
       alpha1 = parseFloat(document.getElementById("alpha1").value) || 0;
       beta1 = parseFloat(document.getElementById("beta1").value) || 0;
-      w = parseFloat(document.getElementById("w").value) || 0;
-      Fx = parseFloat(document.getElementById("Fx").value) || 0;
-      m2 = parseFloat(document.getElementById("m2").value) || 0;
+      //w = parseFloat(document.getElementById("w").value) || 0;
+      //Fx = parseFloat(document.getElementById("Fx").value) || 0;
+      //m2 = parseFloat(document.getElementById("m2").value) || 0;
       A2 = parseFloat(document.getElementById("A2").value) || 0;
      // Q = parseFloat(document.getElementById("Q").value) || 0;
       xi = parseFloat(document.getElementById("xi").value) || 0;
@@ -466,7 +466,7 @@ function exampleFlow(){
         document.getElementById("alpha1").value = 1;
         document.getElementById("beta1").value = 1;
         //document.getElementById("w").value = 1;
-        document.getElementById("Fx").value = 1;
+        //document.getElementById("Fx").value = 1;
         //document.getElementById("m2").value = 1;
         document.getElementById("A2").value = 3;
         //document.getElementById("Q").value = 1;
@@ -488,7 +488,7 @@ function exampleFlow(){
       document.getElementById("alpha1").value = 2;
       document.getElementById("beta1").value = 2;
       //document.getElementById("w").value = 2;
-      document.getElementById("Fx").value = 2;
+      //document.getElementById("Fx").value = 2;
       //document.getElementById("m2").value = 2;
       document.getElementById("A2").value = 2;
       //document.getElementById("Q").value = 2;
@@ -510,7 +510,7 @@ function exampleFlow(){
       document.getElementById("alpha1").value = 3;
       document.getElementById("beta1").value = 3;
       //document.getElementById("w").value = 3;
-      document.getElementById("Fx").value = 3;
+      //document.getElementById("Fx").value = 3;
       //document.getElementById("m2").value = 3;
       document.getElementById("A2").value = 3;
       //document.getElementById("Q").value = 3;
@@ -541,7 +541,7 @@ function exampleFlow(){
       document.getElementById("alpha1").value = 4;
       document.getElementById("beta1").value = 4;
       //document.getElementById("w").value = 4;
-      document.getElementById("Fx").value = 4;
+      //document.getElementById("Fx").value = 4;
       //document.getElementById("m2").value = 4;
       document.getElementById("A2").value = 4;
       //document.getElementById("Q").value = 4;
@@ -572,7 +572,7 @@ function exampleFlow(){
       document.getElementById("alpha1").value = 5;
       document.getElementById("beta1").value = 5;
       //document.getElementById("w").value = 5;
-      document.getElementById("Fx").value = 5;
+      //document.getElementById("Fx").value = 5;
       //document.getElementById("m2").value = 5;
       document.getElementById("A2").value = 5;
       //document.getElementById("Q").value = 5;
@@ -602,7 +602,7 @@ function exampleFlow(){
       document.getElementById("alpha1").value = 6;
       document.getElementById("beta1").value = 6;
      // document.getElementById("w").value = 6;
-      document.getElementById("Fx").value = 6;
+      //document.getElementById("Fx").value = 6;
     //  document.getElementById("m2").value = 6;
       document.getElementById("A2").value = 6;
     //  document.getElementById("Q").value = 6;
@@ -624,7 +624,7 @@ function exampleFlow(){
       document.getElementById("alpha1").value = 7;
       document.getElementById("beta1").value = 7;
       //document.getElementById("w").value = 7;
-      document.getElementById("Fx").value = 7;
+      //document.getElementById("Fx").value = 7;
       //document.getElementById("m2").value = 7;
       document.getElementById("A2").value = 7;
       //document.getElementById("Q").value = 7;
@@ -646,7 +646,7 @@ function exampleFlow(){
       document.getElementById("alpha1").value = 8;
       document.getElementById("beta1").value = 8;
       //document.getElementById("w").value = 8;
-      document.getElementById("Fx").value = 8;
+      //document.getElementById("Fx").value = 8;
       //document.getElementById("m2").value = 8;
       document.getElementById("A2").value = 8;
       //document.getElementById("Q").value = 8;
@@ -667,7 +667,7 @@ function exampleFlow(){
         document.getElementById("alpha1").value = 9;
         document.getElementById("beta1").value = 9;
         //document.getElementById("w").value = 9;
-        document.getElementById("Fx").value = 9;
+        //document.getElementById("Fx").value = 9;
         //document.getElementById("m2").value = 9;
         document.getElementById("A2").value = 9;
         //document.getElementById("Q").value = 9;
@@ -700,9 +700,9 @@ function outputGraph(){
     gamma = parseFloat(document.getElementById("gamma").value) || 0;
     alpha1 = parseFloat(document.getElementById("alpha1").value) || 0;
     beta1 = parseFloat(document.getElementById("beta1").value) || 0;
-    w = parseFloat(document.getElementById("w").value) || 0;
+    //w = parseFloat(document.getElementById("w").value) || 0;
     //var Fx = parseFloat(document.getElementById("Fx").value) || 0;
-    m2 = parseFloat(document.getElementById("m2").value) || 0;
+    //m2 = parseFloat(document.getElementById("m2").value) || 0;
     A2 = parseFloat(document.getElementById("A2").value) || 0;
     //var Q = parseFloat(document.getElementById("Q").value) || 0;
     xi = parseFloat(document.getElementById("xi").value) || 0;
