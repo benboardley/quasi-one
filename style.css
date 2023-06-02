@@ -134,6 +134,7 @@ body {
     .input-container {
       display: flex;
     }
+    .input-container,
     .output-container{
       width: 100%;
     }
