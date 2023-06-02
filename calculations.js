@@ -716,7 +716,8 @@ function outputGraph(){
     }
     var root1 = [];
     var root2 = [];
-    for(M1 = 1; M1 < 10; M1+=0.01){
+    var delta = 0.1;
+    for(M1 = delta; M1 < 10; M1+=delta){
         js_test();
         js_args = pyscript.interpreter.globals.get('args')
         M2 = js_args.M2.toJs();
