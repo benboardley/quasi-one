@@ -43,12 +43,11 @@ var P2P1;
 var T2T1;
 var dsR;
 
-
 window.onload = function() {
     // Call the function to create the chart
     imageGUI();
     exampleFlow();
-    outputGraph();
+   // outputGraph();
   };
 
   // -----------------------------CALCULATIONS USING PYSCRIPT FOR NOW IGNORE THIS-------------------------------------------------
@@ -711,39 +710,52 @@ function outputGraph(){
     alpha2 = parseFloat(document.getElementById("alpha2").value) || 0;
     beta2 = parseFloat(document.getElementById("beta2").value) || 0;
     N = parseFloat(document.getElementById("subelements").value) || 0;
-    X = []
-    Y = []
+    js_test = pyscript.interpreter.globals.get('main');
     if (typeof myChart2 !== 'undefined') {
       myChart2.destroy();
     }
-    for(var i = 0; i < 100; i++){
-        //var sum = calcSum(P , T , M1 , A1 , gamma , alpha1 , beta1 , w , Fx , m2 , A2 , Q , xi , nu , f , alpha2 , beta2 , N);
-        X.push(i);
-        Y.push(i)
+    var root1 = [];
+    var root2 = [];
+    for(M1 = 1; M1 < 10; M1+=0.01){
+        js_test();
+        js_args = pyscript.interpreter.globals.get('args')
+        M2 = js_args.M2.toJs();
+        var dataPoint1 = {
+            x: M1,
+            y: M2[0]
+        };
+        var dataPoint2 = {
+          x: M1,
+          y: M2[1]
+      };
+        root1.push(dataPoint1);
+        root2.push(dataPoint2)
     }
-    console.log("OUTPUT CHART")
-    console.log(X)
-    console.log(Y)
-  // Generate the scatter plot data
-  var dataPoints = [{
-    x: X,
-    y: Y
-  }];
 
   // Create the chart
   myChart2 = new Chart(ctx, {
-    type: 'scatter',
+    type: 'line',
     data: {
       datasets: [{
-        label: 'M1 vs M2',
-        data: dataPoints,
+        label: 'root1',
+        data: root1,
         backgroundColor: 'rgba(75, 192, 192, 0.2)',
         borderColor: 'rgba(75, 192, 192, 1)',
         borderWidth: 1,
-        pointRadius: 6,
+        pointRadius: 0,
         pointHoverRadius: 8
-      }]
+      },
+      {
+        label: 'root2',
+        data: root2,
+        backgroundColor: 'red',
+        borderColor: 'red',
+        borderWidth: 1,
+        pointRadius: 0,
+        pointHoverRadius: 8
+      }],
     },
+    
     options: {
       responsive: true,
       scales: {
@@ -765,9 +777,6 @@ function outputGraph(){
         }
       },
       plugins: {
-        legend: {
-          display: false
-        }
       }
     }
   });
