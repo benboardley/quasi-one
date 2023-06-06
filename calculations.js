@@ -42,6 +42,31 @@ var TR;
 var P2P1;
 var T2T1;
 var dsR;
+var dsRKE;
+var wloss;
+var M2M1;
+var cp;
+
+var data = {
+  cd: null,
+  cf: null,
+  twr: null,
+  qr: null,
+  Af: null,
+  Ad: null,
+  M1: null,
+  A1: null,
+  gamma: null,
+  alpha1: null,
+  beta1: null,
+  A2: null,
+  xi: null,
+  nu: null,
+  alpha2: null,
+  beta2: null,
+  N: null,
+  isent: null
+};
 
 window.onload = function() {
     // Call the function to create the chart
@@ -107,7 +132,7 @@ window.onload = function() {
             self.det = [0.0, 0.0]
 */
   //-------------Filler While creating Calculation Code------------------------------------
-function calcSum(P , T , M1 , A1 , gamma , alpha1 , beta1 , w , Fx , m2 , A2 , Q , xi , nu , f , alpha2 , beta2 , N){
+function calcSum(){
   //  var sum = P + T + M1 + A1 + gamma + alpha1 + beta1 + w + Fx + m2 + A2 + Q + xi + nu + f + alpha2 + beta2 + N;
     js_test = pyscript.interpreter.globals.get('main');
     js_test();
@@ -122,6 +147,10 @@ function calcSum(P , T , M1 , A1 , gamma , alpha1 , beta1 , w , Fx , m2 , A2 , Q
     P2P1 = js_args.P2P1.toJs();
     T2T1 = js_args.T2T1.toJs();
     dsR = js_args.dsR.toJs();
+    dsRKE = js_args.dsRKE.toJs();
+    wloss = js_args.wloss.toJs();
+    M2M1 = [M2[0]/data.M1, M2[1]/data.M1]
+    cp = js_args.CP.toJs();
   //  return sum;
   }
 
@@ -240,10 +269,31 @@ function postProcess(args) {
 
 
   //--------------------------WORKFLOW-------------------------------------------------------
+  function assignValues() {
+    data.cd = parseFloat(document.getElementById("cd").value) || 0;
+    data.cf = parseFloat(document.getElementById("cf").value) || 0;
+    data.twr = parseFloat(document.getElementById("twr").value) || 0;
+    data.qr = parseFloat(document.getElementById("qr").value) || 0;
+    data.Af = parseFloat(document.getElementById("Af").value) || 0;
+    data.Ad = parseFloat(document.getElementById("Ad").value) || 0;
+    data.M1 = parseFloat(document.getElementById("M1").value) || 0;
+    data.A1 = parseFloat(document.getElementById("A1").value) || 0;
+    data.gamma = parseFloat(document.getElementById("gamma").value) || 0;
+    data.alpha1 = parseFloat(document.getElementById("alpha1").value) || 0;
+    data.beta1 = parseFloat(document.getElementById("beta1").value) || 0;
+    data.A2 = parseFloat(document.getElementById("A2").value) || 0;
+    data.xi = parseFloat(document.getElementById("xi").value) || 0;
+    data.nu = parseFloat(document.getElementById("nu").value) || 0;
+    data.alpha2 = parseFloat(document.getElementById("alpha2").value) || 0;
+    data.beta2 = parseFloat(document.getElementById("beta2").value) || 0;
+    data.N = parseFloat(document.getElementById("subelements").value) || 0;
+    data.isent = document.getElementById("isentropic").value;
+}
 
   function calculateFlow(event) {
     try {
         event.preventDefault();
+        assignValues();
       //var P = parseFloat(document.getElementById("P").value) || 0;
       //var T = parseFloat(document.getElementById("T").value) || 0;
       //var M1 = parseFloat(document.getElementById("M1").value) || 0;
@@ -266,35 +316,10 @@ function postProcess(args) {
 
      // P = parseFloat(document.getElementById("P").value) || 0;
      // T = parseFloat(document.getElementById("T").value) || 0;
-      cd = parseFloat(document.getElementById("cd").value) || 0;
-      cf = parseFloat(document.getElementById("cf").value) || 0;
-      twr = parseFloat(document.getElementById("twr").value) || 0;
-      qr = parseFloat(document.getElementById("qr").value) || 0;
-      Af = parseFloat(document.getElementById("Af").value) || 0;
-      Ad = parseFloat(document.getElementById("Ad").value) || 0;
-
-      M1 = parseFloat(document.getElementById("M1").value) || 0;
-      A1 = parseFloat(document.getElementById("A1").value) || 0;
-      gamma = parseFloat(document.getElementById("gamma").value) || 0;
-      alpha1 = parseFloat(document.getElementById("alpha1").value) || 0;
-      beta1 = parseFloat(document.getElementById("beta1").value) || 0;
-      //w = parseFloat(document.getElementById("w").value) || 0;
-      //Fx = parseFloat(document.getElementById("Fx").value) || 0;
-      //m2 = parseFloat(document.getElementById("m2").value) || 0;
-      A2 = parseFloat(document.getElementById("A2").value) || 0;
-     // Q = parseFloat(document.getElementById("Q").value) || 0;
-      xi = parseFloat(document.getElementById("xi").value) || 0;
-      nu = parseFloat(document.getElementById("nu").value) || 0;
-      //f = parseFloat(document.getElementById("f").value) || 0;
-      alpha2 = parseFloat(document.getElementById("alpha2").value) || 0;
-      beta2 = parseFloat(document.getElementById("beta2").value) || 0;
-      N = parseFloat(document.getElementById("subelements").value) || 0;
-      isent = document.getElementById("isentropic").value;
-      console.log(isentropic)
-      calcSum(P , T , M1 , A1 , gamma , alpha1 , beta1 , w , Fx , m2 , A2 , Q , xi , nu , f , alpha2 , beta2 , N);
+      calcSum();
 
       for(var i = 1; i < N; i++){
-        var sum = calcSum(P2 , T2 , M2 , A1 , gamma , alpha1 , beta1 , w , Fx , m2 , A2 , Q , xi , nu , f , alpha2 , beta2 , N);
+        var sum = calcSum();
         console.log(i);
       }
       //console.log(pyscript.interpreter.globals.get('M2'));
@@ -310,6 +335,14 @@ function postProcess(args) {
       document.getElementById("TRSecond").value = TR[1];
       document.getElementById("deltaSR").value = dsR[0];
       document.getElementById("deltaSRSecond").value = dsR[1];
+      document.getElementById("dsRKE").value = dsRKE[0];
+      document.getElementById("dsRKESecond").value = dsRKE[1];
+      document.getElementById("wloss").value = wloss[0];
+      document.getElementById("wlossSecond").value = wloss[1];
+      document.getElementById("cp").value = cp[0];
+      document.getElementById("cpSecond").value = cp[1];
+      document.getElementById("M2M1").value = M2M1[0];
+      document.getElementById("M2M1Second").value = M2M1[1];
     } catch (error) {
       console.log(error);
     }
@@ -448,6 +481,34 @@ function exampleFlow(){
     var selectedOption = selectElement.value;
   
     // Perform actions based on the selected option
+    if (selectedOption === 'Default') {
+      // Call a function for Isentropic flow with area change
+
+        document.getElementById("cd").value = 0;
+        document.getElementById("cf").value = 0;
+        document.getElementById("Ad").value = 0;
+        document.getElementById("Af").value = 0;
+        document.getElementById("qr").value = 0;
+        document.getElementById("twr").value = 1;
+        //document.getElementById("P").value = 1;
+        //document.getElementById("T").value = 1;
+        document.getElementById("M1").value = 1;
+        document.getElementById("A1").value = 1;
+        document.getElementById("gamma").value = 1.4;
+        document.getElementById("alpha1").value = 1;
+        document.getElementById("beta1").value = 1;
+        //document.getElementById("w").value = 1;
+        //document.getElementById("Fx").value = 1;
+        //document.getElementById("m2").value = 1;
+        document.getElementById("A2").value = 2;
+        //document.getElementById("Q").value = 1;
+        document.getElementById("xi").value = 0.5;
+        document.getElementById("nu").value = 0;
+        //document.getElementById("f").value = 1;
+        document.getElementById("alpha2").value = 1;
+        document.getElementById("beta2").value = 1;
+        document.getElementById("subelements").value = 1;
+    } 
     if (selectedOption === 'Isentropic flow with area change') {
       // Call a function for Isentropic flow with area change
 
@@ -681,52 +742,39 @@ function exampleFlow(){
 }
 
 var myChart2;
+var myChart3;
 //-----------------------------Graph for a input vs output---------------------------------------------
 function outputGraph(){
     var ctx = document.getElementById('outputChart').getContext('2d');
-
+    var ctx2 = document.getElementById('outputChart2').getContext('2d');
   // Get the values of M1 and M2
-    cd = parseFloat(document.getElementById("cd").value) || 0;
-    cf = parseFloat(document.getElementById("cf").value) || 0;
-    twr = parseFloat(document.getElementById("twr").value) || 0;
-    qr = parseFloat(document.getElementById("qr").value) || 0;
-    Af = parseFloat(document.getElementById("Af").value) || 0
-    Ad = parseFloat(document.getElementById("Ad").value) || 0;
-    //var P = parseFloat(document.getElementById("P").value) || 1;
-    //var T = parseFloat(document.getElementById("T").value) || 1;
-    M1 = parseFloat(document.getElementById("M1").value) || 0;
-    A1 = parseFloat(document.getElementById("A1").value) || 0;
-    gamma = parseFloat(document.getElementById("gamma").value) || 0;
-    alpha1 = parseFloat(document.getElementById("alpha1").value) || 0;
-    beta1 = parseFloat(document.getElementById("beta1").value) || 0;
-    //w = parseFloat(document.getElementById("w").value) || 0;
-    //var Fx = parseFloat(document.getElementById("Fx").value) || 0;
-    //m2 = parseFloat(document.getElementById("m2").value) || 0;
-    A2 = parseFloat(document.getElementById("A2").value) || 0;
-    //var Q = parseFloat(document.getElementById("Q").value) || 0;
-    xi = parseFloat(document.getElementById("xi").value) || 0;
-    nu = parseFloat(document.getElementById("nu").value) || 0;
-    //var f = parseFloat(document.getElementById("f").value) || 0;
-    alpha2 = parseFloat(document.getElementById("alpha2").value) || 0;
-    beta2 = parseFloat(document.getElementById("beta2").value) || 0;
-    N = parseFloat(document.getElementById("subelements").value) || 0;
+    assignValues();
     js_test = pyscript.interpreter.globals.get('main');
+
+
+    var X = document.getElementById("chart-x").value;
+    var Y = document.getElementById("chart-y").value;
+
+
     if (typeof myChart2 !== 'undefined') {
       myChart2.destroy();
+    }
+    if (typeof myChart3 !== 'undefined') {
+      myChart3.destroy();
     }
     var root1 = [];
     var root2 = [];
     var delta = 0.1;
-    for(M1 = delta; M1 < 10; M1+=delta){
+    for(data[X] = delta; data[X] < 3; data[X]+=delta){
         js_test();
         js_args = pyscript.interpreter.globals.get('args')
-        M2 = js_args.M2.toJs();
+        M2 = js_args[Y].toJs();
         var dataPoint1 = {
-            x: M1,
+            x: data[X],
             y: M2[0]
         };
         var dataPoint2 = {
-          x: M1,
+          x: data[X],
           y: M2[1]
       };
         root1.push(dataPoint1);
@@ -745,7 +793,37 @@ function outputGraph(){
         borderWidth: 1,
         pointRadius: 0,
         pointHoverRadius: 8
+      }],
+    },
+    
+    options: {
+      responsive: true,
+      scales: {
+        x: {
+          type: 'linear',
+          position: 'bottom',
+          title: {
+            display: true,
+            text: X
+          }
+        },
+        y: {
+          type: 'linear',
+          position: 'left',
+          title: {
+            display: true,
+            text: Y
+          }
+        }
       },
+      plugins: {
+      }
+    }
+  });
+  myChart3 = new Chart(ctx2, {
+    type: 'line',
+    data: {
+      datasets: [
       {
         label: 'root2',
         data: root2,

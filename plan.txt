@@ -163,6 +163,24 @@ I could also begin to develop the functionality with the first option throughout
           return(np.real(roots[~np.isnan(roots)]))
   </py-script>
 
+MEETING NOTES:
+
+Questions:
+- default values
+  -M1
+  -A1
+  gamma
+
+
+- example flows values? different processes? etc.
+- in paper
+
+- sub elements? what values get reused vs replaced?
+- M, area ratio, Qr, Af.
+
+- Does he want me to incorporate some of the other values we talked about?
+
+- graph? How could I test this accuracy?
 
 
 

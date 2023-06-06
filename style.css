@@ -1,7 +1,6 @@
 body {
     background-color: #f2f2f2;
   }
-  
   .title {
     background-color: #ffffff;
     display: flex;
@@ -13,7 +12,29 @@ body {
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
     flex-direction: column;
   }
-
+  .chart-selection{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    text-align: center;
+  }
+  .selection-component{
+    display: flex;
+    flex-direction: row;
+    height: 50px;
+    margin: 5px;
+  }
+.charts{
+  display: flex;
+  flex-direction: column;
+  max-width: 100vw;
+}
+.chart-container{
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+}
   .credits{
     color: gray;
     font-style: italic;
@@ -33,6 +54,7 @@ body {
   
   .label-input-row {
     display: flex;
+    flex-direction: row;
     align-items: center;
     margin-bottom: 10px;
   }
@@ -43,7 +65,23 @@ body {
     margin-right: 10px;
     font-weight: bold;
   }
-  
+
+  .label-output-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.label-output-row input {
+  flex: 1;
+  text-align: right;
+}
+.label-output-row label {
+    flex: 1 0 auto;
+    margin-right: 10px;
+    text-align: left;
+    font-weight: bold;
+}
+
   .input-container {
     display: flex;
     flex-direction: column;
@@ -57,7 +95,6 @@ body {
     display: flex;
     flex-direction: column;
     margin: 20px;
-    align-self: flex-start;
     width: 40%;
   }
   .label-input-row h4{
@@ -72,9 +109,15 @@ body {
     flex-direction: column;
     width: 100px;
   }
+  .roots {
+    display: flex;
+    flex-direction: column;
+    width: 100px;
+  }
   
   .input-container,
-  .output-container {
+  .output-container,
+  .chart-container {
     margin: 20px;
     background-color: #fff;
     border-radius: 5px;
@@ -133,6 +176,7 @@ body {
 
     .input-container {
       display: flex;
+      flex-direction: column;
     }
     .input-container,
     .output-container{
@@ -152,7 +196,12 @@ body {
       margin-top: 20px;
     }
   }
-
+  @media(max-width: 750px){
+    .inputFields{
+      display: flex;
+      flex-direction: column;
+    }
+  }
   @media(min-width: 1900px){
     .output-container{
       width: 70%;

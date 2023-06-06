@@ -47,10 +47,10 @@
     args = None
     def main():
       global args
-      from js import cd, cf, twr, qr, Af, Ad, M1 , A1 , gamma , alpha1 , beta1 , Fx , m2 , A2 , xi , nu , alpha2 , beta2 , N, isent
+      from js import data#cd, cf, twr, qr, Af, Ad, M1 , A1 , gamma , alpha1 , beta1 , Fx , m2 , A2 , xi , nu , alpha2 , beta2 , N, isent
       ver = str('v1.7')
       date = str('10/01/22')
-      args = Args(AR=A2/A1, Ad = Ad, Af = Af, qr = qr, twr= twr, cd = cd, cf = cf, M1=M1, xi = xi, nu = nu, k = gamma, b1 = beta1, b2 = beta2, a1 = alpha1, a2 = alpha2 , isentropic=(isent == 'True'))
+      args = Args(AR=data.A2/data.A1, Ad = data.Ad, Af = data.Af, qr = data.qr, twr= data.twr, cd = data.cd, cf = data.cf, M1=data.M1, xi = data.xi, nu = data.nu, k = data.gamma, b1 = data.beta1, b2 = data.beta2, a1 = data.alpha1, a2 = data.alpha2 , isentropic=(data.isent == 'True'))#(AR=A2/A1, Ad = Ad, Af = Af, qr = qr, twr= twr, cd = cd, cf = cf, M1=M1, xi = xi, nu = nu, k = gamma, b1 = beta1, b2 = beta2, a1 = alpha1, a2 = alpha2 , isentropic=(isent == 'True'))
 
       if( args.isentropic ):
           args = isentropic(args)
@@ -838,6 +838,7 @@
                 <div class="exampleFlows">
                 <h4>Example Flows</h4>
                 <select class="selectFlow" onchange="exampleFlow()">
+                <option>Default</option>
                 <option>Isentropic flow with area change</option>
                 <option>Flow across a normal shock</option>
                 <option>Fanno flow</option>
@@ -930,48 +931,114 @@
     <div class="output-container">
         <button id="calculate" onclick="calculateFlow(event)">Calculate</button>
         <div class="outputLabels">
-            <div class="label-input-row"> <!-- This is the new row -->
-                <h4>Roots</h4>
-            </div>
-            <div class="label-input-row">
-              <label for="M2">M<sub>2</sub>=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-              <input type="text" id="M2">
-              <input type="text" id="M2Second">
-            </div>
+            <div class = "roots">
+                <div class="label-input-row"> <!-- This is the new row -->
+                    <h4>Roots</h4>
+                </div>
+                <div class="label-output-row">
+                <label for="M2">M<sub>2</sub>=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                <input type="text" id="M2">
+                <input type="text" id="M2Second">
+                </div>
 
-            <div class="label-input-row">
-              <label for="P2P1">P<sub>2</sub>/P<sub>1</sub>=&nbsp;&nbsp;&nbsp;&nbsp;</label>
-              <input type="text" id="P2P1">
-              <input type="text" id="P2P1Second">
-            </div>
+                <div class="label-output-row">
+                <label for="P2P1">P<sub>2</sub>/P<sub>1</sub>=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                <input type="text" id="P2P1">
+                <input type="text" id="P2P1Second">
+                </div>
 
-            <div class="label-input-row">
-              <label for="T2T1">T<sub>2</sub>/T<sub>1</sub>=&nbsp;&nbsp;&nbsp;&nbsp;</label>
-              <input type="text" id="T2T1">
-              <input type="text" id="T2T1Second">
-            </div>
+                <div class="label-output-row">
+                <label for="T2T1">T<sub>2</sub>/T<sub>1</sub>=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                <input type="text" id="T2T1">
+                <input type="text" id="T2T1Second">
+                </div>
 
-            <div class="label-input-row">
-              <label for="TR">T<sub>o2</sub>/T<sub>o1</sub>=</label>
-              <input type="text" id="TR">
-              <input type="text" id="TRSecond">
-            </div>
+                <div class="label-output-row">
+                <label for="TR">T<sub>o2</sub>/T<sub>o1</sub>=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                <input type="text" id="TR">
+                <input type="text" id="TRSecond">
+                </div>
 
-            <div class="label-input-row">
-              <label for="PR">P<sub>o2</sub>/P<sub>o1</sub>=</label>
-              <input type="text" id="PR">
-              <input type="text" id="PRSecond">
-            </div>
+                <div class="label-output-row">
+                <label for="PR">P<sub>o2</sub>/P<sub>o1</sub>=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                <input type="text" id="PR">
+                <input type="text" id="PRSecond">
+                </div>
 
-            <div class="label-input-row">
-              <label for="deltaSR">&Delta;s/R=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-              <input type="text" id="deltaSR">
-              <input type="text" id="deltaSRSecond">
+                <div class="label-output-row">
+                <label for="deltaSR">&Delta;s/R=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                <input type="text" id="deltaSR">
+                <input type="text" id="deltaSRSecond">
+                </div>
+            </div>
+            <div class = "roots">
+                <div class="label-output-row">
+                <label for="M2M1">M<sub>2</sub>/M<sub>1</sub>=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                <input type="text" id="M2M1">
+                <input type="text" id="M2M1Second">
+                </div>
+
+                <div class="label-output-row">
+                <label for="dsRKE">(ds/R)/(k/2*M<sub>1</sub><sup>2</sup>)=&nbsp;&nbsp;</label>
+                <input type="text" id="dsRKE">
+                <input type="text" id="dsRKESecond">
+                </div>
+
+                <div class="label-output-row">
+                <label for="wloss">(P<sub>o1</sub>-P<sub>o2</sub>)/(P<sub>o1</sub>-P<sub>1</sub>)=</label>
+                <input type="text" id="wloss">
+                <input type="text" id="wlossSecond">
+                </div>
+
+                <div class="label-output-row">
+                <label for="cp">(P<sub>2</sub>-P<sub>1</sub>)/(P<sub>o1</sub>-P<sub>1</sub>)=&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                <input type="text" id="cp">
+                <input type="text" id="cpSecond">
+                </div>
             </div>
         </div>
-        <canvas id="outputChart"></canvas>
     </div>
 </div>
+    <div class = "chart-container">
+        <div class= "chart-selection">
+            <h4>Output Charts</h4>
+            <select class="selection-component" id="chart-y" onchange="outputGraph()">
+                <option value="M2">M<sub>2</sub></option>
+                <option value="P2P1">P<sub>2</sub>/P<sub>1</sub></option>
+                <option value="T2T1">T<sub>2</sub>/T<sub>1</sub></option>
+                <option value="TR">To<sub>2</sub>/To<sub>1</sub></option>
+                <option value="PR">Po<sub>2</sub>/Po<sub>1</sub></option>
+                <option value="dsR">&Delta;s/R</option>
+                <option value="M2M1">M<sub>2</sub>/M<sub>1</sub></option>
+                <option value="dsRKE">(ds/R)/(k/2*M<sub>12</sub>)</option>
+                <option value="wloss">(Po<sub>1</sub>-Po<sub>2</sub>)/(Po<sub>1</sub>-P<sub>1</sub>)</option>
+                <option value="cp">(P<sub>2</sub>-P<sub>1</sub>)/(Po<sub>1</sub>-P<sub>1</sub>)</option>
+            </select>
+            <h4>vs</h4>
+            <select class="selection-component" id="chart-x" onchange="outputGraph()">
+                <option value="M1">M<sub>1</sub></option>
+                <option value="A1">A<sub>1</sub></option>
+                <option value="gamma">&gamma;</option>
+                <option value="cd">C<sub>d</sub></option>
+                <option value="cf">C<sub>f</sub></option>
+                <option value="twr">TWR</option>
+                <option value="alpha1">&alpha;<sub>1</sub></option>
+                <option value="beta1">&beta;<sub>1</sub></option>
+                <option value="qr">Q<sub>r</sub></option>
+                <option value="Af">A<sub>f</sub></option>
+                <option value="Ad">A<sub>d</sub></option>
+                <option value="A2">A<sub>2</sub></option>
+                <option value="xi">&xi;</option>
+                <option value="nu">&nu;</option>
+                <option value="alpha2">&alpha;<sub>2</sub></option>
+                <option value="beta2">&beta;<sub>2</sub></option>
+            </select>
+        </div>
+        <div>
+            <canvas id="outputChart" class="rootGraph"></canvas>
+            <canvas id="outputChart2" class="rootGraph"></canvas>
+        </div>
+    </div>
 </body>
 
 </html>
