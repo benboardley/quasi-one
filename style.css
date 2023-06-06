@@ -70,6 +70,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin: 5px;
 }
 .label-output-row input {
   flex: 1;
@@ -80,6 +81,12 @@ body {
     margin-right: 10px;
     text-align: left;
     font-weight: bold;
+}
+.label-output-row h4{
+  width: 100px;
+  margin: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ccc;
 }
 
   .input-container {
