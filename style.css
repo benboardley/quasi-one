@@ -12,6 +12,11 @@ body {
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
     flex-direction: column;
   }
+  #additional-data{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
   .chart-selection{
     display: flex;
     flex-direction: row;
@@ -124,7 +129,8 @@ body {
   
   .input-container,
   .output-container,
-  .chart-container {
+  .chart-container,
+  #additional-data {
     margin: 20px;
     background-color: #fff;
     border-radius: 5px;
@@ -139,7 +145,8 @@ body {
   }
   
   .input-container input[type="text"],
-  .output-container input[type="text"] {
+  .output-container input[type="text"],
+  #additional-data input[type="text"] {
     width: 100px;
     padding: 5px;
     border: 1px solid #ccc;

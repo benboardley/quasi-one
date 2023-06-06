@@ -934,7 +934,7 @@
             <div class = "roots">
                 <div class="label-output-row"> <!-- This is the new row -->
                     <h4>Roots</h4>
-                    <input type="checkbox" id="additional"> Additional
+                    <input type="checkbox" id="additional" onclick="toggleData()"> Additional
                 </div>
                 <div class="label-output-row">
                 <label for="M2">M<sub>2</sub>=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
@@ -999,7 +999,136 @@
             </div>
         </div>
     </div>
-</div>
+    </div>
+    <div id="additional-data">
+            <h3>Additional Outputs</h3>
+            <div class="additional-1">
+            <!-- Repeat this structure for each output -->
+            <div class="label-output-row">
+                <label for="V2V1">V<sub>2</sub>/V<sub>1</sub>=</label>
+                <input type="text" id="V2V1">
+                <input type="text" id="V2V1Second">
+            </div>
+
+            <div class="label-output-row">
+                <label for="v2v1">v<sub>2</sub>/v<sub>1</sub>=</label>
+                <input type="text" id="v2v1">
+                <input type="text" id="v2v1Second">
+            </div>
+
+            <div class="label-output-row">
+                <label for="p2p1">p<sub>2</sub>/p<sub>1</sub>=</label>
+                <input type="text" id="p2p1">
+                <input type="text" id="p2p1Second">
+            </div>
+
+            <!--<div class="label-output-row">
+                <label for="wpv">wpv=</label>
+                <input type="text" id="wpv">
+                <input type="text" id="wpvSecond">
+            </div>
+
+            <div class="label-output-row">
+                <label for="ek">ek=</label>
+                <input type="text" id="ek">
+                <input type="text" id="ekSecond">
+            </div>
+
+            <div class="label-output-row">
+                <label for="Iq">Iq=</label>
+                <input type="text" id="Iq">
+                <input type="text" id="IqSecond">
+            </div>
+
+            <div class="label-output-row">
+                <label for="we">we=</label>
+                <input type="text" id="we">
+                <input type="text" id="weSecond">
+            </div>
+
+            <div class="label-output-row">
+                <label for="wrev">wrev=</label>
+                <input type="text" id="wrev">
+                <input type="text" id="wrevSecond">
+            </div>
+
+            <div class="label-output-row">
+                <label for="I">I=</label>
+                <input type="text" id="I">
+                <input type="text" id="ISecond">
+            </div>
+
+            <div class="label-output-row">
+                <label for="Theta">Theta=</label>
+                <input type="text" id="Theta">
+                <input type="text" id="ThetaSecond">
+            </div>
+
+            <div class="label-output-row">
+                <label for="IplusTheta">I+Theta=</label>
+                <input type="text" id="IplusTheta">
+                <input type="text" id="IplusThetaSecond">
+            </div>-->
+            </div>
+
+            <div class="additional-data2">
+            <div class="label-output-row">
+                <label for="dsRKE2">dsR/(k/2*M2<sup>2</sup>)=</label>
+                <input type="text" id="dsRKE2">
+                <input type="text" id="dsRKE2Second">
+            </div>
+
+            <div class="label-output-row">
+                <label for="zloss">(Po1-Po2)/q=</label>
+                <input type="text" id="zloss">
+                <input type="text" id="zlossSecond">
+            </div>
+
+            <div class="label-output-row">
+                <label for="CPinc">(P2-P1)/q=</label>
+                <input type="text" id="CPinc">
+                <input type="text" id="CPincSecond">
+            </div>
+
+            <div class="label-output-row">
+                <label for="P3P1">P<sub>3</sub>/P<sub>1</sub>=</label>
+                <input type="text" id="P3P1">
+                <input type="text" id="P3P1Second">
+            </div>
+
+            <div class="label-output-row">
+                <label for="P3P2">P<sub>3</sub>/P<sub>2</sub>=</label>
+                <input type="text" id="P3P2">
+                <input type="text" id="P3P2Second">
+            </div>
+
+            <div class="label-output-row">
+                <label for="P3Po1">P<sub>3</sub>/Po<sub>1</sub>=</label>
+                <input type="text" id="P3Po1">
+                <input type="text" id="P3Po1Second">
+            </div>
+
+            <div class="label-output-row">
+                <label for="Lambda">Lambda=</label>
+                <input type="text" id="Lambda">
+            </div>
+
+            <div class="label-output-row">
+                <label for="b">b=</label>
+                <input type="text" id="b">
+            </div>
+
+            <div class="label-output-row">
+                <label for="c">c=</label>
+                <input type="text" id="c">
+            </div>
+            <div class="label-output-row">
+                <label for="det">Determinant=</label>
+                <input type="text" id="det">
+            </div>
+        </div>
+        </div>
+    </div>
     <div class = "chart-container">
         <div class= "chart-selection">
             <h4>Output Charts</h4>

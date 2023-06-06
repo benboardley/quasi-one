@@ -29,11 +29,6 @@ var TT2 = 0;
 var P2 = 0;
 var T2 = 0;
 var deltaS = 0;
-var a = 0;
-var b = 0;
-var c = 0;
-var det = 0;
-var Lambda = 0;
 var TwTo1 = 1;
 var isent = false;
 var M2;
@@ -46,6 +41,24 @@ var dsRKE;
 var wloss;
 var M2M1;
 var cp;
+var V2V1;
+var v2v1;
+var p2p1;
+var wpv;
+var ek;
+var Iq;
+var we;
+var wrev;
+var I;
+var Theta;
+var dsRKE2;
+var zloss;
+var CPinc;
+var P3P1;
+var Lambda;
+var b;
+var c;
+var det;
 
 var data = {
   cd: null,
@@ -72,6 +85,7 @@ window.onload = function() {
     // Call the function to create the chart
     imageGUI();
     exampleFlow();
+    toggleData();
    // outputGraph();
   };
 
@@ -151,6 +165,24 @@ function calcSum(){
     wloss = js_args.wloss.toJs();
     M2M1 = [M2[0]/data.M1, M2[1]/data.M1]
     cp = js_args.CP.toJs();
+    V2V1 = js_args.V2V1.toJs();
+    v2v1 = js_args.v2v1.toJs();
+    p2p1 = js_args.p2p1.toJs();
+    wpv = js_args.wpv.toJs();
+    ek = js_args.ek.toJs();
+    Iq = js_args.Iq.toJs();
+    we = js_args.we.toJs();
+    wrev = js_args.wrev.toJs();
+    I = js_args.I.toJs();
+    Theta = js_args.Theta.toJs();
+    dsRKE2 = js_args.dsRKE2.toJs();
+    zloss = js_args.zloss.toJs();
+    CPinc = js_args.CPinc.toJs();
+    P3P1 = js_args.P3P1.toJs();
+    Lambda = js_args.Lambda//.toJs();
+    b = js_args.b//.toJs();
+    c = js_args.c//.toJs();
+    det = js_args.det//.toJs();
   //  return sum;
   }
 
@@ -289,33 +321,18 @@ function postProcess(args) {
     data.N = parseFloat(document.getElementById("subelements").value) || 0;
     data.isent = document.getElementById("isentropic").value;
 }
-
+  function toggleData(){
+    var x = document.getElementById("additional-data");
+    if (x.style.display === "none") {
+      x.style.display = "block";
+    } else {
+      x.style.display = "none";
+    }
+  }
   function calculateFlow(event) {
     try {
         event.preventDefault();
         assignValues();
-      //var P = parseFloat(document.getElementById("P").value) || 0;
-      //var T = parseFloat(document.getElementById("T").value) || 0;
-      //var M1 = parseFloat(document.getElementById("M1").value) || 0;
-      //var A1 = parseFloat(document.getElementById("A1").value) || 0;
-      //var gamma = parseFloat(document.getElementById("gamma").value) || 0;
-      //var alpha1 = parseFloat(document.getElementById("alpha1").value) || 0;
-      //var beta1 = parseFloat(document.getElementById("beta1").value) || 0;
-      //var w = parseFloat(document.getElementById("w").value) || 0;
-      //var Fx = parseFloat(document.getElementById("Fx").value) || 0;
-      //var m2 = parseFloat(document.getElementById("m2").value) || 0;
-      //var A2 = parseFloat(document.getElementById("A2").value) || 0;
-      ///var Q = parseFloat(document.getElementById("Q").value) || 0;
-      //var xi = parseFloat(document.getElementById("xi").value) || 0;
-      //var nu = parseFloat(document.getElementById("nu").value) || 0;
-      //var f = parseFloat(document.getElementById("f").value) || 0;
-      //var alpha2 = parseFloat(document.getElementById("alpha2").value) || 0;
-      //var beta2 = parseFloat(document.getElementById("beta2").value) || 0;
-      //var N = parseFloat(document.getElementById("subelements").value) || 0;
-
-
-     // P = parseFloat(document.getElementById("P").value) || 0;
-     // T = parseFloat(document.getElementById("T").value) || 0;
       calcSum();
 
       for(var i = 1; i < N; i++){
@@ -343,6 +360,66 @@ function postProcess(args) {
       document.getElementById("cpSecond").value = cp[1];
       document.getElementById("M2M1").value = M2M1[0];
       document.getElementById("M2M1Second").value = M2M1[1];
+
+      document.getElementById("V2V1").value = V2V1[0];
+      document.getElementById("V2V1Second").value = V2V1[1];
+
+      document.getElementById("v2v1").value = v2v1[0];
+      document.getElementById("v2v1Second").value = v2v1[1];
+
+      document.getElementById("p2p1").value = p2p1[0];
+      document.getElementById("p2p1Second").value = p2p1[1];
+    /*
+      document.getElementById("wpv").value = wpv[0];
+      document.getElementById("wpvSecond").value = wpv[1];
+
+      document.getElementById("ek").value = ek[0];
+      document.getElementById("ekSecond").value = ek[1];
+
+      document.getElementById("Iq").value = Iq[0];
+      document.getElementById("IqSecond").value = Iq[1];
+
+      document.getElementById("we").value = we[0];
+      document.getElementById("weSecond").value = we[1];
+
+      document.getElementById("wrev").value = wrev[0];
+      document.getElementById("wrevSecond").value = wrev[1];
+
+      document.getElementById("I").value = I[0];
+      document.getElementById("ISecond").value = I[1];
+
+      document.getElementById("Theta").value = Theta[0];
+      document.getElementById("ThetaSecond").value = Theta[1];
+
+      document.getElementById("IplusTheta").value = I[0] + Theta[0];
+      document.getElementById("IplusThetaSecond").value = I[1] + Theta[1];
+      */
+      document.getElementById("dsRKE2").value = dsRKE2[0];
+      document.getElementById("dsRKE2Second").value = dsRKE2[1];
+
+      document.getElementById("zloss").value = zloss[0];
+      document.getElementById("zlossSecond").value = zloss[1];
+
+      document.getElementById("CPinc").value = CPinc[0];
+      document.getElementById("CPincSecond").value = CPinc[1];
+
+
+
+      document.getElementById("P3P1").value = P3P1[0];
+      document.getElementById("P3P1Second").value = P3P1[1];
+      
+      document.getElementById("P3P2").value = P3P1[0]/P2P1[0];
+      document.getElementById("P3P2Second").value = P3P1[1]/P2P1[1];
+      
+      document.getElementById("P3Po1").value = P3P1[0]/f1;
+      document.getElementById("P3Po1Second").value = P3P1[1]/f1;
+      
+      document.getElementById("Lambda").value = Lambda;
+      
+      document.getElementById("b").value = b;
+      
+      document.getElementById("c").value = c;
+      document.getElementById("det").value = det;
     } catch (error) {
       console.log(error);
     }
