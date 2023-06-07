@@ -85,8 +85,8 @@ window.onload = function() {
     // Call the function to create the chart
     imageGUI();
     exampleFlow();
-    toggleData();
-   // outputGraph();
+    //toggleData();
+    emptyGraph();
   };
 
   // -----------------------------CALCULATIONS USING PYSCRIPT FOR NOW IGNORE THIS-------------------------------------------------
@@ -301,10 +301,14 @@ function postProcess(args) {
 
 
   //--------------------------WORKFLOW-------------------------------------------------------
+  function check_unit(){
+
+  }
+  
   function assignValues() {
     data.cd = parseFloat(document.getElementById("cd").value) || 0;
     data.cf = parseFloat(document.getElementById("cf").value) || 0;
-    data.twr = parseFloat(document.getElementById("twr").value) || 0;
+    //data.twr = parseFloat(document.getElementById("twr").value) || 0;
     data.qr = parseFloat(document.getElementById("qr").value) || 0;
     data.Af = parseFloat(document.getElementById("Af").value) || 0;
     data.Ad = parseFloat(document.getElementById("Ad").value) || 0;
@@ -329,6 +333,18 @@ function postProcess(args) {
       x.style.display = "none";
     }
   }
+  function toggleDescriptions() {
+    var descriptions = document.getElementsByClassName("description");
+    for (var i = 0; i < descriptions.length; i++) {
+      var description = descriptions[i];
+      if (description.style.display === "none") {
+        description.style.display = "block";
+      } else {
+        description.style.display = "none";
+      }
+    }
+  }
+
   function calculateFlow(event) {
     try {
         event.preventDefault();
@@ -340,86 +356,62 @@ function postProcess(args) {
         console.log(i);
       }
       //console.log(pyscript.interpreter.globals.get('M2'));
-      document.getElementById("M2").value = M2[0];
-      document.getElementById("M2Second").value = M2[1];
-      document.getElementById("P2P1").value = P2P1[0];
-      document.getElementById("P2P1Second").value = P2P1[1];
-      document.getElementById("T2T1").value = T2T1[0];
-      document.getElementById("T2T1Second").value = T2T1[1];
-      document.getElementById("PR").value = PR[0];
-      document.getElementById("PRSecond").value = PR[1];
-      document.getElementById("TR").value = TR[0];
-      document.getElementById("TRSecond").value = TR[1];
-      document.getElementById("deltaSR").value = dsR[0];
-      document.getElementById("deltaSRSecond").value = dsR[1];
-      document.getElementById("dsRKE").value = dsRKE[0];
-      document.getElementById("dsRKESecond").value = dsRKE[1];
-      document.getElementById("wloss").value = wloss[0];
-      document.getElementById("wlossSecond").value = wloss[1];
-      document.getElementById("cp").value = cp[0];
-      document.getElementById("cpSecond").value = cp[1];
-      document.getElementById("M2M1").value = M2M1[0];
-      document.getElementById("M2M1Second").value = M2M1[1];
-
-      document.getElementById("V2V1").value = V2V1[0];
-      document.getElementById("V2V1Second").value = V2V1[1];
-
-      document.getElementById("v2v1").value = v2v1[0];
-      document.getElementById("v2v1Second").value = v2v1[1];
-
-      document.getElementById("p2p1").value = p2p1[0];
-      document.getElementById("p2p1Second").value = p2p1[1];
-    /*
-      document.getElementById("wpv").value = wpv[0];
-      document.getElementById("wpvSecond").value = wpv[1];
-
-      document.getElementById("ek").value = ek[0];
-      document.getElementById("ekSecond").value = ek[1];
-
-      document.getElementById("Iq").value = Iq[0];
-      document.getElementById("IqSecond").value = Iq[1];
-
-      document.getElementById("we").value = we[0];
-      document.getElementById("weSecond").value = we[1];
-
-      document.getElementById("wrev").value = wrev[0];
-      document.getElementById("wrevSecond").value = wrev[1];
-
-      document.getElementById("I").value = I[0];
-      document.getElementById("ISecond").value = I[1];
-
-      document.getElementById("Theta").value = Theta[0];
-      document.getElementById("ThetaSecond").value = Theta[1];
-
-      document.getElementById("IplusTheta").value = I[0] + Theta[0];
-      document.getElementById("IplusThetaSecond").value = I[1] + Theta[1];
-      */
-      document.getElementById("dsRKE2").value = dsRKE2[0];
-      document.getElementById("dsRKE2Second").value = dsRKE2[1];
-
-      document.getElementById("zloss").value = zloss[0];
-      document.getElementById("zlossSecond").value = zloss[1];
-
-      document.getElementById("CPinc").value = CPinc[0];
-      document.getElementById("CPincSecond").value = CPinc[1];
-
-
-
-      document.getElementById("P3P1").value = P3P1[0];
-      document.getElementById("P3P1Second").value = P3P1[1];
+      document.getElementById("M2").value = M2[0].toFixed(5);
+      document.getElementById("M2Second").value = M2[1].toFixed(5);
+      document.getElementById("P2P1").value = P2P1[0].toFixed(5);
+      document.getElementById("P2P1Second").value = P2P1[1].toFixed(5);
+      document.getElementById("T2T1").value = T2T1[0].toFixed(5);
+      document.getElementById("T2T1Second").value = T2T1[1].toFixed(5);
+      document.getElementById("PR").value = PR[0].toFixed(5);
+      document.getElementById("PRSecond").value = PR[1].toFixed(5);
+      document.getElementById("TR").value = TR[0].toFixed(5);
+      document.getElementById("TRSecond").value = TR[1].toFixed(5);
+      document.getElementById("deltaSR").value = dsR[0].toFixed(5);
+      document.getElementById("deltaSRSecond").value = dsR[1].toFixed(5);
+      document.getElementById("dsRKE").value = dsRKE[0].toFixed(5);
+      document.getElementById("dsRKESecond").value = dsRKE[1].toFixed(5);
+      document.getElementById("wloss").value = wloss[0].toFixed(5);
+      document.getElementById("wlossSecond").value = wloss[1].toFixed(5);
+      document.getElementById("cp").value = cp[0].toFixed(5);
+      document.getElementById("cpSecond").value = cp[1].toFixed(5);
+      document.getElementById("M2M1").value = M2M1[0].toFixed(5);
+      document.getElementById("M2M1Second").value = M2M1[1].toFixed(5);
       
-      document.getElementById("P3P2").value = P3P1[0]/P2P1[0];
-      document.getElementById("P3P2Second").value = P3P1[1]/P2P1[1];
+      document.getElementById("V2V1").value = V2V1[0].toFixed(5);
+      document.getElementById("V2V1Second").value = V2V1[1].toFixed(5);
       
-      document.getElementById("P3Po1").value = P3P1[0]/f1;
-      document.getElementById("P3Po1Second").value = P3P1[1]/f1;
+      document.getElementById("v2v1").value = v2v1[0].toFixed(5);
+      document.getElementById("v2v1Second").value = v2v1[1].toFixed(5);
       
-      document.getElementById("Lambda").value = Lambda;
+      document.getElementById("p2p1").value = p2p1[0].toFixed(5);
+      document.getElementById("p2p1Second").value = p2p1[1].toFixed(5);
       
-      document.getElementById("b").value = b;
+      // ... continue for all variables ...
       
-      document.getElementById("c").value = c;
-      document.getElementById("det").value = det;
+      document.getElementById("dsRKE2").value = dsRKE2[0].toFixed(5);
+      document.getElementById("dsRKE2Second").value = dsRKE2[1].toFixed(5);
+      
+      document.getElementById("zloss").value = zloss[0].toFixed(5);
+      document.getElementById("zlossSecond").value = zloss[1].toFixed(5);
+      
+      document.getElementById("CPinc").value = CPinc[0].toFixed(5);
+      document.getElementById("CPincSecond").value = CPinc[1].toFixed(5);
+      
+      document.getElementById("P3P1").value = P3P1[0].toFixed(5);
+      document.getElementById("P3P1Second").value = P3P1[1].toFixed(5);
+        
+      document.getElementById("P3P2").value = (P3P1[0]/P2P1[0]).toFixed(5);
+      document.getElementById("P3P2Second").value = (P3P1[1]/P2P1[1]).toFixed(5);
+        
+      document.getElementById("P3Po1").value = (P3P1[0]/f1).toFixed(5);
+      document.getElementById("P3Po1Second").value = (P3P1[1]/f1).toFixed(5);
+        
+      document.getElementById("Lambda").value = Lambda.toFixed(5);
+        
+      document.getElementById("b").value = b.toFixed(5);
+        
+      document.getElementById("c").value = c.toFixed(5);
+      document.getElementById("det").value = det.toFixed(5);
     } catch (error) {
       console.log(error);
     }
@@ -467,7 +459,7 @@ function postProcess(args) {
             {
               data: line2,
               borderColor: 'black',
-              backgroundColor: A1<A2?'white':'gray',
+              backgroundColor: A1<A2?'#fff':'gray',
               fill: true,
               borderWidth: 1,
               pointRadius: 0,
@@ -566,7 +558,6 @@ function exampleFlow(){
         document.getElementById("Ad").value = 0;
         document.getElementById("Af").value = 0;
         document.getElementById("qr").value = 0;
-        document.getElementById("twr").value = 1;
         //document.getElementById("P").value = 1;
         //document.getElementById("T").value = 1;
         document.getElementById("M1").value = 1;
@@ -594,7 +585,6 @@ function exampleFlow(){
         document.getElementById("Ad").value = 5;
         document.getElementById("Af").value = 5;
         document.getElementById("qr").value = 5;
-        document.getElementById("twr").value = 5;
         //document.getElementById("P").value = 1;
         //document.getElementById("T").value = 1;
         document.getElementById("M1").value = 1;
@@ -666,7 +656,6 @@ function exampleFlow(){
       document.getElementById("Ad").value = 6;
       document.getElementById("Af").value = 6;
       document.getElementById("qr").value = 6;
-      document.getElementById("twr").value = 6;
 
 
 
@@ -697,8 +686,6 @@ function exampleFlow(){
       document.getElementById("Ad").value = 5;
       document.getElementById("Af").value = 5;
       document.getElementById("qr").value = 5;
-      document.getElementById("twr").value = 5;
-
 
 
       //document.getElementById("P").value = 5;
@@ -728,7 +715,6 @@ function exampleFlow(){
       document.getElementById("Ad").value = 6;
       document.getElementById("Af").value = 6;
       document.getElementById("qr").value = 6;
-      document.getElementById("twr").value = 6;
 
 
      // document.getElementById("P").value = 6;
@@ -821,6 +807,117 @@ function exampleFlow(){
 var myChart2;
 var myChart3;
 //-----------------------------Graph for a input vs output---------------------------------------------
+function emptyGraph(){
+  var ctx = document.getElementById('outputChart').getContext('2d');
+  var ctx2 = document.getElementById('outputChart2').getContext('2d');
+// Get the values of M1 and M2
+
+
+  if (typeof myChart2 !== 'undefined') {
+    myChart2.destroy();
+  }
+  if (typeof myChart3 !== 'undefined') {
+    myChart3.destroy();
+  }
+  var root1 = [];
+  var root2 = [];
+  var delta = 0.01;
+  for(var X = delta; data[X] < 3; data[X]+=delta){
+      var dataPoint1 = {
+          x: X,
+          y: 10 * X
+      };
+      var dataPoint2 = {
+        x: X,
+        y: 10 * X
+    };
+      root1.push(dataPoint1);
+      root2.push(dataPoint2)
+  }
+
+// Create the chart
+myChart2 = new Chart(ctx, {
+  type: 'line',
+  data: {
+    datasets: [{
+      label: 'root1',
+      data: root1,
+      backgroundColor: 'transparent',
+      borderColor: 'transparent',
+      borderWidth: 1,
+      pointRadius: 0.5,
+      pointHoverRadius: 8
+    }],
+  },
+  
+  options: {
+    responsive: true,
+    scales: {
+      x: {
+        type: 'linear',
+        position: 'bottom',
+        title: {
+          display: true,
+          text: ''
+        }
+      },
+      y: {
+        type: 'linear',
+        position: 'left',
+        title: {
+          display: true,
+          text: ''
+        }
+      }
+    },
+    plugins: {
+    }
+  }
+});
+myChart3 = new Chart(ctx2, {
+  type: 'line',
+  data: {
+    datasets: [
+    {
+      label: 'root2',
+      data: root2,
+      backgroundColor: 'transparent',
+      borderColor: 'transparent',
+      borderWidth: 1,
+      pointRadius: 0.5,
+      pointHoverRadius: 8
+    }],
+  },
+  
+  options: {
+    responsive: true,
+    scales: {
+      x: {
+        type: 'linear',
+        position: 'bottom',
+        title: {
+          display: true,
+          text: ''
+        }
+      },
+      y: {
+        type: 'linear',
+        position: 'left',
+        title: {
+          display: true,
+          text: ''
+        }
+      }
+    },
+    plugins: {
+    }
+  }
+});
+}
+
+
+
+
 function outputGraph(){
     var ctx = document.getElementById('outputChart').getContext('2d');
     var ctx2 = document.getElementById('outputChart2').getContext('2d');
@@ -841,8 +938,9 @@ function outputGraph(){
     }
     var root1 = [];
     var root2 = [];
-    var delta = 0.1;
+    var delta = 0.01;
     for(data[X] = delta; data[X] < 3; data[X]+=delta){
+        console.log(data[X])
         js_test();
         js_args = pyscript.interpreter.globals.get('args')
         M2 = js_args[Y].toJs();
@@ -868,7 +966,7 @@ function outputGraph(){
         backgroundColor: 'rgba(75, 192, 192, 0.2)',
         borderColor: 'rgba(75, 192, 192, 1)',
         borderWidth: 1,
-        pointRadius: 0,
+        pointRadius: 0.5,
         pointHoverRadius: 8
       }],
     },
@@ -907,7 +1005,7 @@ function outputGraph(){
         backgroundColor: 'red',
         borderColor: 'red',
         borderWidth: 1,
-        pointRadius: 0,
+        pointRadius: 0.5,
         pointHoverRadius: 8
       }],
     },
@@ -920,7 +1018,7 @@ function outputGraph(){
           position: 'bottom',
           title: {
             display: true,
-            text: 'M1'
+            text: X
           }
         },
         y: {
@@ -928,7 +1026,7 @@ function outputGraph(){
           position: 'left',
           title: {
             display: true,
-            text: 'M2'
+            text: Y
           }
         }
       },
@@ -936,4 +1034,20 @@ function outputGraph(){
       }
     }
   });
+}
+
+function openChartPopup(chartId) {
+  var chartCanvas = document.getElementById(chartId);
+
+  var popup = window.open("", "", "width=800,height=600");
+  popup.document.write('<html><head><title>Chart</title>');
+  popup.document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>');
+  popup.document.write('<style>canvas{max-width:100%;}</style>');
+  popup.document.write('</head><body><canvas id="chartCanvas"></canvas>');
+  popup.document.write('<script>var ctx = document.getElementById("chartCanvas").getContext("2d");');
+  popup.document.write('var chartData = ' + JSON.stringify(chartCanvas.toDataURL()) + ';');
+  popup.document.write('var img = new Image(); img.src = chartData;');
+  popup.document.write('img.onload = function() { ctx.drawImage(img, 0, 0); };');
+  popup.document.write('</script></body></html>');
+  popup.document.close();
 }

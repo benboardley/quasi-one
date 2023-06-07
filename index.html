@@ -6,6 +6,7 @@
   <!-- Additional meta tags, stylesheets, or scripts -->
   <script src="./calculations.js"></script>
   <link rel="stylesheet" type="text/css" href="./style.css">
+  <link rel="stylesheet" type="text/css" href="./notredame.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.0/dist/chartjs-plugin-annotation.min.js"></script>
  <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
@@ -50,17 +51,32 @@
       from js import data#cd, cf, twr, qr, Af, Ad, M1 , A1 , gamma , alpha1 , beta1 , Fx , m2 , A2 , xi , nu , alpha2 , beta2 , N, isent
       ver = str('v1.7')
       date = str('10/01/22')
-      args = Args(AR=data.A2/data.A1, Ad = data.Ad, Af = data.Af, qr = data.qr, twr= data.twr, cd = data.cd, cf = data.cf, M1=data.M1, xi = data.xi, nu = data.nu, k = data.gamma, b1 = data.beta1, b2 = data.beta2, a1 = data.alpha1, a2 = data.alpha2 , isentropic=(data.isent == 'True'))#(AR=A2/A1, Ad = Ad, Af = Af, qr = qr, twr= twr, cd = cd, cf = cf, M1=M1, xi = xi, nu = nu, k = gamma, b1 = beta1, b2 = beta2, a1 = alpha1, a2 = alpha2 , isentropic=(isent == 'True'))
+      M1 = data.M1
+      Qr = data.qr / data.N
+      Af = (data.Af / data.A1) / data.N
+      Ar = (data.A2/data.A1) ** (1/data.N)
+      for i in range(data.N):
+        if i:
+            #print("What")
+            #print(i)
+            #print(Ar)
+            #print(Qr)
+            ##print(Af)
+            #print("what")
+            M1 = args.M2[0]
+            Qr *= i+1
+            Af *= i+1
+            Ar = Ar ** (i+1)
+        args = Args(AR=Ar, Ad = data.Ad/data.A1, Af = Af/data.A1, qr = Qr, cd = data.cd, cf = data.cf, M1=M1, xi = data.xi, nu = data.nu, k = data.gamma, b1 = data.beta1, b2 = data.beta2, a1 = data.alpha1, a2 = data.alpha2 , isentropic=(data.isent == 'True'))#(AR=A2/A1, Ad = Ad, Af = Af, qr = qr, twr= twr, cd = cd, cf = cf, M1=M1, xi = xi, nu = nu, k = gamma, b1 = beta1, b2 = beta2, a1 = alpha1, a2 = alpha2 , isentropic=(isent == 'True'))
+        if( args.isentropic ):
+            args = isentropic(args)
+            args = coefsBiquadratic(args)
 
-      if( args.isentropic ):
-          args = isentropic(args)
-          args = coefsBiquadratic(args)
+        else:
+            args = coefsBiquadratic(args)
+            args = solveBiquadratic(args)
 
-      else:
-          args = coefsBiquadratic(args)
-          args = solveBiquadratic(args)
-
-      args = postProcess(args)
+        args = postProcess(args)
     #      print(args.M2)
     #      printOutput(args) #-> updateResults
       
@@ -769,6 +785,62 @@
   </py-script>
 </head>
 <body>
+    <header id="header" class="site-header">
+            <h1 id="site-title" class="site-title">
+            <span class="logo-container">
+            <img class="logo" src="ndtl_logo_v2.svg" alt="NDTL Logo">
+            <!--<span class="fallback-text">NDTL Propulsion &amp; Power</span> -->
+            </span>
+        </h1>
+        <p id="ndtl" class="mark-header"><a href="https://www.nd.edu/">University of Notre Dame</a></p>
+        <div class="site-title-group">
+        </div>
+
+        <div class="nav-header">
+       <!-- <nav id="nav-top" class="nav-top" role="navigation" aria-label="Primary navigation">
+            
+            
+            <div id="primary"><ul class="nav-level-1 depth_1"><li id="primary_126112" class="first active"><a href="/" aria-current="page" class="current current-last" aria-label="Home"><svg class="icon" width="16" height="16"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-home"></use></svg></a></li><li id="primary_126113" class="li-has-children"><a href="/about/">About</a></li><li id="primary_126114" class="li-has-children"><a href="/facilities-and-capabilities/">Facilities &amp; Capabilities</a></li><li id="primary_126328"><a href="/people/">People</a></li><li id="primary_127101" class="li-has-children"><a href="/news-events/">News &amp; Events</a></li><li id="primary_126183" class="li-has-children"><a href="/get-involved/">Get Involved</a></li><li id="primary_126186" class="last"><a href="/contact/">Contact</a></li>
+            <li class="nav-search"><button class="btn-search search-toggle" aria-label="Toggle search"><svg class="icon" width="16" height="16"><use xlink:href="#icon-search"></use></svg></button></li>
+        </ul> -->
+       <!-- <div class="nav-search-wrapper">
+            <form method="get" action="/search/" id="search-nav-top" class="search-form" role="search" aria-label="Site search">
+            <input type="hidden" name="as_sitesearch" value="ndtl.nd.edu">
+            <input type="hidden" name="entqr" value="3">
+            <input type="search" name="q" class="search-input" id="search-input-nav-top" placeholder="Search this site" title="type your search term" aria-label="Site Search input">
+            <button class="search-button" type="submit" aria-label="Search"><svg class="icon" width="16" height="16" data-icon="search"><use xlink:href="#icon-search"></use></svg></button>
+            <button class="search-close search-toggle" aria-label="Close Search"><svg class="icon" width="16" height="16"><use xlink:href="#icon-close"></use></svg></button>
+            </form>
+        </div></div>
+        </nav>
+        </div>-->
+
+        <!-- <div class="nav-mobile-util">
+        <ul class="no-bullets">
+            <li><a href="/"><svg class="icon" width="16" height="16"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-home"></use></svg> Home</a></li>
+            <li><a href="/contact/"><svg class="icon" width="16" height="16"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-envelope-o"></use></svg> Contact</a></li>
+            <li><button class="btn-search search-toggle"><svg class="icon" width="16" height="16"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-search"></use></svg> Search</button></li>
+            <li>
+            <a href="#nav" class="nav-menu nav-skip">
+            <svg version="1.1" class="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 20 20" xml:space="preserve">
+                <line class="ni ni1" stroke-width="2" stroke-linecap="square" stroke-miterlimit="10" x1="0.98" y1="2" x2="18.94" y2="2"></line>
+                <line class="ni ni2" stroke-width="2" stroke-linecap="square" stroke-miterlimit="10" x1="0.98" y1="8.69" x2="18.94" y2="8.69"></line>
+            </svg>
+            <span class="ni ni3">Menu</span>
+            </a>
+            </li>
+        </ul>
+        <div class="nav-search-wrapper">
+            <form method="get" action="/search/" id="search-navbar-mobile" class="search-form" role="search" aria-label="Site search">
+            <input type="hidden" name="as_sitesearch" value="ndtl.nd.edu">
+            <input type="hidden" name="entqr" value="3">
+            <input type="search" name="q" class="search-input" id="search-input-navbar-mobile" placeholder="Search this site" title="type your search term" aria-label="Site Search input">
+            <button class="search-button" type="submit" aria-label="Search"><svg class="icon" width="16" height="16"><use xlink:href="#icon-search"></use></svg></button>
+            <button class="search-close search-toggle" aria-label="Close Search"><svg class="icon" width="16" height="16"><use xlink:href="#icon-close"></use></svg></button>
+            </form>
+        </div> -->
+        </div>
+    </header>
     <div class="title">
         <h3>Steady, quasi-one-dimensional, internal compressible flow with area change, heat addition and friction</h3>
         <p class="credits">by Andrew Oliva and Scott Morris <a href="https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/steady-quasionedimensional-internal-compressible-flow-with-area-change-heat-addition-and-friction/941B60C217C6096C6980DFDD4B5F9E34" target="_blank" rel="noopener noreferrer">Here</a></p>
@@ -778,351 +850,437 @@
         <form class="inputFields">
             <div class="Inlet">
                 <h4 class="InputHeaders">Inlet Conditions</h4>
-              <!--  <div class="label-input-row">
-                <label for="P">P=</label>
-                <input type="text" id="P">
+                    
+                    <!-- P1 Input -->
+                    <div class="label-input-row">
+                        <label for="P1">P<sub>1</sub>=</label>
+                        <input type="text" id="P1">
+                        <select>
+                            <option>Pa</option>
+                        </select>
+                        <input type="text" value="Inlet Mach Number" class="description" readonly>
+                    </div>
+
+                    <!-- T1 Input -->
+                    <div class="label-input-row">
+                        <label for="T1">T<sub>1</sub>=</label>
+                        <input type="text" id="T1">
+                        <select>
+                            <option>K</option>
+                        </select>
+                        <input type="text" value="Inlet Mach Number" class="description" readonly>
+                    </div>
+
+                    <!-- M1 Input -->
+                    <div class="label-input-row">
+                        <label for="M1">M<sub>1</sub>=</label>
+                        <input type="text" id="M1">
+                        <select>
+                            <option>-</option>
+                        </select>
+                        <input type="text" value="Inlet Mach Number" class="description" readonly>
+                    </div>
+
+                    <!-- A1 Input -->
+                    <div class="label-input-row">
+                        <label for="A1">A<sub>1</sub>=</label>
+                        <input type="text" id="A1" oninput="imageGUI()">
+                        <select>
+                            <option>m&sup2;</option>
+                        </select>
+                        <input type="text" value="EInlet Area" class="description" readonly>
+                    </div>
+
+                    <!-- Alpha1 Input -->
+                    <div class="label-input-row">
+                        <label for="alpha1">&alpha;<sub>1</sub>=</label>
+                        <input type="text" id="alpha1">
+                        <select>
+                            <option>-</option>
+                        </select>
+                        <input type="text" value="Inlet mass flux correction factor" class="description" readonly>
+                    </div>
+
+                    <!-- Beta1 Input -->
+                    <div class="label-input-row">
+                        <label for="beta1">&beta;<sub>1</sub>=</label>
+                        <input type="text" id="beta1">
+                        <select>
+                            <option>-</option>
+                        </select>
+                        <input type="text" value="Inlet momentum flux correction factor" class="description" readonly>
+                    </div>
+
+                    <!-- Isentropic Input -->
+                    <div class="label-input-row">
+                    <label for="isentropic">Isentropic</label>
+                    <select id="isentropic">
+                    <option>False</option>
+                    <option>True</option>
+                    </select>
+                    <input type="text" value="Force entropy change to zero" class="description" readonly>
+                    </div>
+
+                    <!-- Example Flows -->
+                    <div class="exampleFlows">
+                        <h4>Example Flows</h4>
+                        <select class="selectFlow" onchange="exampleFlow()">
+                        <option>Default</option>
+                        <option>Isentropic flow with area change</option>
+                        <option>Flow across a normal shock</option>
+                        <option>Fanno flow</option>
+                        <option>Rayleigh flow</option>
+                        <option>Sudden expansion</option>
+                        <option>Sudden Contraction</option>
+                        <option>Two-stream mixing layer</option>
+                        <option>Simultaneous friction and heat transfer</option>
+                        <option>Simultaneous area change and friction</option>
+                        </select>
+                    </div>
+
                 </div>
 
-                <div class="label-input-row">
-                <label for="T">T=</label>
-                <input type="text" id="T">
-                </div> -->
+                <div class="gui-parameters">
+                    <h4 class="InputHeaders">Parameters</h4>
 
-                <div class="label-input-row">
-                <label for="M1" title="Inlet Mach Number">M<sub>1</sub>=</label>
-                <input type="text" id="M1">
-                </div>
+                    <!-- Gamma Input -->
+                    <div class="label-input-row">
+                        <label for="gamma">&gamma;=</label>
+                        <input type="text" id="gamma">
+                        <select>
+                            <option>-</option>
+                        </select>
+                        <input type="text" value="Ratio of Specific Heats" class="description" readonly>
+                    </div>
 
-                <div class="label-input-row">
-                <label for="A1" title="Exit Area / Inlet Area">A<sub>1</sub>=</label>
-                <input type="text" id="A1" oninput="imageGUI()">
-                </div>
+                    <!-- Cd Input -->
+                    <div class="label-input-row">
+                        <label for="cd">C<sub>d</sub>=</label>
+                        <input type="text" id="cd">
+                        <select>
+                            <option>-</option>
+                        </select>
+                        <input type="text" value="Drag Coefficient" class="description" readonly>
+                    </div>
 
-                <div class="label-input-row">
-                <label for="gamma" title="Ratio of Specific Heats">&gamma;=</label>
-                <input type="text" id="gamma">
-                </div>
+                    <!-- Cf Input -->
+                    <div class="label-input-row">
+                        <label for="cf">C<sub>f</sub>=</label>
+                        <input type="text" id="cf">
+                        <select>
+                            <option>-</option>
+                        </select>
+                        <input type="text" value="Friction Coefficient" class="description" readonly>
+                    </div>
 
-                <div class="label-input-row">
-                <label for="cd" title="Drag Coefficient">C<sub>d</sub>=</label>
-                <input type="text" id="cd">
-                </div>
+                    <!-- Qr Input -->
+                    <div class="label-input-row">
+                        <label for="qr">Q<sub>r</sub>=</label>
+                        <input type="text" id="qr">
+                        <select>
+                            <option>-</option>
+                        </select>
+                        <input type="text" value="Heat transfer normalized by Inlet Stagnation Enthalpy (q/ho)" class="description" readonly>
+                    </div>
 
-                <div class="label-input-row">
-                <label for="cf" title="Friction Coefficient">C<sub>f</sub>=</label>
-                <input type="text" id="cf">
-                </div>
+                    <!-- Xi Input -->
+                    <div class="label-input-row">
+                        <label for="xi">&xi;=</label>
+                        <input type="text" id="xi">
+                        <select>
+                            <option>-</option>
+                        </select>
+                        <input type="text" value="Wall-pressure weighting for exit-static-to-inlet-static pressure ratio" class="description" readonly>
+                    </div>
 
-                <div class="label-input-row">
-                <label for="twr" title="Ratio of wall temperature to inlet stagnation temperature">TWR=</label>
-                <input type="text" id="twr">
-                </div>
+                    <!-- Nu Input -->
+                    <div class="label-input-row">
+                        <label for="nu">&nu;=</label>
+                        <input type="text" id="nu">
+                        <select>
+                            <option>-</option>
+                        </select>
+                        <input type="text" value="Wall-pressure weighting for inlet-stagnation-to-inlet-static pressure ratio" class="description" readonly>
+                    </div>
 
-                <div class="label-input-row">
-                <label for="alpha1" title="Inlet mass flux correction factor">&alpha;<sub>1</sub>=</label>
-                <input type="text" id="alpha1">
-                </div>
+                    <!-- Af Input -->
+                    <div class="label-input-row">
+                        <label for="Af">A<sub>f</sub>=</label>
+                        <input type="text" id="Af">
+                        <select>
+                            <option>m&sup2;</option>
+                        </select>
+                        <input type="text" value="Friction Surface Area" class="description" readonly>
+                    </div>
 
-                <div class="label-input-row">
-                <label for="beta1" title="Inlet momentum flux correction factor">&beta;<sub>1</sub>=</label>
-                <input type="text" id="beta1">
-                </div>
+                    <!-- Ad Input -->
+                    <div class="label-input-row">
+                        <label for="Ad">A<sub>d</sub>=</label>
+                        <input type="text" id="Ad">
+                        <select>
+                            <option>m&sup2;</option>
+                        </select>
+                        <input type="text" value="Drag Area" class="description" readonly>
+                    </div>
 
-                <div class="label-input-row">
-                <label for="isentropic" title="Force entropy change to zero">Isentropic</label>
-                <select id="isentropic">
-                <option>False</option>
-                <option>True</option>
-                </select>
-                </div>
-                <div class="exampleFlows">
-                <h4>Example Flows</h4>
-                <select class="selectFlow" onchange="exampleFlow()">
-                <option>Default</option>
-                <option>Isentropic flow with area change</option>
-                <option>Flow across a normal shock</option>
-                <option>Fanno flow</option>
-                <option>Rayleigh flow</option>
-                <option>Sudden expansion</option>
-                <option>Sudden Contraction</option>
-                <option>Two-stream mixing layer</option>
-                <option>Simultaneous friction and heat transfer</option>
-                <option>Simultaneous area change and friction</option>
-                </select>
-        </div>
+                    <div class="label-input-row">
+                    <label for="N">N=</label>
+                    <input type="text" id="subelements">
+                        <select>
+                            <option>-</option>
+                        </select>
+                        <input type="text" value="Number of Subelements" class="description" readonly>
+                    </div>
             </div>
-            <div class="Gui">
-              <canvas id="myChart"></canvas>
-          </div>
+
             <div class="Outlet">
-                <h4 class="InputHeaders">Outlet Conditions</h4>
-              <!--  <div class="label-input-row">
-                <label for="w">w=</label>
-                <input type="text" id="w">
+                <h4 class="InputHeaders">Outlet Conditions <input type="checkbox" id="additional" onclick="toggleDescriptions()"> <span style="font-weight: normal; font-size: small;">Hide Descriptions </span></h4>
+
+                <!-- A2 Input -->
+                <div class="label-input-row">
+                    <label for="A2">A<sub>2</sub>=</label>
+                    <input type="text" id="A2">
+                    <select>
+                        <option>m&sup2;</option>
+                    </select>
+                    <input type="text" value="Outlet Area" class="description" readonly>
                 </div>
 
+                <!-- Alpha2 Input -->
                 <div class="label-input-row">
-                <label for="Fx">F<sub>x</sub>=</label>
-                <input type="text" id="Fx">
+                    <label for="alpha2">&alpha;<sub>2</sub>=</label>
+                    <input type="text" id="alpha2">
+                    <select>
+                        <option>-</option>
+                    </select>
+                    <input type="text" value="Outlet mass flux correction factor" class="description" readonly>                    
                 </div>
 
+                <!-- Beta2 Input -->
                 <div class="label-input-row">
-                <label for="m2">m<sub>2</sub>=</label>
-                <input type="text" id="m2">
-                </div> -->
-
-              <!--  <div class="label-input-row">
-                <label for="Q">Q=</label>
-                <input type="text" id="Q">
-                </div> -->
-
-                <div class="label-input-row">
-                <label for="qr" title="Heat transfer / inlet specific total enthalpy (q/ho)">Q<sub>r</sub>=</label>
-                <input type="text" id="qr">
+                    <label for="beta2">&beta;<sub>2</sub>=</label>
+                    <input type="text" id="beta2">
+                    <select>
+                        <option>-</option>
+                    </select>
+                    <input type="text" value="Outlet momentum flux correction factor" class="description" readonly>
                 </div>
-
-                <div class="label-input-row">
-                <label for="A2" title="Exit Area / Inlet Area">A<sub>2</sub>=</label>
-                <input type="text" id="A2" oninput="imageGUI()">
-                </div>
-
-                <div class="label-input-row">
-                <label for="xi" title="Wall-pressure weighting for exit-static-to-inlet-static pressure ratio">&xi;=</label>
-                <input type="text" id="xi">
-                </div>
-
-                <div class="label-input-row">
-                <label for="nu" title="Wall-pressure weighting for inlet-stagnation-to-inlet-static pressure ratio">&nu;=</label>
-                <input type="text" id="nu">
-                </div>
-
-                <div class="label-input-row">
-                <label for="Af" title="Friction Surface Area / Inlet Area">A<sub>f</sub>=</label>
-                <input type="text" id="Af">
-                </div>
-
-                <div class="label-input-row">
-                <label for="Ad" title="Drag Area / Inlet Area">A<sub>d</sub>=</label>
-                <input type="text" id="Ad">
-                </div>
-
-                <div class="label-input-row">
-                <label for="alpha2" title="Outlet mass flux correction factor">&alpha;<sub>2</sub>=</label>
-                <input type="text" id="alpha2">
-                </div>
-
-                <div class="label-input-row">
-                <label for="beta2" title="Outlet momentum flux correction factor">&beta;<sub>2</sub>=</label>
-                <input type="text" id="beta2">
-                </div>
-
-                <div class="label-input-row">
-                <label for="subelements" title="Number of subdivisions for flow field solution">N=</label>
-                <input type="text" id="subelements" min="1" step="1" value="1">
-                </div>
+                <button id="calculate" onclick="calculateFlow(event)">Calculate</button>
+                <canvas id="myChart"></canvas>
             </div>
         </form>
     </div>
     <div class="output-container">
-        <button id="calculate" onclick="calculateFlow(event)">Calculate</button>
-        <div class="outputLabels">
-            <div class = "roots">
-                <div class="label-output-row"> <!-- This is the new row -->
-                    <h4>Roots</h4>
-                    <input type="checkbox" id="additional" onclick="toggleData()"> Additional
-                </div>
-                <div class="label-output-row">
-                <label for="M2">M<sub>2</sub>=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        <div class="traditional-output">
+            <div class="label-output-row">
+                <h4>Roots</h4>
+                <input type="checkbox" id="additional" onclick="toggleData()"> Additional
+            </div>
+
+            <!-- Output for M2 -->
+            <div class="label-output-row" title="Mach number at the exit">
+                <label for="M2">M<sub>2</sub>=</label>
                 <input type="text" id="M2">
                 <input type="text" id="M2Second">
-                </div>
+                <select><option>-</option></select>
+                <input type="text" value="Mach number at the exit" class="description" readonly>
+            </div>
 
-                <div class="label-output-row">
-                <label for="P2P1">P<sub>2</sub>/P<sub>1</sub>=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+            <!-- Output for P2P1 -->
+            <div class="label-output-row" title="Pressure ratio across the duct">
+                <label for="P2P1">P<sub>2</sub>/P<sub>1</sub>=</label>
                 <input type="text" id="P2P1">
                 <input type="text" id="P2P1Second">
-                </div>
+                <select><option>-</option></select>
+                <input type="text" value="Pressure ratio across the duct" class="description" readonly>
+            </div>
 
-                <div class="label-output-row">
-                <label for="T2T1">T<sub>2</sub>/T<sub>1</sub>=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+            <!-- Output for T2T1 -->
+            <div class="label-output-row" title="Temperature ratio across the duct">
+                <label for="T2T1">T<sub>2</sub>/T<sub>1</sub>=</label>
                 <input type="text" id="T2T1">
                 <input type="text" id="T2T1Second">
-                </div>
+                <select><option>-</option></select>
+                <input type="text" value="Temperature ratio across the duct" class="description" readonly>
+            </div>
 
-                <div class="label-output-row">
-                <label for="TR">T<sub>o2</sub>/T<sub>o1</sub>=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+            <!-- Output for TR -->
+            <div class="label-output-row" title="Stagnation temperature ratio across the duct">
+                <label for="TR">T<sub>o2</sub>/T<sub>o1</sub>=</label>
                 <input type="text" id="TR">
                 <input type="text" id="TRSecond">
-                </div>
+                <select><option>-</option></select>
+                <input type="text" value="Stagnation temperature ratio across the duct" class="description" readonly>
+            </div>
 
-                <div class="label-output-row">
-                <label for="PR">P<sub>o2</sub>/P<sub>o1</sub>=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+            <!-- Output for PR -->
+            <div class="label-output-row" title="Stagnation pressure ratio across the duct">
+                <label for="PR">P<sub>o2</sub>/P<sub>o1</sub>=</label>
                 <input type="text" id="PR">
                 <input type="text" id="PRSecond">
-                </div>
+                <select><option>-</option></select>
+                <input type="text" value="Stagnation pressure ratio across the duct" class="description" readonly>
+            </div>
 
-                <div class="label-output-row">
-                <label for="deltaSR">&Delta;s/R=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+            <!-- Output for deltaSR -->
+            <div class="label-output-row" title="Change in entropy across the duct per gas constant">
+                <label for="deltaSR">&Delta;s/R=</label>
                 <input type="text" id="deltaSR">
                 <input type="text" id="deltaSRSecond">
-                </div>
+                <select><option>-</option></select>
+                <input type="text" value="Change in entropy across the duct per gas constant" class="description" readonly>
             </div>
-            <div class = "roots">
-                <div class="label-output-row">
-                <label for="M2M1">M<sub>2</sub>/M<sub>1</sub>=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+
+            <!-- Output for M2M1 -->
+            <div class="label-output-row" title="Ratio of exit Mach number to inlet Mach number">
+                <label for="M2M1">M<sub>2</sub>/M<sub>1</sub>=</label>
                 <input type="text" id="M2M1">
                 <input type="text" id="M2M1Second">
-                </div>
+                <select><option>-</option></select>
+                <input type="text" value="Ratio of exit Mach number to inlet Mach number" class="description" readonly>
+            </div>
 
-                <div class="label-output-row">
-                <label for="dsRKE">(ds/R)/(k/2*M<sub>1</sub><sup>2</sup>)=&nbsp;&nbsp;</label>
+            <!-- Output for dsRKE -->
+            <div class="label-output-row" title="Entropy change normalized by outlet kinetic energy">
+                <label for="dsRKE">(ds/R)/(k/2*M<sub>1</sub><sup>2</sup>)=</label>
                 <input type="text" id="dsRKE">
                 <input type="text" id="dsRKESecond">
-                </div>
+                <select><option>-</option></select>
+                <input type="text" value="Entropy change per gas constant divided by kinetic energy term" class="description" readonly>
+            </div>
 
-                <div class="label-output-row">
+            <!-- Output for wloss -->
+            <div class="label-output-row" title="Ratio of stagnation pressure loss to total pressure change">
                 <label for="wloss">(P<sub>o1</sub>-P<sub>o2</sub>)/(P<sub>o1</sub>-P<sub>1</sub>)=</label>
                 <input type="text" id="wloss">
                 <input type="text" id="wlossSecond">
-                </div>
+                <select><option>-</option></select>
+                <input type="text" value="Ratio of stagnation pressure loss to total pressure change" class="description" readonly>
+            </div>
 
-                <div class="label-output-row">
-                <label for="cp">(P<sub>2</sub>-P<sub>1</sub>)/(P<sub>o1</sub>-P<sub>1</sub>)=&nbsp;&nbsp;&nbsp;&nbsp;</label>
+            <!-- Output for cp -->
+            <div class="label-output-row" title="Pressure recovery coefficient">
+                <label for="cp">(P<sub>2</sub>-P<sub>1</sub>)/(P<sub>o1</sub>-P<sub>1</sub>)=</label>
                 <input type="text" id="cp">
                 <input type="text" id="cpSecond">
+                <select><option>-</option></select>
+                <input type="text" value="Pressure recovery coefficient" class="description" readonly>
+            </div>
+        </div>
+
+        <div id="additional-data">
+            <div class="label-output-row">
+                <h4>Additional Data</h4>
+            </div>
+            <div class="additional-1">
+                <div class="label-output-row" title="Ratio of exit volume flow rate to inlet volume flow rate">
+                    <label for="V2V1">V<sub>2</sub>/V<sub>1</sub>=</label>
+                    <input type="text" id="V2V1">
+                    <input type="text" id="V2V1Second">
+                    <select><option>-</option></select>
+                    <input type="text" value="Ratio of exit volume flow rate to inlet volume flow rate" class="description" readonly>
+                </div>
+
+                <div class="label-output-row" title="Ratio of exit specific volume to inlet specific volume">
+                    <label for="v2v1">v<sub>2</sub>/v<sub>1</sub>=</label>
+                    <input type="text" id="v2v1">
+                    <input type="text" id="v2v1Second">
+                    <select><option>-</option></select>
+                    <input type="text" value="Ratio of exit specific volume to inlet specific volume" class="description" readonly>
+                </div>
+
+                <div class="label-output-row" title="Ratio of exit static pressure to inlet static pressure">
+                    <label for="p2p1">p<sub>2</sub>/p<sub>1</sub>=</label>
+                    <input type="text" id="p2p1">
+                    <input type="text" id="p2p1Second">
+                    <select><option>-</option></select>
+                    <input type="text" value="Ratio of exit static pressure to inlet static pressure" class="description" readonly>
+                </div>
+
+                <div class="label-output-row" title="Entropy change per gas constant divided by kinetic energy term">
+                    <label for="dsRKE2">dsR/(k/2*M2<sup>2</sup>)=</label>
+                    <input type="text" id="dsRKE2">
+                    <input type="text" id="dsRKE2Second">
+                    <select><option>-</option></select>
+                    <input type="text" value="Entropy change per gas constant divided by kinetic energy term" class="description" readonly>
+                </div>
+
+                <div class="label-output-row" title="Ratio of stagnation pressure loss to total energy loss">
+                    <label for="zloss">(Po1-Po2)/q=</label>
+                    <input type="text" id="zloss">
+                    <input type="text" id="zlossSecond">
+                    <select><option>-</option></select>
+                    <input type="text" value="Ratio of stagnation pressure loss to total energy loss" class="description" readonly>
+                </div>
+
+                <div class="label-output-row" title="Increment of pressure recovery coefficient">
+                    <label for="CPinc">(P2-P1)/q=</label>
+                    <input type="text" id="CPinc">
+                    <input type="text" id="CPincSecond">
+                    <select><option>-</option></select>
+                    <input type="text" value="Increment of pressure recovery coefficient" class="description" readonly>
+                </div>
+
+                <div class="label-output-row" title="Ratio of the static pressure at point 3 to point 1">
+                    <label for="P3P1">P<sub>3</sub>/P<sub>1</sub>=</label>
+                    <input type="text" id="P3P1">
+                    <input type="text" id="P3P1Second">
+                    <select><option>-</option></select>
+                    <input type="text" value="Ratio of the static pressure at point 3 to point 1" class="description" readonly>
+                </div>
+
+                <div class="label-output-row" title="Ratio of the static pressure at point 3 to point 2">
+                    <label for="P3P2">P<sub>3</sub>/P<sub>2</sub>=</label>
+                    <input type="text" id="P3P2">
+                    <input type="text" id="P3P2Second">
+                    <select><option>-</option></select>
+                    <input type="text" value="Ratio of the static pressure at point 3 to point 2" class="description" readonly>
+                </div>
+
+                <div class="label-output-row" title="Ratio of the static pressure at point 3 to stagnation pressure at point 1">
+                    <label for="P3Po1">P<sub>3</sub>/Po<sub>1</sub>=</label>
+                    <input type="text" id="P3Po1">
+                    <input type="text" id="P3Po1Second">
+                    <select><option>-</option></select>
+                    <input type="text" value="Ratio of the static pressure at point 3 to stagnation pressure at point 1" class="description" readonly>
+                </div>
+
+                <div class="label-output-row" title="Lambda">
+                    <label for="Lambda">Lambda=</label>
+                    <input type="text" id="Lambda">
+                    <input type="text" id="LambdaSecond">
+                    <select><option>-</option></select>
+                    <input type="text" value="Lambda" class="description" readonly>
+                </div>
+
+                <div class="label-output-row" title="linear coefficient">
+                    <label for="b">b=</label>
+                    <input type="text" id="b">
+                    <input type="text" id="bSecond">
+                    <select><option>-</option></select>
+                    <input type="text" value="Linear Coefficient" class="description" readonly>
+                </div>
+
+                <div class="label-output-row" title="Constant Coefficient">
+                    <label for="c">c=</label>
+                    <input type="text" id="c">
+                    <input type="text" id="cSecond">
+                    <select><option>-</option></select>
+                    <input type="text" value="Constant Coefficient" class="description" readonly>
+                </div>
+
+                <div class="label-output-row" title="Quadtratic Polynomial Discriminant">
+                    <label for="det">Discriminant=</label>
+                    <input type="text" id="det">
+                    <input type="text" id="detSecond">
+                    <select><option>-</option></select>
+                    <input type="text" value="Quadtratic Polynomial Discriminant" class="description" readonly>
                 </div>
             </div>
         </div>
     </div>
+
     </div>
-    <div id="additional-data">
-            <h3>Additional Outputs</h3>
-            <div class="additional-1">
-            <!-- Repeat this structure for each output -->
-            <div class="label-output-row">
-                <label for="V2V1">V<sub>2</sub>/V<sub>1</sub>=</label>
-                <input type="text" id="V2V1">
-                <input type="text" id="V2V1Second">
-            </div>
-
-            <div class="label-output-row">
-                <label for="v2v1">v<sub>2</sub>/v<sub>1</sub>=</label>
-                <input type="text" id="v2v1">
-                <input type="text" id="v2v1Second">
-            </div>
-
-            <div class="label-output-row">
-                <label for="p2p1">p<sub>2</sub>/p<sub>1</sub>=</label>
-                <input type="text" id="p2p1">
-                <input type="text" id="p2p1Second">
-            </div>
-
-            <!--<div class="label-output-row">
-                <label for="wpv">wpv=</label>
-                <input type="text" id="wpv">
-                <input type="text" id="wpvSecond">
-            </div>
-
-            <div class="label-output-row">
-                <label for="ek">ek=</label>
-                <input type="text" id="ek">
-                <input type="text" id="ekSecond">
-            </div>
-
-            <div class="label-output-row">
-                <label for="Iq">Iq=</label>
-                <input type="text" id="Iq">
-                <input type="text" id="IqSecond">
-            </div>
-
-            <div class="label-output-row">
-                <label for="we">we=</label>
-                <input type="text" id="we">
-                <input type="text" id="weSecond">
-            </div>
-
-            <div class="label-output-row">
-                <label for="wrev">wrev=</label>
-                <input type="text" id="wrev">
-                <input type="text" id="wrevSecond">
-            </div>
-
-            <div class="label-output-row">
-                <label for="I">I=</label>
-                <input type="text" id="I">
-                <input type="text" id="ISecond">
-            </div>
-
-            <div class="label-output-row">
-                <label for="Theta">Theta=</label>
-                <input type="text" id="Theta">
-                <input type="text" id="ThetaSecond">
-            </div>
-
-            <div class="label-output-row">
-                <label for="IplusTheta">I+Theta=</label>
-                <input type="text" id="IplusTheta">
-                <input type="text" id="IplusThetaSecond">
-            </div>-->
-            </div>
-
-            <div class="additional-data2">
-            <div class="label-output-row">
-                <label for="dsRKE2">dsR/(k/2*M2<sup>2</sup>)=</label>
-                <input type="text" id="dsRKE2">
-                <input type="text" id="dsRKE2Second">
-            </div>
-
-            <div class="label-output-row">
-                <label for="zloss">(Po1-Po2)/q=</label>
-                <input type="text" id="zloss">
-                <input type="text" id="zlossSecond">
-            </div>
-
-            <div class="label-output-row">
-                <label for="CPinc">(P2-P1)/q=</label>
-                <input type="text" id="CPinc">
-                <input type="text" id="CPincSecond">
-            </div>
-
-            <div class="label-output-row">
-                <label for="P3P1">P<sub>3</sub>/P<sub>1</sub>=</label>
-                <input type="text" id="P3P1">
-                <input type="text" id="P3P1Second">
-            </div>
-
-            <div class="label-output-row">
-                <label for="P3P2">P<sub>3</sub>/P<sub>2</sub>=</label>
-                <input type="text" id="P3P2">
-                <input type="text" id="P3P2Second">
-            </div>
-
-            <div class="label-output-row">
-                <label for="P3Po1">P<sub>3</sub>/Po<sub>1</sub>=</label>
-                <input type="text" id="P3Po1">
-                <input type="text" id="P3Po1Second">
-            </div>
-
-            <div class="label-output-row">
-                <label for="Lambda">Lambda=</label>
-                <input type="text" id="Lambda">
-            </div>
-
-            <div class="label-output-row">
-                <label for="b">b=</label>
-                <input type="text" id="b">
-            </div>
-
-            <div class="label-output-row">
-                <label for="c">c=</label>
-                <input type="text" id="c">
-            </div>
-            <div class="label-output-row">
-                <label for="det">Determinant=</label>
-                <input type="text" id="det">
-            </div>
-        </div>
-        </div>
     </div>
     <div class = "chart-container">
         <div class= "chart-selection">
@@ -1159,9 +1317,9 @@
                 <option value="beta2">&beta;<sub>2</sub></option>
             </select>
         </div>
-        <div>
-            <canvas id="outputChart" class="rootGraph"></canvas>
-            <canvas id="outputChart2" class="rootGraph"></canvas>
+        <div class="charts">
+           <span class="rootGraph"> <canvas id="outputChart" class="rootGraph"></canvas> </span>
+            <span class="rootGraph"> <canvas id="outputChart2" class="rootGraph"></canvas> </span>
         </div>
     </div>
 </body>
