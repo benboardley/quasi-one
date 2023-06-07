@@ -161,7 +161,6 @@ body {
   }
   .chart-container{
     display: flex;
-    width: 100%;
   }
   .input-container h4 {
     margin: 0;
