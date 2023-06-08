@@ -3,21 +3,11 @@ Plan for Web Calculator
 wednesday- example, ask about N, ask about units, add a unit field, add third row
 thrusday- fix N, fix units, work on api
 
+Functionality Needed: 
+- units
+- subelements
+- Isentropic improvement
 
-Hello, I will not have access to slack until the end of the day today or tomorrow. I am currently doing a little research into the best way we can create and deploy this web application.
-Currently, we have a few options,:
-1. We will need a domain or server to host our web app even if it is only client side. However, there is an easy way to do this with github pages. This would give a few benefits:
-        - You would only need to create a github account and you could host the page for free with a url similar to: https://benboardley.github.io/quasi-one/
-        - If you wanted a different domain you could purchase a domain name and tell github pages to redirect to that domain (I could take care of this github pages gives easy functionality to this), a domain like steadyquasioneflow.com would cost about 12 dollars a year.
-        - Once you have a github account you can easly edit the files and it will automatically replicate these changes on the website once you "push" them to your github repository. This is really really simple I could give a tutorial or create documentation.
-        - This would have to be developed with HTML, CSS and JavaScript. HTML and CSS are general frontend design languages which are easy to use and pretty intuitive (even if you wanted to use django you would need html and css) and Javascript would perform calculations/make interactive. I could create good documentation to make this easy to add to.
-2. I was looking into other technologies, there is one called pywebio, which I may be able to use to build this entire thing in python (without html or css), if you wanted me to do this option I would need to do more research 
-into the functionality to make sure i could incorporate the GUI you would wanted. However, This would have to be hosted by a server as github pages does not support python, I was thinking if you wanted to do this we could figure out how ndtl website is 
-hosted (I am not sure how we would get access to where the code and such is stored) and we may be able to add this calculator onto your current turbo lab website ndtl.nd.edu. We could also do this same option for 1. instead of github pages but I think github pages would give a better ease of use if you want to add to it.
-3. We could also use a server hosting technology like google cloud, this would be a recurrent fee as well tho, it would probably be another option for 2.
-
-Personally, as of right now I think github pages would be the best, If you would like me to look into pywebio I am also able to do that as I know python might be easier for the two of you to interpret.
-I could also begin to develop the functionality with the first option throughout this week and we could reevaluate during out meeting, we could aslo figure out how to host it on the internet after the website is developed.
 
     try {
     var P = parseFloat(document.getElementById("P").value);

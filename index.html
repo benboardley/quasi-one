@@ -51,23 +51,50 @@
       from js import data#cd, cf, twr, qr, Af, Ad, M1 , A1 , gamma , alpha1 , beta1 , Fx , m2 , A2 , xi , nu , alpha2 , beta2 , N, isent
       ver = str('v1.7')
       date = str('10/01/22')
+
+      N = data.N
       M1 = data.M1
-      Qr = data.qr / data.N
-      Af = (data.Af / data.A1) / data.N
-      Ar = (data.A2/data.A1) ** (1/data.N)
-      for i in range(data.N):
-        if i:
-            #print("What")
-            #print(i)
-            #print(Ar)
-            #print(Qr)
-            ##print(Af)
-            #print("what")
-            M1 = args.M2[0]
-            Qr *= i+1
-            Af *= i+1
-            Ar = Ar ** (i+1)
-        args = Args(AR=Ar, Ad = data.Ad/data.A1, Af = Af/data.A1, qr = Qr, cd = data.cd, cf = data.cf, M1=M1, xi = data.xi, nu = data.nu, k = data.gamma, b1 = data.beta1, b2 = data.beta2, a1 = data.alpha1, a2 = data.alpha2 , isentropic=(data.isent == 'True'))#(AR=A2/A1, Ad = Ad, Af = Af, qr = qr, twr= twr, cd = cd, cf = cf, M1=M1, xi = xi, nu = nu, k = gamma, b1 = beta1, b2 = beta2, a1 = alpha1, a2 = alpha2 , isentropic=(isent == 'True'))
+      Qr = data.qr
+      Af = data.Af
+
+
+      AfA1 = (Af / data.A1)
+      Ar = (data.A2/data.A1)
+      ARi = (Ar** (1/N)*np.ones(int(N))).cumprod()
+
+      Qri = Qr / N
+      TR = 1 + (Qri*np.ones(int(N))).cumsum()
+      qihoi = Qri/TR
+
+      AfiA1 = AfA1/N 
+      ARim1 = ARi ** ((np.ones(N).cumsum()-1)/N)
+      AfiAim1 = 1/N * AfA1 * 1/ARim1
+
+      print((AfiAim1*ARi**((np.ones(N).cumsum()-1)/N)).sum())
+      print(qihoi)
+      print(ARi)
+      if N > 1:
+        for i in range(N):
+            #-----------We are going to daisy chain we need to use the calculated elements--------------
+                if i: #After first pass
+                    M1 = args.M2[data.root]
+                Qr = qihoi[i]
+                Af = AfiAim1[i]
+                Ar = ARi[i]
+
+                #--------------Runs for N Subelements----------------    
+                args = Args(AR=Ar, Ad = data.Ad/data.A1, Af = AfA1, qr = Qr, cd = data.cd, cf = data.cf, M1=M1, xi = data.xi, nu = data.nu, k = data.gamma, b1 = data.beta1, b2 = data.beta2, a1 = data.alpha1, a2 = data.alpha2 , isentropic=(data.isent == 'True'))#(AR=A2/A1, Ad = Ad, Af = Af, qr = qr, twr= twr, cd = cd, cf = cf, M1=M1, xi = xi, nu = nu, k = gamma, b1 = beta1, b2 = beta2, a1 = alpha1, a2 = alpha2 , isentropic=(isent == 'True'))
+                if( args.isentropic ):
+                    args = isentropic(args)
+                    args = coefsBiquadratic(args)
+
+                else:
+                    args = coefsBiquadratic(args)
+                    args = solveBiquadratic(args)
+
+                args = postProcess(args)
+      else:
+        args = Args(AR=Ar, Ad = data.Ad/data.A1, Af = AfA1, qr = Qr, cd = data.cd, cf = data.cf, M1=M1, xi = data.xi, nu = data.nu, k = data.gamma, b1 = data.beta1, b2 = data.beta2, a1 = data.alpha1, a2 = data.alpha2 , isentropic=(data.isent == 'True'))#(AR=A2/A1, Ad = Ad, Af = Af, qr = qr, twr= twr, cd = cd, cf = cf, M1=M1, xi = xi, nu = nu, k = gamma, b1 = beta1, b2 = beta2, a1 = alpha1, a2 = alpha2 , isentropic=(isent == 'True'))
         if( args.isentropic ):
             args = isentropic(args)
             args = coefsBiquadratic(args)
@@ -76,9 +103,7 @@
             args = coefsBiquadratic(args)
             args = solveBiquadratic(args)
 
-        args = postProcess(args)
-    #      print(args.M2)
-    #      printOutput(args) #-> updateResults
+            args = postProcess(args)
       
       return()
     def coefsBiquadratic(args):

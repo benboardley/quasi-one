@@ -31,30 +31,30 @@ var T2 = 0;
 var deltaS = 0;
 var TwTo1 = 1;
 var isent = false;
-var M2;
-var PR;
-var TR;
-var P2P1;
-var T2T1;
-var dsR;
-var dsRKE;
-var wloss;
-var M2M1;
-var cp;
-var V2V1;
-var v2v1;
-var p2p1;
-var wpv;
-var ek;
-var Iq;
-var we;
-var wrev;
-var I;
-var Theta;
-var dsRKE2;
-var zloss;
-var CPinc;
-var P3P1;
+var M2 = [];
+var PR = [];
+var TR = [];
+var P2P1 = [];
+var T2T1 = [];
+var dsR = [];
+var dsRKE = [];
+var wloss = [];
+var M2M1 = [];
+var cp = [];
+var V2V1 = [];
+var v2v1 = [];
+var p2p1 = [];
+var wpv = [];
+var ek = [];
+var Iq = [];
+var we = [];
+var wrev = [];
+var I = [];
+var Theta = [];
+var dsRKE2 = [];
+var zloss = [];
+var CPinc = [];
+var P3P1 = [];
 var Lambda;
 var b;
 var c;
@@ -78,7 +78,8 @@ var data = {
   alpha2: null,
   beta2: null,
   N: null,
-  isent: null
+  isent: null,
+  root: null
 };
 
 window.onload = function() {
@@ -149,40 +150,74 @@ window.onload = function() {
 function calcSum(){
   //  var sum = P + T + M1 + A1 + gamma + alpha1 + beta1 + w + Fx + m2 + A2 + Q + xi + nu + f + alpha2 + beta2 + N;
     js_test = pyscript.interpreter.globals.get('main');
-    js_test();
-    js_args = pyscript.interpreter.globals.get('args')
-    console.log("STUFF")
-    let jsArray = js_args.M2.toJs();
-    console.log(jsArray[0]);
-    console.log(js_args.M2)
-    M2 = js_args.M2.toJs();
-    PR = js_args.PR.toJs();
-    TR = js_args.TR.toJs();
-    P2P1 = js_args.P2P1.toJs();
-    T2T1 = js_args.T2T1.toJs();
-    dsR = js_args.dsR.toJs();
-    dsRKE = js_args.dsRKE.toJs();
-    wloss = js_args.wloss.toJs();
-    M2M1 = [M2[0]/data.M1, M2[1]/data.M1]
-    cp = js_args.CP.toJs();
-    V2V1 = js_args.V2V1.toJs();
-    v2v1 = js_args.v2v1.toJs();
-    p2p1 = js_args.p2p1.toJs();
-    wpv = js_args.wpv.toJs();
-    ek = js_args.ek.toJs();
-    Iq = js_args.Iq.toJs();
-    we = js_args.we.toJs();
-    wrev = js_args.wrev.toJs();
-    I = js_args.I.toJs();
-    Theta = js_args.Theta.toJs();
-    dsRKE2 = js_args.dsRKE2.toJs();
-    zloss = js_args.zloss.toJs();
-    CPinc = js_args.CPinc.toJs();
-    P3P1 = js_args.P3P1.toJs();
-    Lambda = js_args.Lambda//.toJs();
-    b = js_args.b//.toJs();
-    c = js_args.c//.toJs();
-    det = js_args.det//.toJs();
+
+    if(data.N > 1){
+      for(var root = 0; root <=1; root++){
+          data.root = root;
+          js_test();
+          js_args = pyscript.interpreter.globals.get('args');
+          M2[root] = js_args.M2.toJs()[root];
+          PR[root] = js_args.PR.toJs()[root];
+          TR[root] = js_args.TR.toJs()[root];
+          P2P1[root] = js_args.P2P1.toJs()[root];
+          T2T1[root] = js_args.T2T1.toJs()[root];
+          dsR[root] = js_args.dsR.toJs()[root];
+          dsRKE[root] = js_args.dsRKE.toJs()[root];
+          wloss[root] = js_args.wloss.toJs()[root];
+          M2M1[root] = M2[root]/data.M1
+          cp[root] = js_args.CP.toJs()[root];
+          V2V1[root] = js_args.V2V1.toJs()[root];
+          v2v1[root] = js_args.v2v1.toJs()[root];
+          p2p1[root] = js_args.p2p1.toJs()[root];
+          wpv[root] = js_args.wpv.toJs()[root];
+          ek[root] = js_args.ek.toJs()[root];
+          Iq[root] = js_args.Iq.toJs()[root];
+          we[root] = js_args.we.toJs()[root];
+          wrev[root] = js_args.wrev.toJs()[root];
+          I[root] = js_args.I.toJs()[root];
+          Theta[root] = js_args.Theta.toJs()[root];
+          dsRKE2[root] = js_args.dsRKE2.toJs()[root];
+          zloss[root] = js_args.zloss.toJs()[root];
+          CPinc[root] = js_args.CPinc.toJs()[root];
+          P3P1[root] = js_args.P3P1.toJs()[root];
+          Lambda = js_args.Lambda//.toJs();
+          b = js_args.b//.toJs();
+          c = js_args.c//.toJs();
+          det = js_args.det//.toJs();
+      }
+    }
+    else{
+      js_test();
+      js_args = pyscript.interpreter.globals.get('args')
+      M2 = js_args.M2.toJs();
+      PR = js_args.PR.toJs();
+      TR = js_args.TR.toJs();
+      P2P1 = js_args.P2P1.toJs();
+      T2T1 = js_args.T2T1.toJs();
+      dsR = js_args.dsR.toJs();
+      dsRKE = js_args.dsRKE.toJs();
+      wloss = js_args.wloss.toJs();
+      M2M1 = [M2[0]/data.M1, M2[1]/data.M1]
+      cp = js_args.CP.toJs();
+      V2V1 = js_args.V2V1.toJs();
+      v2v1 = js_args.v2v1.toJs();
+      p2p1 = js_args.p2p1.toJs();
+      wpv = js_args.wpv.toJs();
+      ek = js_args.ek.toJs();
+      Iq = js_args.Iq.toJs();
+      we = js_args.we.toJs();
+      wrev = js_args.wrev.toJs();
+      I = js_args.I.toJs();
+      Theta = js_args.Theta.toJs();
+      dsRKE2 = js_args.dsRKE2.toJs();
+      zloss = js_args.zloss.toJs();
+      CPinc = js_args.CPinc.toJs();
+      P3P1 = js_args.P3P1.toJs();
+      Lambda = js_args.Lambda//.toJs();
+      b = js_args.b//.toJs();
+      c = js_args.c//.toJs();
+      det = js_args.det//.toJs();
+    }
   //  return sum;
   }
 
@@ -311,6 +346,7 @@ function postProcess(args) {
     //data.twr = parseFloat(document.getElementById("twr").value) || 0;
     data.qr = parseFloat(document.getElementById("qr").value) || 0;
     data.Af = parseFloat(document.getElementById("Af").value) || 0;
+    console.log(Af)
     data.Ad = parseFloat(document.getElementById("Ad").value) || 0;
     data.M1 = parseFloat(document.getElementById("M1").value) || 0;
     data.A1 = parseFloat(document.getElementById("A1").value) || 0;
@@ -821,7 +857,7 @@ function emptyGraph(){
   }
   var root1 = [];
   var root2 = [];
-  var delta = 0.01;
+  var delta = 0.05;
   for(var X = delta; data[X] < 3; data[X]+=delta){
       var dataPoint1 = {
           x: X,
