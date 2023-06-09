@@ -222,123 +222,143 @@ function calcSum(){
   }
 
 //Variables missing: Af, AD, CD, Cf, TWR, qr
-function coefsBiquadratic(P , T , M1 , A1 , gamma , alpha1 , beta1 , w , Fx , m2 , A2 , Q , xi , nu , f , alpha2 , beta2 , N){
-    TR = (gamma-1) ? (1 + qr) : 1;
-    G = (gamma-1)/2;
-    f1 = 1 + G * M1*M1;
-    AR = A2/A1
-    try {
-      Lambda = math.complex(((1 + beta1*gamma*(1-cf/4*Af - cd/2*Ad)*M1**2 + (1-xi+nu*(Math.pow(f1, gamma/(gamma-1))-1))*(AR-1)) 
-                /(alpha1/alpha2*M1*Math.sqrt(f1*TR))));
-      Lambda = math.multiply(Lambda, Lambda);
-    } catch(e) {
-      Lambda = math.complex(((1 + beta1*gamma*(1-cf/4*Af - cd/2*Ad)*M1**2 + (1-xi+nu*(Math.exp(-(M1**2))-1))*(AR-1)) 
-                /(alpha1/alpha2*M1*Math.sqrt(f1*TR))));
-      Lambda = math.multiply(Lambda, Lambda);
-    }
-  
-    b = (Lambda - 2*gamma*beta2*(1+xi*(1/AR-1))*(1+cf/4*Af/AR)) //Af????
-        /(Lambda * G  -(Math.pow(gamma*beta2*(1+cf/4*Af/AR), 2)));
-  
-    c = -(Math.pow((1+xi*(1/AR-1)), 2))
-        /(Lambda * G  -(Math.pow(gamma*beta2*(1+cf/4*Af/AR), 2))); ///Af????? k -> gamma
-  
-    det = Math.pow(b/2, 2) - c;
-    console.log(det);
-    Lambda = math.re(Lambda);
-  
-    solveBiquadratic();
-  }
-
-function solveBiquadratic(args) {
-    // Solution to mass, momentum, and energy balance equations.
-    // Mass balance is simple inlet nad outlet balance
-    // Momentum balance as 1 friction force and 1 drag force
-    // Energy balance has 1 heat addition term
-    // Gravity and other sources of Potential Energy have been ignored.
-    // Uses calorically perfect ideal gas assumption.
-
-    b;
-    c;
-    det;
-
-    let roots = [-b/2+math.sqrt(det), -b/2-math.sqrt(det)];
-
-    // reject non-physical roots and replace with NaNs
-    M2 = math.sqrt(rejectNonphysicalRoots(roots,true));
-    postProcess()
-}
-
-function rejectNonphysicalRoots(roots, keepNans=false) {
-  // set any roots with negative real part to NaN
-  roots = roots.map(root => (math.re(root) < 0) ? NaN : root);
-
-  // set any roots with non-zero imaginary part to NaN 
-  roots = roots.map(root => (!math.isZero(math.im(root), 1e-6)) ? NaN : root);
-
-  // sort values from lowest to highest
-  roots.sort((a, b) => a - b);
-
-  // remove any NaNs from roots, cast as real, and return
-  if(!keepNans) {
-      roots = roots.filter(root => !Number.isNaN(root));
-  }
-
-  return roots.map(root => math.re(root));
-}
-
-function postProcess(args) {
-  // standard post-processing routine for all solutions
-
-  let G = (k-1)/2;
-  let f1 = 1 + G * M1*M1;
-  let f2 = 1 + G * M2*M2;
-
-  let TR = (k-1) ? (1 + qr) : 1;
-
-  try {
-      let PR = alpha1/alpha2 * Math.sqrt(TR) * M1/M2 * 1./AR * Math.pow(f1/f2, -(k+1)/(2*(k-1)));
-      let dsR  = k/(k-1) * Math.log(TR) - Math.log(PR);
-      let P2P1  = alpha1/alpha2 * Math.sqrt(TR) * M1/M2 * 1./AR * Math.sqrt(f1/f2);
-      let P3P1 = ((1 - xi - nu) + xi * P2P1 + nu * Math.pow(f1, k/(k-1)))*onesLike(M2);
-
-      let T2T1 = TR*(f1/f2);
-      let p2p1 = P2P1/T2T1;
-      let v2v1 = 1/p2p1;
-      let M2M1 = M2/M1;
-      let V2V1 = M2M1 * Math.sqrt(T2T1);
-
-      args.V2V1 = V2V1;
-      args.v2v1 = v2v1;
-      args.p2p1 = p2p1;
-      args.PR = PR;
-      args.TR = onesLike(M2).map(i => i * TR);
-      args.P2P1 = P2P1;
-      args.T2T1 = TR * (f1/f2);
-      args.dsR = dsR;
-      args.dsRKE = dsR/(k/2*Math.pow(M1, 2));
-      args.dsRKE2= dsR/(k/2*Math.pow(M2, 2));
-      args.P3P1 = P3P1;
-      args.wpv = -Math.log(P2P1*V2V1*AR);
-      args.wrev = -Math.log(V2V1*AR);
-
-      // Additional calculations ...
-  } catch(e) {
-      // Handle exception...
-  }
-
-  function onesLike(arr) {
-      return Array(arr.length).fill(1);
-  }
-
-  // Further calculations go here...
-}
-
-
   //--------------------------WORKFLOW-------------------------------------------------------
-  function check_unit(){
+// Pressure conversion functions
+function kpascalsToPascals(value) {
+  return (value * 1000);
+}
 
+function psiToPascals(value) {
+  return (value * 6894.76);
+}
+
+function psfToPascals(value) {
+  return (value * 47.880258);
+}
+
+// Temperature conversion functions
+function celsiusToKelvin(value) {
+  return (value + 273.15);
+}
+
+function rankineToKelvin(value) {
+  return (value * 5/9);
+}
+
+function fahrenheitToKelvin(value) {
+  return ((value + 459.67) * 5/9);
+}
+
+// Area conversion functions
+function centimetersToMeters(value) {
+  return (value * 0.0001);
+}
+
+function feetToMeters(value) {
+  return (value * 0.092903);
+}
+
+function inchesToMeters(value) {
+  return (value * 0.00064516);
+}
+
+// Conversion function
+function convertToSI() {
+  var P1 = parseFloat(document.getElementById("P1").value) || 0;
+  var pressureUnit = document.getElementById("pressure-unit").value;
+
+  var T1 = document.getElementById("T1").value;
+  var tempUnit = document.getElementById("temp-unit").value;
+
+  var A1 = parseFloat(document.getElementById("A1").value) || 0;
+  var inletAreaUnit = document.getElementById("inlet-area-unit").value;
+
+  var A2 = parseFloat(document.getElementById("A2").value) || 0;
+  var outletAreaUnit = document.getElementById("outlet-area-unit").value;
+  
+  parseFloat(document.getElementById("Af").value) || 0;
+  var frictionAreaUnit = document.getElementById("friction-area-unit").value;
+  
+  parseFloat(document.getElementById("Ad").value) || 0;
+  var dragAreaUnit = document.getElementById("drag-area-unit").value;
+
+
+  switch(pressureUnit) {
+      case 'kpascals':
+          data.P1 = kpascalsToPascals(P1);
+          break;
+      case 'psi':
+        data.P1 = psiToPascals(P1);
+          break;
+      case 'psf':
+        data.P1 = psfToPascals(P1);
+          break;
   }
+
+  switch(tempUnit) {
+      case 'celsius':
+          data.T1 = celsiusToKelvin(T1);
+          break;
+      case 'rankine':
+        data.T1 = rankineToKelvin(T1);
+          break;
+      case 'fahrenheit':
+        data.T1 = fahrenheitToKelvin(T1);
+          break;
+  }
+
+  switch(inletAreaUnit) {
+      case 'centimeters':
+          data.A1 = centimetersToMeters(A1);
+          break;
+      case 'feet':
+          data.A1 = feetToMeters(A1);
+          break;
+      case 'inches':
+          data.A1 = inchesToMeters(A1);
+          break;
+  }
+
+  switch(outletAreaUnit) {
+    case 'centimeters':
+        data.A2 = centimetersToMeters(A1);
+        break;
+    case 'feet':
+        data.A2 = feetToMeters(A1);
+        break;
+    case 'inches':
+        data.A2 = inchesToMeters(A1);
+        break;
+}
+
+  switch(frictionAreaUnit) {
+    case 'centimeters':
+      data.Af = centimetersToMeters(Af);
+        break;
+    case 'feet':
+      data.Af = feetToMeters(Af);
+        break;
+    case 'inches':
+      data.Af = inchesToMeters(Af);
+        break;
+}
+
+// Convert Ad to meters
+switch(dragAreaUnit) {
+    case 'centimeters':
+      data.Ad = centimetersToMeters(Ad);
+        break;
+    case 'feet':
+      data.Ad = feetToMeters(Ad);
+        break;
+    case 'inches':
+      data.Ad = inchesToMeters(Ad);
+        break;
+}
+
+  // Return the converted values
+}
+
   
   function assignValues() {
     data.cd = parseFloat(document.getElementById("cd").value) || 0;
@@ -346,7 +366,6 @@ function postProcess(args) {
     //data.twr = parseFloat(document.getElementById("twr").value) || 0;
     data.qr = parseFloat(document.getElementById("qr").value) || 0;
     data.Af = parseFloat(document.getElementById("Af").value) || 0;
-    console.log(Af)
     data.Ad = parseFloat(document.getElementById("Ad").value) || 0;
     data.M1 = parseFloat(document.getElementById("M1").value) || 0;
     data.A1 = parseFloat(document.getElementById("A1").value) || 0;
@@ -360,6 +379,7 @@ function postProcess(args) {
     data.beta2 = parseFloat(document.getElementById("beta2").value) || 0;
     data.N = parseFloat(document.getElementById("subelements").value) || 0;
     data.isent = document.getElementById("isentropic").value;
+    convertToSI();
 }
   function toggleData(){
     var x = document.getElementById("additional-data");
@@ -386,12 +406,6 @@ function postProcess(args) {
         event.preventDefault();
         assignValues();
       calcSum();
-
-      for(var i = 1; i < N; i++){
-        var sum = calcSum();
-        console.log(i);
-      }
-      //console.log(pyscript.interpreter.globals.get('M2'));
       document.getElementById("M2").value = M2[0].toFixed(5);
       document.getElementById("M2Second").value = M2[1].toFixed(5);
       document.getElementById("P2P1").value = P2P1[0].toFixed(5);
@@ -421,8 +435,7 @@ function postProcess(args) {
       
       document.getElementById("p2p1").value = p2p1[0].toFixed(5);
       document.getElementById("p2p1Second").value = p2p1[1].toFixed(5);
-      
-      // ... continue for all variables ...
+
       
       document.getElementById("dsRKE2").value = dsRKE2[0].toFixed(5);
       document.getElementById("dsRKE2Second").value = dsRKE2[1].toFixed(5);
@@ -451,7 +464,7 @@ function postProcess(args) {
     } catch (error) {
       console.log(error);
     }
-    outputGraph();
+    setTimeout(outputGraph, 0);
   }
 
   //--------------------------------------Inlet->Outlet Graphic ----------------------------------
@@ -459,8 +472,9 @@ function postProcess(args) {
 
   function imageGUI() {
     var ctx = document.getElementById('myChart').getContext('2d');
-    var A1 = parseFloat(document.getElementById("A1").value) || 1;
-    var A2 = parseFloat(document.getElementById("A2").value) || 4;
+    assignValues();
+    var A1 = data.A1 || 1;
+    var A2 = data.A2 || 2;
     
     var center = A2 / 2;
     var top = center + A1 / 2;
@@ -950,13 +964,18 @@ myChart3 = new Chart(ctx2, {
   }
 });
 }
-
-
-
-
-function outputGraph(){
+let shouldCancel = false;
+function delay(duration) {
+  return new Promise(resolve => setTimeout(resolve, duration));
+}
+function cancel(){
+  shouldCancel = true;
+}
+async function outputGraph(){
     var ctx = document.getElementById('outputChart').getContext('2d');
     var ctx2 = document.getElementById('outputChart2').getContext('2d');
+    var wasCancelled = false;
+    s_test = pyscript.interpreter.globals.get('main');
   // Get the values of M1 and M2
     assignValues();
     js_test = pyscript.interpreter.globals.get('main');
@@ -976,8 +995,11 @@ function outputGraph(){
     var root2 = [];
     var delta = 0.01;
     for(data[X] = delta; data[X] < 3; data[X]+=delta){
-        console.log(data[X])
-        js_test();
+        if(shouldCancel) {
+          shouldCancel = false;
+          break;
+        }
+        js_test()
         js_args = pyscript.interpreter.globals.get('args')
         M2 = js_args[Y].toJs();
         var dataPoint1 = {
@@ -988,10 +1010,18 @@ function outputGraph(){
           x: data[X],
           y: M2[1]
       };
-        root1.push(dataPoint1);
-        root2.push(dataPoint2)
+      root1.push(dataPoint1);
+      root2.push(dataPoint2);
+      if(data.N > 50){
+        updateProgress(data[X],delta)
+        await delay(1);
+      }
     }
-
+    //if(wasCancelled) {
+    //  document.getElementById('processing').textContent = 'Processing cancelled!';
+    //} else {
+    //    document.getElementById('processing').textContent = 'Processed!';
+   // }
   // Create the chart
   myChart2 = new Chart(ctx, {
     type: 'line',
@@ -1071,6 +1101,12 @@ function outputGraph(){
     }
   });
 }
+function updateProgress(point,delta){
+  var progress = Math.ceil(point/0.01)
+  number_points= 3/delta
+  document.getElementById('progress').textContent = `${progress} / ${number_points}`;
+}
+
 
 function openChartPopup(chartId) {
   var chartCanvas = document.getElementById(chartId);
