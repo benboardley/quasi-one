@@ -55,6 +55,7 @@
             self.a2 = a2
             self.debug = debug
             self.N = N
+            self.error = None
 
 
     args = None
@@ -66,18 +67,21 @@
       
       args = Args(AR=data.A2/data.A1, Ad = data.Ad/data.A1, Af = data.Af/data.A1, qr = data.qr, cd = data.cd, cf = data.cf, M1=data.M1, xi = data.xi, nu = data.nu, k = data.gamma, b1 = data.beta1, b2 = data.beta2, a1 = data.alpha1, a2 = data.alpha2 , N = data.N, isentropic=(data.isent == 'True'))
       #print(args.M1)
-      if( args.isentropic ):
-        args = isentropic(args)
-        args = coefsBiquadratic(args)
-
-      else:
-        if( args.N  == 1 ):
+      try:
+        if( args.isentropic ):
+            args = isentropic(args)
             args = coefsBiquadratic(args)
-            args = solveBiquadratic(args)
-        else:
-            args = subelements(args)
 
-      args = postProcess(args)
+        else:
+            if( args.N  == 1 ):
+                args = coefsBiquadratic(args)
+                args = solveBiquadratic(args)
+            else:
+                args = subelements(args)
+
+        args = postProcess(args)
+      except Exception as e:
+        args.error = e
       return()
     def coefsBiquadratic(args):
       '''
@@ -1068,6 +1072,7 @@
             <canvas id="myChart"></canvas>
         </div>
     </form>
+    <p class="error" id="input-error"></p>
 </div>
     <div class="output-container">
         <div class="traditional-output">
@@ -1228,28 +1233,24 @@
                 <div class="label-output-row" title="Lambda">
                     <label for="Lambda">Lambda=</label>
                     <input type="text" id="Lambda">
-                    <input type="text" id="LambdaSecond">
                     <select><option>-</option></select>
                 </div>
 
                 <div class="label-output-row" title="linear coefficient">
                     <label for="b">b=</label>
                     <input type="text" id="b">
-                    <input type="text" id="bSecond">
                     <select><option>-</option></select>
                 </div>
 
                 <div class="label-output-row" title="Constant Coefficient">
                     <label for="c">c=</label>
                     <input type="text" id="c">
-                    <input type="text" id="cSecond">
                     <select><option>-</option></select>
                 </div>
 
                 <div class="label-output-row" title="Quadtratic Polynomial Discriminant">
                     <label for="det">Discriminant=</label>
                     <input type="text" id="det">
-                    <input type="text" id="detSecond">
                     <select><option>-</option></select>
                 </div>
             </div>
@@ -1297,6 +1298,7 @@
             <button id="cancel-button" onclick="cancel()">Cancel</button>
         </div>
         <div class="charts">
+            <p class="error" id="graph-error"></p>
            <span class="rootGraph"> <canvas id="outputChart" class="rootGraph"></canvas> </span>
             <span class="rootGraph"> <canvas id="outputChart2" class="rootGraph"></canvas> </span>
         </div>

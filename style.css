@@ -47,14 +47,16 @@ body {
     justify-content: space-between;
 
   }
-
+  
   .chart-selection{
     display: flex;
     flex-direction: row;
     justify-content: center;
     text-align: center;
   }
-  .selection-component{
+  #cancel-button,
+  .selection-component,
+  #progress{
     display: flex;
     flex-direction: row;
     height: 25px;

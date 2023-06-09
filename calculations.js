@@ -79,7 +79,8 @@ var data = {
   beta2: null,
   N: null,
   isent: null,
-  root: null
+  root: null,
+  error: null
 };
 
 window.onload = function() {
@@ -217,6 +218,7 @@ function calcSum(){
       b = js_args.b//.toJs();
       c = js_args.c//.toJs();
       det = js_args.det//.toJs();
+      data.error = js_args.error
     }
   //  return sum;
   }
@@ -403,8 +405,8 @@ switch(dragAreaUnit) {
 
   function calculateFlow(event) {
     try {
-        event.preventDefault();
-        assignValues();
+      event.preventDefault();
+      assignValues();
       calcSum();
       document.getElementById("M2").value = M2[0].toFixed(5);
       document.getElementById("M2Second").value = M2[1].toFixed(5);
@@ -454,17 +456,36 @@ switch(dragAreaUnit) {
         
       document.getElementById("P3Po1").value = (P3P1[0]/f1).toFixed(5);
       document.getElementById("P3Po1Second").value = (P3P1[1]/f1).toFixed(5);
-        
-      document.getElementById("Lambda").value = Lambda.toFixed(5);
-        
-      document.getElementById("b").value = b.toFixed(5);
-        
-      document.getElementById("c").value = c.toFixed(5);
-      document.getElementById("det").value = det.toFixed(5);
+      if( data.error){
+        document.getElementById("input-error").text = error
+      }
+      if(data.N == 1){
+        document.getElementById("Lambda").value = Lambda.toFixed(5);
+          
+        document.getElementById("b").value = b.toFixed(5);
+          
+        document.getElementById("c").value = c.toFixed(5);
+        document.getElementById("det").value = det.toFixed(5);
+      }
+      else{
+        document.getElementById("Lambda").value = '';
+          
+        document.getElementById("b").value = '';
+          
+        document.getElementById("c").value = '';
+        document.getElementById("det").value = '';
+      }
     } catch (error) {
       console.log(error);
+      document.getElementById("input-error").text = error
     }
-    setTimeout(outputGraph, 0);
+    try{
+      setTimeout(outputGraph, 0);
+    }
+    catch(error){
+      console.log(error)
+      document.getElementById("graph-error").text = error
+    }
   }
 
   //--------------------------------------Inlet->Outlet Graphic ----------------------------------
@@ -633,29 +654,7 @@ function exampleFlow(){
     if (selectedOption === 'Isentropic flow with area change') {
       // Call a function for Isentropic flow with area change
 
-        document.getElementById("cd").value = 5;
-        document.getElementById("cf").value = 5;
-        document.getElementById("Ad").value = 5;
-        document.getElementById("Af").value = 5;
-        document.getElementById("qr").value = 5;
-        //document.getElementById("P").value = 1;
-        //document.getElementById("T").value = 1;
-        document.getElementById("M1").value = 1;
-        document.getElementById("A1").value = 1;
-        document.getElementById("gamma").value = 1;
-        document.getElementById("alpha1").value = 1;
-        document.getElementById("beta1").value = 1;
-        //document.getElementById("w").value = 1;
-        //document.getElementById("Fx").value = 1;
-        //document.getElementById("m2").value = 1;
-        document.getElementById("A2").value = 3;
-        //document.getElementById("Q").value = 1;
-        document.getElementById("xi").value = 1;
-        document.getElementById("nu").value = 1;
-        //document.getElementById("f").value = 1;
-        document.getElementById("alpha2").value = 1;
-        document.getElementById("beta2").value = 1;
-        document.getElementById("subelements").value = 1;
+        document.getElementById("isentropic").value = "True";
     } 
     
     else if (selectedOption === 'Flow across a normal shock') {
@@ -734,60 +733,14 @@ function exampleFlow(){
     
     else if (selectedOption === 'Sudden expansion') {
       // Call a function for Sudden expansion
-      document.getElementById("cd").value = 5;
-      document.getElementById("cf").value = 5;
-      document.getElementById("Ad").value = 5;
-      document.getElementById("Af").value = 5;
-      document.getElementById("qr").value = 5;
-
-
-      //document.getElementById("P").value = 5;
-      //document.getElementById("T").value = 5;
-      document.getElementById("M1").value = 5;
-      document.getElementById("A1").value = 5;
-      document.getElementById("gamma").value = 5;
-      document.getElementById("alpha1").value = 5;
-      document.getElementById("beta1").value = 5;
-      //document.getElementById("w").value = 5;
-      //document.getElementById("Fx").value = 5;
-      //document.getElementById("m2").value = 5;
-      document.getElementById("A2").value = 5;
-      //document.getElementById("Q").value = 5;
-      document.getElementById("xi").value = 5;
-      document.getElementById("nu").value = 5;
-      //document.getElementById("f").value = 5;
-      document.getElementById("alpha2").value = 5;
-      document.getElementById("beta2").value = 5;
-      document.getElementById("subelements").value = 5;
+      document.getElementById("xi").value = 0;
     } 
     
     else if (selectedOption === 'Sudden Contraction') {
       // Call a function for Sudden Contraction
-      document.getElementById("cd").value = 6;
-      document.getElementById("cf").value = 6;
-      document.getElementById("Ad").value = 6;
-      document.getElementById("Af").value = 6;
-      document.getElementById("qr").value = 6;
-
-
-     // document.getElementById("P").value = 6;
-     // document.getElementById("T").value = 6;
-      document.getElementById("M1").value = 6;
-      document.getElementById("A1").value = 6;
-      document.getElementById("gamma").value = 6;
-      document.getElementById("alpha1").value = 6;
-      document.getElementById("beta1").value = 6;
-     // document.getElementById("w").value = 6;
-      //document.getElementById("Fx").value = 6;
-    //  document.getElementById("m2").value = 6;
-      document.getElementById("A2").value = 6;
-    //  document.getElementById("Q").value = 6;
+      document.getElementById("A1").value = 2;
+      document.getElementById("A2").value = 1;
       document.getElementById("xi").value = 6;
-      document.getElementById("nu").value = 6;
-    //  document.getElementById("f").value = 6;
-      document.getElementById("alpha2").value = 6;
-      document.getElementById("beta2").value = 6;
-      document.getElementById("subelements").value = 6;
     } 
     
     else if (selectedOption === 'Two-stream mixing layer') {
@@ -1004,6 +957,9 @@ async function outputGraph(){
         }
         js_test()
         js_args = pyscript.interpreter.globals.get('args')
+        if(js_args.error){
+          document.getElementById("graph-error").text = js_args.error
+        }
         M2 = js_args[Y].toJs();
         var dataPoint1 = {
             x: data[X],
