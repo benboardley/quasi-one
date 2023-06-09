@@ -229,7 +229,7 @@ function kpascalsToPascals(value) {
 }
 
 function psiToPascals(value) {
-  return (value * 6894.76);
+  return (value * 6894.7572931783);
 }
 
 function psfToPascals(value) {
@@ -264,10 +264,10 @@ function inchesToMeters(value) {
 
 // Conversion function
 function convertToSI() {
-  var P1 = parseFloat(document.getElementById("P1").value) || 0;
+  var P1 = parseFloat(document.getElementById("Po1").value) || 0;
   var pressureUnit = document.getElementById("pressure-unit").value;
 
-  var T1 = document.getElementById("T1").value;
+  var T1 = document.getElementById("To1").value;
   var tempUnit = document.getElementById("temp-unit").value;
 
   var A1 = parseFloat(document.getElementById("A1").value) || 0;
@@ -603,6 +603,9 @@ function exampleFlow(){
     if (selectedOption === 'Default') {
       // Call a function for Isentropic flow with area change
 
+        document.getElementById("Po1").value = 0;
+        document.getElementById("To1").value = 0;
+        document.getElementById("cd").value = 0;
         document.getElementById("cd").value = 0;
         document.getElementById("cf").value = 0;
         document.getElementById("Ad").value = 0;
