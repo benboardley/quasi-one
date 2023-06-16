@@ -36,9 +36,9 @@ body {
   #additional-data{
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     width: 300px;
   }
+
 
   .output-container {
     display: flex;

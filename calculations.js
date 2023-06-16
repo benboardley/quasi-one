@@ -1,4 +1,6 @@
+//------------------------Objects-----------------------------
 
+//------------------------Input Data--------------------------
 var data = {
   po1: null,
   to1: null,
@@ -23,6 +25,7 @@ var data = {
   root: null,
   error: null
 };
+//----------------------Output Data---------------------------
 var output = {
   M2: [],
   PR: [],
@@ -61,7 +64,6 @@ window.onload = function() {
     emptyGraph();
   };
 
-  // -----------------------------CALCULATIONS USING PYSCRIPT FOR NOW IGNORE THIS-------------------------------------------------
 /*--------------Available Values--------------------
             self.AR = AR
             self.Ad = Ad
@@ -117,12 +119,22 @@ window.onload = function() {
             self.c = [0.0, 0.0]
             self.det = [0.0, 0.0]
 */
-  //-------------Filler While creating Calculation Code------------------------------------
+
+  /* ------------------------------------------------------------------------------------------------------------------------
+  -
+  -
+  -
+  -                                 Calculations Code
+  -
+  -
+  -------------------------------------------------------------------------------------------------------------------------*/
+
+
 function calcSum(){
   //  var sum = P + T + M1 + A1 + gamma + alpha1 + beta1 + w + Fx + m2 + A2 + Q + xi + nu + f + alpha2 + beta2 + N;
     js_test = pyscript.interpreter.globals.get('main');
 
-    if(data.N > 1){
+    if(false){ //data.N > 1
       for(var root = 0; root <=1; root++){
           data.root = root;
           js_test();
@@ -184,30 +196,45 @@ function calcSum(){
         output.CPinc = js_args.CPinc.toJs();
         output.P3P1 = js_args.P3P1.toJs();
         output.Lambda = js_args.Lambda; //.toJs();
+        output.f1 = js_args.f1;
         output.b = js_args.b; //.toJs();
         output.c = js_args.c; //.toJs();
-        output.det = js_args.det; //.toJs();
+        output.det = js_args.discriminant; //.toJs();
         data.error = js_args.error;
       }
       calculateRootsWithUnits();
 }
 function calculateRootsWithUnits(){
-  output.po2 = []
-  output.P1 = []
+  var R = 287
+  output.T2 = []
   output.P2 = []
-
-  output.po2[0] = output.PR[0] * data.po1;
-  output.po2[1] = output.PR[1] * data.po1;
-
-  output.P1[0] = -1 * ((1 / output.wloss[0]) * (data.po1 - output.po2[0]) - data.po1)
-  output.P1[1] = -1 * ((1 / output.wloss[1]) * (data.po1 - output.po2[1]) - data.po1)
-  output.P2[0] = output.P2P1[0] * output.P1[0]
-  output.P2[1] = output.P2P1[1] * output.P1[1]
-  test_cp = (output.P2[1] - output.P1[1]) / (data.po1 - output.P1[1])
-  console.log('check cp')
-  console.log(test_cp)
+  output.po2 = []
+  output.to2 = []
+  output.ds = []
+  output.V2 = []
+  output.rho2 = []
+  output.P3 = []
+  output.P1 = data.po1 * output.f1 ** (-data.gamma/(data.gamma-1))
+  output.T1 = data.to1 * output.f1
+  output.P2[0] = output.P1 * output.P2P1[0]
+  output.P2[1] = output.P1 * output.P2P1[1]
+  output.T2[0] = output.T1 * output.T2T1[0]
+  output.T2[1] = output.T1 * output.T2T1[1]
+  output.po2[0] = data.po1 * output.PR[0]
+  output.po2[1] = data.po1 * output.PR[1]
+  output.to2[0] = data.to1 * output.TR[0]
+  output.to2[1] = data.to1 * output.TR[1]
+  output.ds[0] = output.dsR[0] * R
+  output.ds[1] = output.dsR[1] * R
+  output.rho1 = output.P1 / (R*output.T1)
+  output.V1 = data.M1 * Math.sqrt(data.gamma*R*output.T1)
+  output.V2[0] = output.V2V1[0] * output.V1
+  output.V2[1] = output.V2V1[1] * output.V1
+  output.rho2[0] = output.p2p1[0] * output.ro1
+  output.rho2[1] = output.p2p1[1] * output.ro1
+  output.P3[0] = output.P3P1[0] * output.P1
+  output.P3[1] = output.P3P1[1] * output.P1
 }
-  //--------------------------WORKFLOW-------------------------------------------------------
 // Pressure conversion functions
 function kpascalsToPascals(value) {
   return (value * 1000);
@@ -368,30 +395,15 @@ switch(dragAreaUnit) {
     data.isent = document.getElementById("isentropic").value;
     convertToSI();
 }
-  function toggleData(){
-    var x = document.getElementById("additional-data");
-    if (x.style.display === "none") {
-      x.style.display = "block";
-    } else {
-      x.style.display = "none";
-    }
-  }
-  function toggleDescriptions() {
-    var descriptions = document.getElementsByClassName("description");
-    for (var i = 0; i < descriptions.length; i++) {
-      var description = descriptions[i];
-      if (description.style.display === "none") {
-        description.style.display = "block";
-      } else {
-        description.style.display = "none";
-      }
-    }
-  }
 
   function calculateFlow(event) {
     try {
       event.preventDefault();
       assignValues();
+      if(data.N > 1000){
+        alert("Please limit your subelemenets to be less than 1000.")
+        return;
+      }
       calcSum();
       document.getElementById("M2").value = output.M2[0].toFixed(5);
       document.getElementById("M2Second").value = output.M2[1].toFixed(5);
@@ -441,6 +453,37 @@ switch(dragAreaUnit) {
       
       document.getElementById("P3Po1").value = (output.P3P1[0] /*/ f1*/).toFixed(5);
       document.getElementById("P3Po1Second").value = (output.P3P1[1]/* / f1*/).toFixed(5);
+
+      document.getElementById("P1").value = output.P1;
+
+      document.getElementById("P2").value = output.P2[0];
+      document.getElementById("P2Second").value = output.P2[1];
+
+      document.getElementById("T1").value = output.T1;
+      document.getElementById("V1").value = output.V1;
+
+      document.getElementById("T2").value = output.T2[0];
+      document.getElementById("T2Second").value = output.T2[1];
+
+      document.getElementById("To2").value = output.to2[0];
+      document.getElementById("To2Second").value = output.to2[1];
+
+      document.getElementById("Po2").value = output.po2[0];
+      document.getElementById("Po2Second").value = output.po2[1];
+
+      document.getElementById("deltaS").value = output.ds[0];
+      document.getElementById("deltaSSecond").value = output.ds[1];
+
+      document.getElementById("p1").value = output.rho1;
+
+      document.getElementById("V2").value = output.V2[0];
+      document.getElementById("V2Second").value = output.V2[1];
+      
+      document.getElementById("p2").value = output.rho2[0];
+      document.getElementById("p2Second").value = output.rho2[1];
+      
+      document.getElementById("P3").value = output.P3[0];
+      document.getElementById("P3Second").value = output.P3[1];
       
       if (data.error) {
         document.getElementById("input-error").textContent = output.data.error;
@@ -473,6 +516,44 @@ switch(dragAreaUnit) {
     }
   }
 
+
+  /* ------------------------------------------------------------------------------------------------------------------------
+  -
+  -
+  -
+  -                                 User Interface Code
+  -
+  -
+  -------------------------------------------------------------------------------------------------------------------------*/
+
+
+//-----------------------------------------Check Boxes--------------------------------------------
+function toggleData(){
+  var x = document.getElementById("additional-data");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+}
+function toggleDimension(){
+  var x = document.getElementById("dimensional");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+    document.getElementById("dimensional-additional").style.display = "block";
+  } else {
+    x.style.display = "none";
+    document.getElementById("dimensional-additional").style.display = "none";
+  }
+  x = document.getElementById("non-dimensional");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+    document.getElementById("non-dimensional-additional").style.display = "block";
+  } else {
+    x.style.display = "none";
+    document.getElementById("non-dimensional-additional").style.display = "none";
+  }
+}
   //--------------------------------------Inlet->Outlet Graphic ----------------------------------
   var myChart;
 
@@ -600,42 +681,35 @@ switch(dragAreaUnit) {
       
   }
   
-//----------------------------------------------Example Flow fill in Values------------------------------------
+//---------------------------------------Example Flow fill in Values------------------------------
 function exampleFlow(){
     var selectElement = document.querySelector('.selectFlow');
     var selectedOption = selectElement.value;
   
     // Perform actions based on the selected option
-    if (selectedOption === 'Default') {
+    //if (selectedOption === 'Default') {
       // Call a function for Isentropic flow with area change
 
-        document.getElementById("Po1").value = 0;
-        document.getElementById("To1").value = 0;
+        document.getElementById("Po1").value = 1;
+        document.getElementById("To1").value = 1;
         document.getElementById("cd").value = 0;
         document.getElementById("cd").value = 0;
         document.getElementById("cf").value = 0;
         document.getElementById("Ad").value = 0;
         document.getElementById("Af").value = 0;
         document.getElementById("qr").value = 0;
-        //document.getElementById("P").value = 1;
-        //document.getElementById("T").value = 1;
         document.getElementById("M1").value = 1;
         document.getElementById("A1").value = 1;
         document.getElementById("gamma").value = 1.4;
         document.getElementById("alpha1").value = 1;
         document.getElementById("beta1").value = 1;
-        //document.getElementById("w").value = 1;
-        //document.getElementById("Fx").value = 1;
-        //document.getElementById("m2").value = 1;
         document.getElementById("A2").value = 2;
-        //document.getElementById("Q").value = 1;
         document.getElementById("xi").value = 0.5;
         document.getElementById("nu").value = 0;
-        //document.getElementById("f").value = 1;
         document.getElementById("alpha2").value = 1;
         document.getElementById("beta2").value = 1;
         document.getElementById("subelements").value = 1;
-    } 
+    //} 
     if (selectedOption === 'Isentropic flow with area change') {
       // Call a function for Isentropic flow with area change
 
@@ -644,21 +718,14 @@ function exampleFlow(){
     
     else if (selectedOption === 'Flow across a normal shock') {
       // Call a function for Flow across a normal shock
-      //document.getElementById("P").value = 2;
-      //document.getElementById("T").value = 2;
       document.getElementById("M1").value = 2;
       document.getElementById("A1").value = 2;
       document.getElementById("gamma").value = 2;
       document.getElementById("alpha1").value = 2;
       document.getElementById("beta1").value = 2;
-      //document.getElementById("w").value = 2;
-      //document.getElementById("Fx").value = 2;
-      //document.getElementById("m2").value = 2;
       document.getElementById("A2").value = 2;
-      //document.getElementById("Q").value = 2;
       document.getElementById("xi").value = 2;
       document.getElementById("nu").value = 2;
-      //document.getElementById("f").value = 2;
       document.getElementById("alpha2").value = 2;
       document.getElementById("beta2").value = 2;
       document.getElementById("subelements").value = 2;
@@ -666,54 +733,16 @@ function exampleFlow(){
     
     else if (selectedOption === 'Fanno flow') {
       // Call a function for Fanno flow
-      //document.getElementById("P").value = 3;
-      //document.getElementById("T").value = 3;
-      document.getElementById("M1").value = 3;
-      document.getElementById("A1").value = 3;
-      document.getElementById("gamma").value = 3;
-      document.getElementById("alpha1").value = 3;
-      document.getElementById("beta1").value = 3;
-      //document.getElementById("w").value = 3;
-      //document.getElementById("Fx").value = 3;
-      //document.getElementById("m2").value = 3;
-      document.getElementById("A2").value = 3;
-      //document.getElementById("Q").value = 3;
-      document.getElementById("xi").value = 3;
-      document.getElementById("nu").value = 3;
-      //document.getElementById("f").value = 3;
-      document.getElementById("alpha2").value = 3;
-      document.getElementById("beta2").value = 3;
-      document.getElementById("subelements").value = 3;
+      document.getElementById("A1").value = 1;
+      document.getElementById("A2").value = 1;
+      document.getElementById("Af").value = 1;
+      document.getElementById("cf").value = 0.005;
     } 
     
     else if (selectedOption === 'Rayleigh flow') {
-      // Call a function for Rayleigh flow
-      document.getElementById("cd").value = 6;
-      document.getElementById("cf").value = 6;
-      document.getElementById("Ad").value = 6;
-      document.getElementById("Af").value = 6;
-      document.getElementById("qr").value = 6;
-
-
-
-      //document.getElementById("P").value = 4;
-      //document.getElementById("T").value = 4;
-      document.getElementById("M1").value = 4;
-      document.getElementById("A1").value = 4;
-      document.getElementById("gamma").value = 4;
-      document.getElementById("alpha1").value = 4;
-      document.getElementById("beta1").value = 4;
-      //document.getElementById("w").value = 4;
-      //document.getElementById("Fx").value = 4;
-      //document.getElementById("m2").value = 4;
-      document.getElementById("A2").value = 4;
-      //document.getElementById("Q").value = 4;
-      document.getElementById("xi").value = 4;
-      document.getElementById("nu").value = 4;
-      //document.getElementById("f").value = 4;
-      document.getElementById("alpha2").value = 4;
-      document.getElementById("beta2").value = 4;
-      document.getElementById("subelements").value = 4;
+      document.getElementById("A1").value = 1;
+      document.getElementById("A2").value = 1;
+      document.getElementById("qr").value = 0.1;
     } 
     
     else if (selectedOption === 'Sudden expansion') {
@@ -725,79 +754,48 @@ function exampleFlow(){
       // Call a function for Sudden Contraction
       document.getElementById("A1").value = 2;
       document.getElementById("A2").value = 1;
-      document.getElementById("xi").value = 6;
+      document.getElementById("xi").value = 0;
+      document.getElementById("nu").value = 1;
     } 
     
     else if (selectedOption === 'Two-stream mixing layer') {
       // Call a function for Two-stream mixing layer
-      //document.getElementById("P").value = 7;
-      //document.getElementById("T").value = 7;
       document.getElementById("M1").value = 7;
       document.getElementById("A1").value = 7;
       document.getElementById("gamma").value = 7;
       document.getElementById("alpha1").value = 7;
       document.getElementById("beta1").value = 7;
-      //document.getElementById("w").value = 7;
-      //document.getElementById("Fx").value = 7;
-      //document.getElementById("m2").value = 7;
       document.getElementById("A2").value = 7;
-      //document.getElementById("Q").value = 7;
       document.getElementById("xi").value = 7;
       document.getElementById("nu").value = 7;
-      //document.getElementById("f").value = 7;
       document.getElementById("alpha2").value = 7;
       document.getElementById("beta2").value = 7;
       document.getElementById("subelements").value = 7;
     } 
     
-    else if (selectedOption === 'Simultaneous friction and heat transfer') {
+    else if (selectedOption === 'Ferrari 1 (Simultaneous friction and heat transfer)') {
       // Call a function for Simultaneous friction and heat transfer
-      //document.getElementById("P").value = 8;
-      //document.getElementById("T").value = 8;
-      document.getElementById("M1").value = 8;
-      document.getElementById("A1").value = 8;
-      document.getElementById("gamma").value = 8;
-      document.getElementById("alpha1").value = 8;
-      document.getElementById("beta1").value = 8;
-      //document.getElementById("w").value = 8;
-      //document.getElementById("Fx").value = 8;
-      //document.getElementById("m2").value = 8;
-      document.getElementById("A2").value = 8;
-      //document.getElementById("Q").value = 8;
-      document.getElementById("xi").value = 8;
-      document.getElementById("nu").value = 8;
-      //document.getElementById("f").value = 8;
-      document.getElementById("alpha2").value = 8;
-      document.getElementById("beta2").value = 8;
-      document.getElementById("subelements").value = 8;
+      document.getElementById("A1").value = 1;
+      document.getElementById("A2").value = 1;
+      document.getElementById("qr").value = 0.1;
+      document.getElementById("Af").value = 1;
+      document.getElementById("cf").value = 0.005;
+      document.getElementById("subelements").value = 1000;
     } 
     
-    else if (selectedOption === 'Simultaneous area change and friction') {
-        //document.getElementById("P").value = 9;
-        //document.getElementById("T").value = 9;
-        document.getElementById("M1").value = 9;
-        document.getElementById("A1").value = 9;
-        document.getElementById("gamma").value = 9;
-        document.getElementById("alpha1").value = 9;
-        document.getElementById("beta1").value = 9;
-        //document.getElementById("w").value = 9;
-        //document.getElementById("Fx").value = 9;
-        //document.getElementById("m2").value = 9;
-        document.getElementById("A2").value = 9;
-        //document.getElementById("Q").value = 9;
-        document.getElementById("xi").value = 9;
-        document.getElementById("nu").value = 9;
-        //document.getElementById("f").value = 9;
-        document.getElementById("alpha2").value = 9;
-        document.getElementById("beta2").value = 9;
-        document.getElementById("subelements").value = 9;
+    else if (selectedOption === 'Ferrari 2 (Simultaneous area change and friction)') {
+      document.getElementById("A1").value = 1;
+      document.getElementById("A2").value = 2;
+      document.getElementById("Af").value = 1;
+      document.getElementById("cf").value = 0.005;
+      document.getElementById("subelements").value = 1000;
     }
     imageGUI();
 }
 
+//--------------------------------------Graph for a input vs output------------------------------
 var myChart2;
 var myChart3;
-//-----------------------------Graph for a input vs output---------------------------------------------
 function emptyGraph(){
   var ctx = document.getElementById('outputChart').getContext('2d');
   var ctx2 = document.getElementById('outputChart2').getContext('2d');
@@ -1049,21 +1047,4 @@ function updateProgress(point,delta){
   var progress = Math.ceil(point/0.01)
   number_points= 3/delta
   document.getElementById('progress').textContent = `${progress} / ${number_points}`;
-}
-
-
-function openChartPopup(chartId) {
-  var chartCanvas = document.getElementById(chartId);
-
-  var popup = window.open("", "", "width=800,height=600");
-  popup.document.write('<html><head><title>Chart</title>');
-  popup.document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>');
-  popup.document.write('<style>canvas{max-width:100%;}</style>');
-  popup.document.write('</head><body><canvas id="chartCanvas"></canvas>');
-  popup.document.write('<script>var ctx = document.getElementById("chartCanvas").getContext("2d");');
-  popup.document.write('var chartData = ' + JSON.stringify(chartCanvas.toDataURL()) + ';');
-  popup.document.write('var img = new Image(); img.src = chartData;');
-  popup.document.write('img.onload = function() { ctx.drawImage(img, 0, 0); };');
-  popup.document.write('</script></body></html>');
-  popup.document.close();
 }

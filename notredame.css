@@ -184,26 +184,6 @@ div > h6:first-child,  div > .h6:first-child { margin-top:0; }
   .has-parent .site-title,
   .has-tagline .site-title { font-size:2rem; }
 
-/* Breadcrumbs
-----------------------------------------------------*/
-.breadcrumbs {margin:0 0 2.5em; padding:0; list-style:none; font-size:0.8rem;}
-  .breadcrumbs li {display:inline-block; margin:0 0.5rem 0 0; text-indent:-0.5rem; color:var(--gray);}
-  .breadcrumbs li:last-child {padding-left:0.5rem; display:none;}
-  .has-title ~ .page-main .breadcrumbs li:last-child {display:inline-block;}
-  .breadcrumbs a {text-decoration:none;  color:var(--gray); padding:0 0.5rem;}
-    .breadcrumbs a:hover {text-decoration:underline;}
-    .breadcrumbs a:visited {color:var(--gray);}
-
-
-
-/* Events
-----------------------------------------------------*/
-.events .article,
-.event.snippet {margin-bottom:0; }
-.snippet .event-date { text-align:center; margin:0; padding:1.5rem 0.5rem; width:4.5rem; line-height:1.1; }
-  .event-month { text-transform:uppercase; font-size:1.125rem; letter-spacing:0.08em; color:var(--gray); }
-  .event-day { display:block; color:var(--brand-blue); font-size:2rem; font-weight:700 }
-
 
 
 
@@ -236,12 +216,6 @@ div > h6:first-child,  div > .h6:first-child { margin-top:0; }
 
 
 
-  /* Structure
-  ----------------------------------------------------*/
-  .page-sidebar {padding:1em 0; border-top:1px solid #dadada; box-shadow:inset 0 1px 0 rgba(255,255,255,0.9); position:relative; z-index:100; clear:both; }
-  .page-title {margin:0 0 .35em; padding:0 0 0.25em; z-index:100; }
-    .page-title::after { content:''; display:block; width:50px; height:4px; margin:0.2em 0 0.2em -0.2em; background-color:var(--brand-gold); }
-  .page-lede { font-size:1.25rem; z-index:100; }
 
   /* Header
   ----------------------------------------------------*/
@@ -322,11 +296,6 @@ div > h6:first-child,  div > .h6:first-child { margin-top:0; }
   /* Content
   ----------------------------------------------------*/
 
-  /* Home
-  ----------------------------------------------------*/
-  .home-primary {margin:0 0 2em;}
-    .home-primary .image-right {max-width:40%; float:right; margin:0 0 1em 1em;}
-    .home-primary .image-left {max-width:40%; float:left; margin:0 1em 1em 0;}
 
   /* Footer
   ----------------------------------------------------*/
@@ -426,11 +395,3 @@ div > h6:first-child,  div > .h6:first-child { margin-top:0; }
   --font-default:"Helvetica Neue", Helvetica, Arial, Verdana, sans-serif;
   --font-heading:GPC, "Helvetica Neue", Helvetica, Arial, Verdana, sans-serif;
 ----------------------------------------------------*/
-
-
-
-
-
-
-
-
