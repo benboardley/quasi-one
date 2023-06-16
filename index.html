@@ -82,6 +82,8 @@
         args = postProcess(args)
       except Exception as e:
         args.error = e
+        print(e)
+      #printOutput(args)
       return()
     def coefsBiquadratic(args):
       '''
@@ -1004,7 +1006,7 @@
         def march(argn,root=0):
             tmp = copy.deepcopy(argn)
 
-            for i in tqdm(range(1,argn.N)):
+            for i in range(1,argn.N):#tqdm(range(1,argn.N)):
                 try:
                     tmp.M1 = np.nanmin(tmp.M2) * np.float64(1-root) + np.nanmax(tmp.M2) * np.float64(root)
                 except:
@@ -1021,13 +1023,13 @@
             except:
                 return(np.nan)
 
-        print('Solving sub-elements for smaller Mach number branch...')
+        #print('Solving sub-elements for smaller Mach number branch...')
         args.M2[0] = march(argn,root=0)
-        print('',end='\n')
+        #print('',end='\n')
 
-        print('Solving sub-elements for larger Mach number branch...')
+        #print('Solving sub-elements for larger Mach number branch...')
         args.M2[1] = march(argn,root=1)
-        print('',end='\n')
+        #print('',end='\n')
 
         args.Lambda = np.zeros(2)
         args.b = np.zeros(2)
