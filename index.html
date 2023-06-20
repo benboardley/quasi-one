@@ -83,6 +83,7 @@
       except Exception as e:
         args.error = e
         print(e)
+      #regurgitate(args)
       #printOutput(args)
       return()
     def coefsBiquadratic(args):
@@ -1038,6 +1039,7 @@
 
         return(args)
 
+
   </py-script>
 </head>
 
@@ -1075,7 +1077,7 @@
                         <input type="text" id="Po1">
                         <select id="pressure-unit">
                             <option value="pascals">Pa</option>
-                            <option value="kpascals">kPsi</option>
+                            <option value="kpascals">kPa</option>
                             <option value="psi">Psi</option>
                             <option value="psf">Psf</option>
                         </select>
@@ -1088,8 +1090,8 @@
                         <select id="temp-unit">
                             <option value="kelvin">K&deg;</option>
                             <option value="celsius">C&deg;</option>
-                            <option value="kelvin">R&deg;</option>
-                            <option value="kelvin">F&deg;</option>
+                            <option value="rankine">R&deg;</option>
+                            <option value="farenheit">F&deg;</option>
                         </select>
                     </div>
 
@@ -1224,7 +1226,7 @@
                         <label for="Ad">A<sub>d</sub>=</label>
                         <input type="text" id="Ad">
                         <select id="drag-area-unit">
-                                                <option value="meters">m&sup2;</option>
+                            <option value="meters">m&sup2;</option>
                             <option value="centimeters">cm&sup2;</option>
                             <option value="feet">ft&sup2;</option>
                             <option value="inches">in&sup2;</option>
@@ -1369,7 +1371,12 @@
                         <label for="P2">P<sub>2</sub>=</label>
                         <input type="text" id="P2">
                         <input type="text" id="P2Second">
-                        <select><option>-</option></select>
+                        <select id="static-pressure2-unit" onchange="convertFromSI()">     
+                            <option value="pascals">Pa</option>
+                            <option value="kpascals">kPa</option>
+                            <option value="psi">Psi</option>
+                            <option value="psf">Psf</option>
+                        </select>
                     </div>
 
                     <!-- Output for T2T1 -->
@@ -1377,7 +1384,12 @@
                         <label for="T2">T<sub>2</sub>=</label>
                         <input type="text" id="T2">
                         <input type="text" id="T2Second">
-                        <select><option>-</option></select>
+                        <select id="static-temp2-unit" onchange="convertFromSI()">
+                            <option value="kelvin">K&deg;</option>
+                            <option value="celsius">C&deg;</option>
+                            <option value="rankine">R&deg;</option>
+                            <option value="fahrenheit">F&deg;</option>
+                        </select>
                     </div>
 
                     <!-- Output for TR -->
@@ -1385,15 +1397,25 @@
                         <label for="To2">T<sub>o<sub>2</sub></sub>=</label>
                         <input type="text" id="To2">
                         <input type="text" id="To2Second">
-                        <select><option>-</option></select>
+                        <select id="stagnation-temp2-unit" onchange="convertFromSI()">
+                            <option value="kelvin">K&deg;</option>
+                            <option value="celsius">C&deg;</option>
+                            <option value="rankine">R&deg;</option>
+                            <option value="fahrenheit">F&deg;</option>
+                        </select>
                     </div>
 
                     <!-- Output for PR -->
-                    <div class="label-output-row" title="Stagnation pressure ratio">
+                    <div class="label-output-row" title="Stagnation pressure at outlet">
                         <label for="Po2">P<sub>o<sub>2</sub></sub>=</label>
                         <input type="text" id="Po2">
                         <input type="text" id="Po2Second">
-                        <select><option>-</option></select>
+                        <select id="stagnation-pressure2-unit" onchange="convertFromSI()">
+                            <option value="pascals">Pa</option>
+                            <option value="kpascals">kPa</option>
+                            <option value="psi">Psi</option>
+                            <option value="psf">Psf</option>
+                        </select>
                     </div>
 
                     <!-- Output for deltaSR -->
@@ -1401,28 +1423,46 @@
                         <label for="deltaS">&Delta;s=</label>
                         <input type="text" id="deltaS">
                         <input type="text" id="deltaSSecond">
-                        <select><option>-</option></select>
+                        <select id = "entropy-unit" onchange="convertFromSI()">
+                        <option>J/K</option>
+                        <option>cal/K</option>
+                        <option>BTU</option>
+                        </select>
                     </div>
 
                     <!-- Output for P1 -->
-                    <div class="label-output-row" title="Pressure ratio">
+                    <div class="label-output-row" title="Static Pressure at Inlet">
                         <label for="P1">P<sub>1</sub>=</label>
                         <input type="text" id="P1">
-                        <select><option>-</option></select>
+                        <select id="static-pressure1-unit" onchange="convertFromSI()">
+                            <option value="pascals">Pa</option>
+                            <option value="kpascals">kPa</option>
+                            <option value="psi">Psi</option>
+                            <option value="psf">Psf</option>
+                        </select>
                     </div>
 
                     <!-- Output for T1 -->
-                    <div class="label-output-row" title="Temperature ratio">
+                    <div class="label-output-row" title="Static Temperature at Inlet">
                         <label for="T1">T<sub>1</sub>=</label>
                         <input type="text" id="T1">
-                        <select><option>-</option></select>
+                        <select id="static-temp1-unit" onchange="convertFromSI()">
+                            <option value="kelvin">K&deg;</option>
+                            <option value="celsius">C&deg;</option>
+                            <option value="rankine">R&deg;</option>
+                            <option value="fahrenheit">F&deg;</option>
+                        </select>
                     </div>
 
                     <!-- Output for V1 -->
-                    <div class="label-output-row" title="Change in entropy normalized by the gas constant">
+                    <div class="label-output-row" title="Inlet Velocity">
                         <label for="V1">V1=</label>
                         <input type="text" id="V1">
-                        <select><option>-</option></select>
+                        <select id = "velocity1-unit" onchange="convertFromSI()">
+                            <option>m/s</option>
+                            <option>m/ms</option>
+                            <option>ft/s</option>
+                        </select>
                     </div>
 
                 </div>
@@ -1522,19 +1562,30 @@
                 <div class = "additional-1" id = "dimensional-additional" style="display:none;">
 
                     <!-- Output for V2 -->
-                    <div class="label-output-row" title="Change in entropy normalized by the gas constant">
+                    <div class="label-output-row" title="Outlet Velocity">
                         <label for="V2">V<sub>2</sub>=</label>
                         <input type="text" id="V2">
                         <input type="text" id="V2Second">
-                        <select><option>-</option></select>
+                        <select id = "velocity2-unit" onchange="convertFromSI()">
+                            <option>m/s</option>
+                            <option>m/ms</option>
+                            <option>ft/s</option>
+                        </select>
                     </div>
 
                     <!-- Output for rho 2 -->
-                    <div class="label-output-row" title="Change in entropy normalized by the gas constant">
+                    <div class="label-output-row" title="Outlet Static Density">
                         <label for="p2">&rho;<sub>2</sub>=</label>
                         <input type="text" id="p2">
                         <input type="text" id="p2Second">
-                        <select><option>-</option></select>
+                        <select id = "density2-unit" onchange="convertFromSI()">
+                            <option value="kg/m^3">kg/m<sup>3</sup></option>
+                            <option value="g/m^3">g/m<sup>3</sup></option>
+                            <option value="g/cm^3">g/cm<sup>3</sup></option>
+                            <option value="mg/cm^3">mg/cm<sup>3</sup></option>
+                            <option value="slug/ft^3">slug/ft<sup>3</sup></option>
+                            <option value="slug/in^3">slug/in<sup>3</sup></option>
+                        </select>
                     </div>
 
                     <!-- Output for P3 -->
@@ -1542,14 +1593,26 @@
                         <label for="P3">P<sub>3</sub>=</label>
                         <input type="text" id="P3">
                         <input type="text" id="P3Second">
-                        <select><option>-</option></select>
+                        <select id="static-pressure3-unit" onchange="convertFromSI()">
+                            <option value="pascals">Pa</option>
+                            <option value="kpascals">kPa</option>
+                            <option value="psi">Psi</option>
+                            <option value="psf">Psf</option>
+                        </select>
                     </div>
 
                     <!-- Output for rho 1 -->
-                    <div class="label-output-row" title="Change in entropy normalized by the gas constant">
+                    <div class="label-output-row" title="Inlet Static Density">
                         <label for="p1">&rho;<sub>1</sub>=</label>
                         <input type="text" id="p1">
-                        <select><option>-</option></select>
+                        <select id="density1-unit" onchange="convertFromSI()">
+                            <option value="kg/m^3">kg/m<sup>3</sup></option>
+                            <option value="g/m^3">g/m<sup>3</sup></option>
+                            <option value="g/cm^3">g/cm<sup>3</sup></option>
+                            <option value="mg/cm^3">mg/cm<sup>3</sup></option>
+                            <option value="slug/ft^3">slug/ft<sup>3</sup></option>
+                            <option value="slug/in^3">slug/in<sup>3</sup></option>
+                        </select>
                     </div>
 
                 </div>
@@ -1571,6 +1634,11 @@
                 <option value="dsRKE">(ds/R)/(k/2*M<sub>12</sub>)</option>
                 <option value="wloss">(Po<sub>1</sub>-Po<sub>2</sub>)/(Po<sub>1</sub>-P<sub>1</sub>)</option>
                 <option value="cp">(P<sub>2</sub>-P<sub>1</sub>)/(Po<sub>1</sub>-P<sub>1</sub>)</option>
+                <option value="T2">T<sub>2</sub></option>
+                <option value="P2">P<sub>2</sub></option>
+                <option value="to2">T<sub>o<sub>2</sub></sub></option>
+                <option value="po2">P<sub>o<sub>2</sub></sub></option>
+                <option value="ds">&Delta;s</option>
             </select>
             <h4 style="margin-top: 0px;">vs</h4>
             <select class="selection-component" id="chart-x" onchange="outputGraph()">
