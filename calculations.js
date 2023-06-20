@@ -212,7 +212,7 @@ function calculateRootsWithUnits(){
   output.to2 = []
   output.ds = []
   output.V2 = []
-  output.rho2 = []
+  output.p2 = []
   output.P3 = []
 
 
@@ -228,12 +228,12 @@ function calculateRootsWithUnits(){
   output.to2[1] = data.to1 * output.TR[1]
   output.ds[0] = output.dsR[0] * R
   output.ds[1] = output.dsR[1] * R
-  output.rho1 = output.P1 / (R*output.T1)
+  output.p1 = output.P1 / (R*output.T1)
   output.V1 = data.M1 * Math.sqrt(data.gamma*R*output.T1)
   output.V2[0] = output.V2V1[0] * output.V1
   output.V2[1] = output.V2V1[1] * output.V1
-  output.rho2[0] = output.p2p1[0] * output.ro1
-  output.rho2[1] = output.p2p1[1] * output.ro1
+  output.p2[0] = output.p2p1[0] * output.ro1
+  output.p2[1] = output.p2p1[1] * output.ro1
   output.P3[0] = output.P3P1[0] * output.P1
   output.P3[1] = output.P3P1[1] * output.P1
 }
@@ -454,276 +454,225 @@ function joulesPerKelvinToBTU(joulesPerKelvin) {
 // Conversion function
 function convertFromSI() {
   calculateRootsWithUnits();
-  assignOutputs();
-  var P1 = parseFloat(document.getElementById("P1").value) || 0;
+  //assignOutputs();
+  //var P1 = parseFloat(document.getElementById("P1").value) || 0;
   var pressureUnit = document.getElementById("static-pressure1-unit").value;
 
-  var T1 = document.getElementById("T1").value;
+  //var T1 = document.getElementById("T1").value;
   var tempUnit = document.getElementById("static-temp1-unit").value;
 
-  var V1 = parseFloat(document.getElementById("V1").value) || 0;
+  //var V1 = parseFloat(document.getElementById("V1").value) || 0;
   var velocity1Unit = document.getElementById("velocity1-unit").value;
 
-  var V2 = parseFloat(document.getElementById("V2").value) || 0;
-  var V2Second = parseFloat(document.getElementById("V2Second").value) || 0;
+  //var V2 = parseFloat(document.getElementById("V2").value) || 0;
+  //var V2Second = parseFloat(document.getElementById("V2Second").value) || 0;
   var velocity2Unit = document.getElementById("velocity2-unit").value;
 
-  var p1 = parseFloat(document.getElementById("p1").value) || 0;
+  //var p1 = parseFloat(document.getElementById("p1").value) || 0;
   var density1Unit = document.getElementById("density1-unit").value;
 
-  var p2 = parseFloat(document.getElementById("p2").value) || 0;
-  var p2Second = parseFloat(document.getElementById("p2Second").value) || 0;
+  //var p2 = parseFloat(document.getElementById("p2").value) || 0;
+  //var p2Second = parseFloat(document.getElementById("p2Second").value) || 0;
   var density2Unit = document.getElementById("density2-unit").value;
 
-  var P2 = parseFloat(document.getElementById("P2").value) || 0;
-  var P2Second = parseFloat(document.getElementById("P2Second").value) || 0;
+  //var P2 = parseFloat(document.getElementById("P2").value) || 0;
+  //var P2Second = parseFloat(document.getElementById("P2Second").value) || 0;
   var pressureUnit2 = document.getElementById("static-pressure2-unit").value;
 
-  var P3 = parseFloat(document.getElementById("P3").value) || 0;
-  var P3Second = parseFloat(document.getElementById("P3Second").value) || 0;
+  //var P3 = parseFloat(document.getElementById("P3").value) || 0;
+  //var P3Second = parseFloat(document.getElementById("P3Second").value) || 0;
   var pressureUnit3 = document.getElementById("static-pressure3-unit").value;
 
-  var T2 = document.getElementById("T2").value;
-  var T2Second = document.getElementById("T2Second").value;
+  //var T2 = document.getElementById("T2").value;
+  //var T2Second = document.getElementById("T2Second").value;
   var tempUnit2 = document.getElementById("static-temp2-unit").value;
 
-  var To2 = document.getElementById("To2").value;
-  var To2Second = document.getElementById("To2Second").value;
+  //var To2 = document.getElementById("To2").value;
+  //var To2Second = document.getElementById("To2Second").value;
   var stagnationtempUnit = document.getElementById("stagnation-temp2-unit").value;
 
-  var Po2 = parseFloat(document.getElementById("Po2").value) || 0;
-  var Po2Second = parseFloat(document.getElementById("Po2Second").value) || 0;
+  //var Po2 = parseFloat(document.getElementById("Po2").value) || 0;
+  //var Po2Second = parseFloat(document.getElementById("Po2Second").value) || 0;
   var stagnationpressureUnit = document.getElementById("stagnation-pressure2-unit").value;
 
-  var deltaS = parseFloat(document.getElementById("deltaS").value) || 0;
-  var deltaSSecond = parseFloat(document.getElementById("deltaSSecond").value) || 0;
+  //var deltaS = parseFloat(document.getElementById("deltaS").value) || 0;
+  //var deltaSSecond = parseFloat(document.getElementById("deltaSSecond").value) || 0;
   var deltaSunit = document.getElementById("entropy-unit").value;
   
   switch (pressureUnit) {
     case 'kpascals':
-      P1 = pascalsToKpascals(P1);
+      output.P1 = pascalsToKpascals(output.P1);
       break;
     case 'psi':
-      P1 = pascalsToPsi(P1);
+      output.P1 = pascalsToPsi(output.P1);
       break;
     case 'psf':
-      P1 = pascalsToPsf(P1);
+      output.P1 = pascalsToPsf(output.P1);
       break;
   }
 
   switch (tempUnit) {
     case 'celsius':
-      T1 = kelvinToCelsius(T1);
+      output.T1 = kelvinToCelsius(output.T1);
       break;
     case 'rankine':
-      T1 = kelvinToRankine(T1);
+      output.T1 = kelvinToRankine(output.T1);
       break;
     case 'fahrenheit':
-      T1 = kelvinToFahrenheit(T1);
+      output.T1 = kelvinToFahrenheit(output.T1);
       break;
   }
 
   switch (velocity1Unit) {
     case 'ft/s':
-      V1 = metersPerSecondToFeetPerSecond(V1);
+      output.V1 = metersPerSecondToFeetPerSecond(output.V1);
       break;
     case 'm/ms':
-      V1 = metersPerMillisecondToFeetPerSecond(V1);
+      output.V1 = metersPerMillisecondToFeetPerSecond(output.V1);
       break;
   }
-
   switch (velocity2Unit) {
     case 'ft/s':
-      V2 = metersPerSecondToFeetPerSecond(V2);
-      V2Second = metersPerSecondToFeetPerSecond(V2Second);
+      output.V2[0] = metersPerSecondToFeetPerSecond(output.V2[0]);
+      output.V2[1] = metersPerSecondToFeetPerSecond(output.V2[1]);
       break;
     case 'm/ms':
-      V2 = metersPerMillisecondToFeetPerSecond(V2);
-      V2Second = metersPerMillisecondToFeetPerSecond(V2Second);
+      output.V2[0] = metersPerMillisecondToFeetPerSecond(output.V2[0]);
+      output.V2[1] = metersPerMillisecondToFeetPerSecond(output.V2[1]);
       break;
   }
-
+  
   switch (density1Unit) {
     case 'g/m^3':
-      p1 = kilogramsPerCubicMeterToGramsPerCubicMeter(p1);
-      console.log(p1)
+      output.p1 = kilogramsPerCubicMeterToGramsPerCubicMeter(output.p1);
+      console.log(output.p1);
       break;
     case 'g/cm^3':
-      p1 = kilogramsPerCubicMeterToGramsPerCubicCentimeter(p1);
+      output.p1 = kilogramsPerCubicMeterToGramsPerCubicCentimeter(output.p1);
       break;
     case 'mg/cm^3':
-      p1 = kilogramsPerCubicMeterToMilligramsPerCubicCentimeter(p1);
+      output.p1 = kilogramsPerCubicMeterToMilligramsPerCubicCentimeter(output.p1);
       break;
     case 'slug/ft^3':
-      p1 = kilogramsPerCubicMeterToSlugsPerCubicFoot(p1);
+      output.p1 = kilogramsPerCubicMeterToSlugsPerCubicFoot(output.p1);
       break;
     case 'slug/in^3':
-      p1 = kilogramsPerCubicMeterToSlugsPerCubicInch(p1);
+      output.p1 = kilogramsPerCubicMeterToSlugsPerCubicInch(output.p1);
       break;
   }
-
+  
   switch (density2Unit) {
     case 'g/m^3':
-      p2 = kilogramsPerCubicMeterToGramsPerCubicMeter(p2);
-      p2Second = kilogramsPerCubicMeterToGramsPerCubicMeter(p2Second);
+      output.p2[0] = kilogramsPerCubicMeterToGramsPerCubicMeter(output.p2[0]);
+      output.p2[1] = kilogramsPerCubicMeterToGramsPerCubicMeter(output.p2[1]);
       break;
     case 'g/cm^3':
-      p2 = kilogramsPerCubicMeterToGramsPerCubicCentimeter(p2);
-      p2Second = kilogramsPerCubicMeterToGramsPerCubicCentimeter(p2Second);
+      output.p2[0] = kilogramsPerCubicMeterToGramsPerCubicCentimeter(output.p2[0]);
+      output.p2[1] = kilogramsPerCubicMeterToGramsPerCubicCentimeter(output.p2[1]);
       break;
     case 'mg/cm^3':
-      p2 = kilogramsPerCubicMeterToMilligramsPerCubicCentimeter(p2);
-      p2Second = kilogramsPerCubicMeterToMilligramsPerCubicCentimeter(p2Second);
+      output.p2[0] = kilogramsPerCubicMeterToMilligramsPerCubicCentimeter(output.p2[0]);
+      output.p2[1] = kilogramsPerCubicMeterToMilligramsPerCubicCentimeter(output.p2[1]);
       break;
     case 'slug/ft^3':
-      p2 = kilogramsPerCubicMeterToSlugsPerCubicFoot(p2);
-      p2Second = kilogramsPerCubicMeterToSlugsPerCubicFoot(p2Second);
+      output.p2[0] = kilogramsPerCubicMeterToSlugsPerCubicFoot(output.p2[0]);
+      output.p2[1] = kilogramsPerCubicMeterToSlugsPerCubicFoot(output.p2[1]);
       break;
     case 'slug/in^3':
-      p2 = kilogramsPerCubicMeterToSlugsPerCubicInch(p2);
-      p2Second = kilogramsPerCubicMeterToSlugsPerCubicInch(p2Second);
+      output.p2[0] = kilogramsPerCubicMeterToSlugsPerCubicInch(output.p2[0]);
+      output.p2[1] = kilogramsPerCubicMeterToSlugsPerCubicInch(output.p2[1]);
       break;
   }
-
+  
   switch (pressureUnit2) {
     case 'kpascals':
-      P2 = pascalsToKpascals(P2);
-      P2Second = pascalsToKpascals(P2Second);
+      output.P2[0] = pascalsToKpascals(output.P2[0]);
+      output.P2[1] = pascalsToKpascals(output.P2[1]);
       break;
     case 'psi':
-      P2 = pascalsToPsi(P2);
-      P2Second = pascalsToPsi(P2Second);
+      output.P2[0] = pascalsToPsi(output.P2[0]);
+      output.P2[1] = pascalsToPsi(output.P2[1]);
       break;
     case 'psf':
-      P2 = pascalsToPsf(P2);
-      P2Second = pascalsToPsf(P2Second);
+      output.P2[0] = pascalsToPsf(output.P2[0]);
+      output.P2[1] = pascalsToPsf(output.P2[1]);
       break;
   }
-
+  
   switch (pressureUnit3) {
     case 'kpascals':
-      P3 = pascalsToKpascals(P3);
-      P3Second = pascalsToKpascals(P3Second);
+      output.P3[0] = pascalsToKpascals(output.P3[0]);
+      output.P3[1] = pascalsToKpascals(output.P3[1]);
       break;
     case 'psi':
-      P3 = pascalsToPsi(P3);
-      P3Second = pascalsToPsi(P3Second);
+      output.P3[0] = pascalsToPsi(output.P3[0]);
+      output.P3[1] = pascalsToPsi(output.P3[1]);
       break;
     case 'psf':
-      P3Second = pascalsToPsf(P3Second);
+      output.P3Second = pascalsToPsf(output.P3Second);
       break;
   }
-
+  
   switch (tempUnit2) {
     case 'celsius':
-      T2 = kelvinToCelsius(T2);
-      T2Second = kelvinToCelsius(T2Second);
+      output.T2[0] = kelvinToCelsius(output.T2[0]);
+      output.T2[1] = kelvinToCelsius(output.T2[1]);
       break;
     case 'rankine':
-      T2 = kelvinToRankine(T2);
-      T2Second = kelvinToRankine(T2Second);
+      output.T2[0] = kelvinToRankine(output.T2[0]);
+      output.T2[1] = kelvinToRankine(output.T2[1]);
       break;
     case 'fahrenheit':
-      T2 = kelvinToFahrenheit(T2);
-      T2Second = kelvinToFahrenheit(T2Second);
+      output.T2[0] = kelvinToFahrenheit(output.T2[0]);
+      output.T2[1] = kelvinToFahrenheit(output.T2[1]);
       break;
   }
-
+  
   switch (stagnationtempUnit) {
     case 'celsius':
-      To2 = kelvinToCelsius(To2);
-      To2Second = kelvinToCelsius(To2Second);
+      output.to2[0] = kelvinToCelsius(output.to2[0]);
+      output.to2[1] = kelvinToCelsius(output.to2[1]);
       break;
     case 'rankine':
-      To2 = kelvinToRankine(To2);
-      To2Second = kelvinToRankine(To2Second);
+      output.to2[0] = kelvinToRankine(output.to2[0]);
+      output.to2[1] = kelvinToRankine(output.to2[1]);
       break;
     case 'fahrenheit':
-      To2 = kelvinToFahrenheit(To2);
-      To2Second = kelvinToFahrenheit(To2Second);
+      output.to2[0] = kelvinToFahrenheit(output.to2[0]);
+      output.To2[1] = kelvinToFahrenheit(output.To2[1]);
       break;
   }
-
+  
   switch (stagnationpressureUnit) {
     case 'kpascals':
-      Po2 = pascalsToKpascals(Po2);
-      Po2Second = pascalsToKpascals(Po2Second);
+      output.po2[0] = pascalsToKpascals(output.po2[0]);
+      output.po2[1] = pascalsToKpascals(output.po2[1]);
       break;
     case 'psi':
-      Po2 = pascalsToPsi(Po2);
-      Po2Second = pascalsToPsi(Po2Second);
+      output.po2[0] = pascalsToPsi(output.po2[0]);
+      output.po2[1] = pascalsToPsi(output.po2[1]);
       break;
     case 'psf':
-      Po2 = pascalsToPsf(Po2);
-      Po2Second = pascalsToPsf(Po2Second);
+      output.po2[0] = pascalsToPsf(output.po2[0]);
+      output.po2[1] = pascalsToPsf(output.po2[1]);
       break;
   }
-
-  // Additional conversions for new elements
-  switch (velocity2Unit) {
-    case 'ft/s':
-      V2 = metersPerSecondToFeetPerSecond(V2);
-      V2Second = metersPerSecondToFeetPerSecond(V2Second);
-      break;
-    case 'm/ms':
-      V2 = metersPerMillisecondToFeetPerSecond(V2);
-      V2Second = metersPerMillisecondToFeetPerSecond(V2Second);
-      break;
-  }
-
+  
   switch (deltaSunit) {
     case 'J/K':
       // No conversion needed for J/K
       break;
     case 'cal/K':
-      deltaS = joulesPerKelvinToCaloriesPerKelvin(deltaS);
-      deltaSSecond = joulesPerKelvinToCaloriesPerKelvin(deltaSSecond);
+      output.ds[0] = joulesPerKelvinToCaloriesPerKelvin(output.ds[0]);
+      output.ds[1] = joulesPerKelvinToCaloriesPerKelvin(output.ds[1]);
       break;
     case 'BTU':
-      deltaS = joulesPerKelvinToBTU(deltaS);
-      deltaSSecond = joulesPerKelvinToBTU(deltaSSecond);
+      output.ds[0] = joulesPerKelvinToBTU(output.ds[0]);
+      output.ds[1] = joulesPerKelvinToBTU(output.ds[1]);
       break;
   }
 
-
-  document.getElementById("V1").value = V1;
-  // Update the HTML element values with the converted values
-  document.getElementById("V2").value = V2;
-  document.getElementById("V2Second").value = V2Second;
-  // Update other HTML elements with their respective converted values
-
-  document.getElementById("p2").value = p2;
-  document.getElementById("p2Second").value = p2Second;
-  // Update other HTML elements with their respective converted values
-
-  document.getElementById("p1").value = p1;
-
-  document.getElementById("P3").value = P3;
-  document.getElementById("P3Second").value = P3Second;
-  // Update other HTML elements with their respective converted values
-
-  document.getElementById("P2").value = P2;
-  document.getElementById("P2Second").value = P2Second;
-  // Update other HTML elements with their respective converted values
-
-  document.getElementById("T2").value = T2;
-  document.getElementById("T2Second").value = T2Second;
-  // Update other HTML elements with their respective converted values
-
-  document.getElementById("T1").value = T1;
-
-  document.getElementById("To2").value = To2;
-  document.getElementById("To2Second").value = To2Second;
-  // Update other HTML elements with their respective converted values
-
-  document.getElementById("Po2").value = Po2;
-  document.getElementById("Po2Second").value = Po2Second;
-  // Update other HTML elements with their respective converted values
-
-  document.getElementById("deltaS").value = deltaS;
-  document.getElementById("deltaSSecond").value = deltaSSecond;
-  // Update other HTML elements with their respective converted values
-
+  assignOutputs();
   // Return the converted values
 }
   
@@ -820,13 +769,13 @@ function assignOutputs(){
   document.getElementById("deltaS").value = output.ds[0];
   document.getElementById("deltaSSecond").value = output.ds[1];
 
-  document.getElementById("p1").value = output.rho1;
+  document.getElementById("p1").value = output.p1;
 
   document.getElementById("V2").value = output.V2[0];
   document.getElementById("V2Second").value = output.V2[1];
   
-  document.getElementById("p2").value = output.rho2[0];
-  document.getElementById("p2Second").value = output.rho2[1];
+  document.getElementById("p2").value = output.p2[0];
+  document.getElementById("p2Second").value = output.p2[1];
   
   document.getElementById("P3").value = output.P3[0];
   document.getElementById("P3Second").value = output.P3[1];
@@ -911,10 +860,10 @@ function toggleDimension(){
     document.getElementById("non-dimensional-additional").style.display = "none";
   }
 }
-  //--------------------------------------Inlet->Outlet Graphic ----------------------------------
-  var myChart;
 
-  function imageGUI() {
+//--------------------------------------Inlet->Outlet Graphic ----------------------------------
+var myChart;
+function imageGUI() {
     var ctx = document.getElementById('myChart').getContext('2d');
     assignValues();
     var A1 = data.A1 || 1;
@@ -1256,6 +1205,8 @@ myChart3 = new Chart(ctx2, {
   }
 });
 }
+
+//--------------Allows user to cancel------------------
 let shouldCancel = false;
 function delay(duration) {
   return new Promise(resolve => setTimeout(resolve, duration));
@@ -1263,20 +1214,21 @@ function delay(duration) {
 function cancel(){
   shouldCancel = true;
 }
+
+//-----------------------graphs outputs-----------------------------------------------
 async function outputGraph(){
     var ctx = document.getElementById('outputChart').getContext('2d');
     var ctx2 = document.getElementById('outputChart2').getContext('2d');
     var wasCancelled = false;
-    s_test = pyscript.interpreter.globals.get('main');
-  // Get the values of M1 and M2
+
+    //Get inputs
     assignValues();
-    //js_test = pyscript.interpreter.globals.get('main');
 
 
     var X = document.getElementById("chart-x").value;
     var Y = document.getElementById("chart-y").value;
 
-
+    // If there is already a chart destroy it
     if (typeof myChart2 !== 'undefined') {
       myChart2.destroy();
     }
@@ -1291,15 +1243,13 @@ async function outputGraph(){
           shouldCancel = false;
           break;
         }
-//        js_test()
-//        js_args = pyscript.interpreter.globals.get('args')
+        //Calculate Flow
         calcSum();
-        //console.log(output.M2[0])
-        console.log(output[Y][0])
+        convertFromSI();
         if(js_args.error){
           document.getElementById("graph-error").text = js_args.error
         }
-       // M2 = js_args[Y].toJs();
+
         var dataPoint1 = {
             x: data[X],
             y: output[Y][0]
@@ -1315,6 +1265,12 @@ async function outputGraph(){
         await delay(1);
       }
     }
+    //RESET output values to the original values
+    console.log(data[X])
+    assignValues();
+    console.log(data[X])
+    calcSum();
+    convertFromSI();
     //if(wasCancelled) {
     //  document.getElementById('processing').textContent = 'Processing cancelled!';
     //} else {
@@ -1399,6 +1355,8 @@ async function outputGraph(){
     }
   });
 }
+
+
 function updateProgress(point,delta){
   var progress = Math.ceil(point/0.01)
   number_points= 3/delta
