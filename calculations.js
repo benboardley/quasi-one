@@ -215,7 +215,7 @@ function calculateRootsWithUnits(){
   output.p2 = []
   output.P3 = []
 
-
+  output.f1 = 1 + ((data.gamma - 1)/2) * data.M1 ** 2 
   output.P1 = data.po1 * output.f1 ** (-data.gamma/(data.gamma-1))
   output.T1 = data.to1 * output.f1
   output.P2[0] = output.P1 * output.P2P1[0]
@@ -232,10 +232,37 @@ function calculateRootsWithUnits(){
   output.V1 = data.M1 * Math.sqrt(data.gamma*R*output.T1)
   output.V2[0] = output.V2V1[0] * output.V1
   output.V2[1] = output.V2V1[1] * output.V1
-  output.p2[0] = output.p2p1[0] * output.ro1
-  output.p2[1] = output.p2p1[1] * output.ro1
+  output.p2[0] = output.p2p1[0] * output.p1
+  output.p2[1] = output.p2p1[1] * output.p1
   output.P3[0] = output.P3P1[0] * output.P1
   output.P3[1] = output.P3P1[1] * output.P1
+
+  var test_wloss = (data.po1 - output.po2[0]) / (data.po1 - output.P1)
+  var test_cp = (output.P2[0] - output.P1) / (data.po1 - output.P1)
+
+  var test_wloss2 = (data.po1 - output.po2[1]) / (data.po1 - output.P1)
+  var test_cp2 = (output.P2[1] - output.P1) / (data.po1 - output.P1)
+
+  var P3P1 = output.P3[0] / output.P1
+  var P3P12 = output.P3[1] / output.P1
+  var P3P2 = output.P3[0] / output.P2[0]
+  var P3P22 = output.P3[1] / output.P2[1]
+  var P3Po1 = output.P3[0] / data.po1
+  var P3Po12 = output.P3[1] / data.po1
+
+  console.log(test_wloss)
+  console.log(test_wloss2)
+  console.log(test_cp)
+  console.log(test_cp2)
+
+  console.log(P3P1)
+  console.log(P3P12)
+
+  console.log(P3P2)
+  console.log(P3P22)
+
+  console.log(P3Po1)
+  console.log(P3Po12)
 }
 // Pressure conversion functions
 function kpascalsToPascals(value) {
@@ -396,7 +423,6 @@ function kelvinToRankine(value) {
 }
 
 function kelvinToFahrenheit(value) {
-  console.log("BlahBlah")
   return (value * 9/5) - 459.67;
 }
 
@@ -545,7 +571,6 @@ function convertFromSI() {
   switch (density1Unit) {
     case 'g/m^3':
       output.p1 = kilogramsPerCubicMeterToGramsPerCubicMeter(output.p1);
-      console.log(output.p1);
       break;
     case 'g/cm^3':
       output.p1 = kilogramsPerCubicMeterToGramsPerCubicCentimeter(output.p1);
@@ -1266,9 +1291,7 @@ async function outputGraph(){
       }
     }
     //RESET output values to the original values
-    console.log(data[X])
     assignValues();
-    console.log(data[X])
     calcSum();
     convertFromSI();
     //if(wasCancelled) {
