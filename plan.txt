@@ -1,13 +1,14 @@
 Plan for Web Calculator
 
 P1 - 0.5282817877171742
+po2 - 0.9096206129040943 , 2.0098199927797196
 P2 - 0.839379295755261 , 0.05940411908089032
 P3 - 0.6838305417362176 , 0.2938429533990322
 T1 - 1.2
 T2 - 1.4073122903541277 , 0.5265117096458725
 To2 - 1 , 1
 
-
+0.09038 
 wednesday- example, ask about N, ask about units, add a unit field, add third row
 thrusday- fix N, fix units, work on api
 

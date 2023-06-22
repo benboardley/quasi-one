@@ -53,7 +53,7 @@
             self.b2 = b2
             self.a1 = a1
             self.a2 = a2
-            self.debug = debug
+            self.debug = True
             self.N = N
             self.error = None
 
@@ -86,58 +86,6 @@
       #regurgitate(args)
       #printOutput(args)
       return()
-    def coefsBiquadratic(args):
-      '''
-      calculate the 2nd and zeroth order coefficients of the bi-quadratic polynomial
-      '''
-      M1 = args.M1
-      k  = args.k
-      AR = args.AR
-      Ad = args.Ad
-      cd = args.cd
-      cf = args.cf
-      Af = args.Af
-      nu = args.nu
-      qr = args.qr
-      xi = args.xi
-      beta1 = args.b1
-      beta2 = args.b2
-      alpha1 = args.a1
-      alpha2 = args.a2
-
-      TR = np.float64(bool(k-1))*(1 + args.qr) + np.float64(not bool(k-1))*1
-
-      G = (k-1)/2
-
-      f1 = 1 + G * M1*M1
-
-      try:
-          Lambda = np.complex128(\
-                      ((1 + beta1*k*(1-cf/4*Af - cd/2*Ad)*M1**2 + (1-xi+nu*(f1**(k/(k-1))-1))*(AR-1) ) \
-                      /(alpha1/alpha2*M1*np.sqrt(f1*TR))) \
-                      )
-          Lambda *= Lambda
-      except:
-          Lambda = np.complex128(\
-                      ((1 + beta1*k*(1-cf/4*Af - cd/2*Ad)*M1**2 + (1-xi+nu*(np.exp(-M1**2)-1))*(AR-1) ) \
-                      /(alpha1/alpha2*M1*np.sqrt(f1*TR))) \
-                      )
-          Lambda *= Lambda
-
-
-      b = (Lambda - 2*k*beta2*(1+xi*(1/AR-1))*(1+cf/4*Af/AR)) \
-              /(Lambda * G  -(k*beta2*(1+cf/4*Af/AR))**2)
-      c = -(1+xi*(1/AR-1))**2 \
-              /(Lambda * G  -(k*beta2*(1+cf/4*Af/AR))**2)
-
-      det = (b/2)*(b/2)-c
-
-      args.Lambda = np.real(Lambda)
-      args.b = np.real(b)
-      args.c = np.real(c)
-      args.det = np.real(det)
-
-      return(args)
 
     def intro(string,ver,date):
         '''
@@ -157,7 +105,8 @@
         use argparse to get user inputs from command line
         '''
         parser = argparse.ArgumentParser(description="Steady Quasi-1D Compressible Flow."\
-                +"Assumes Calorically Perfect Ideal Gas")
+                +"Assumes Calorically Perfect Ideal Gas.",\
+                formatter_class=argparse.ArgumentDefaultsHelpFormatter)
         parser.add_argument('--area-ratio','-ar',default=1.0,dest='AR',\
                             help="Exit Area / Inlet Area",type=np.float64)
 
@@ -283,15 +232,16 @@
 
         f1 = 1 + G * M1*M1
 
-        try:
+        if( k == 1):
             Lambda = np.complex128(\
-                        ((1 + beta1*k*(1-cf/4*Af - cd/2*Ad)*M1**2 + (1-xi+nu*(f1**(k/(k-1))-1))*(AR-1) ) \
+                        ((1 + beta1*k*(1-cf/4*Af - cd/2*Ad)*M1**2 + (1-xi+nu*(np.exp(-M1**2)-1))*(AR-1) ) \
                         /(alpha1/alpha2*M1*np.sqrt(f1*TR))) \
                         )
             Lambda *= Lambda
-        except:
+
+        else:
             Lambda = np.complex128(\
-                        ((1 + beta1*k*(1-cf/4*Af - cd/2*Ad)*M1**2 + (1-xi+nu*(np.exp(-M1**2)-1))*(AR-1) ) \
+                        ((1 + beta1*k*(1-cf/4*Af - cd/2*Ad)*M1**2 + (1-xi+nu*(f1**(k/(k-1))-1))*(AR-1) ) \
                         /(alpha1/alpha2*M1*np.sqrt(f1*TR))) \
                         )
             Lambda *= Lambda
@@ -358,19 +308,12 @@
 
         f1 = 1 + G * M1*M1
         f2 = 1 + G * M2*M2
+        args.f1    = f1
+        args.f2    = f2
 
         TR = np.float64(bool(k-1))*(1 + qr) + np.float64(not bool(k-1))*1
 
-        try:
-            PR = alpha1/alpha2 * np.sqrt(TR) * M1/M2 * 1./AR * (f1/f2)**(-(k+1)/(2*(k-1)))
-
-            dsR  = k/(k-1) *np.log(TR) - np.log(PR)
-
-            P2P1  = alpha1/alpha2 * np.sqrt(TR) * M1/M2 * 1./AR * np.sqrt(f1/f2)
-
-            P3P1 = ((1 - xi - nu) + xi * P2P1 + nu * f1**(k/(k-1)))*np.ones_like(M2)
-
-        except:
+        if( k == 1):
             PR = alpha1/alpha2*np.sqrt(TR) * M1/M2 * 1/AR * np.exp(0.5*(M2*M2-M1*M1))
 
             dsR = - np.log(PR)
@@ -378,6 +321,15 @@
             P2P1  = alpha1/alpha2*np.sqrt(TR) * M1/M2 * 1./AR * np.sqrt(f1/f2)
 
             P3P1 = ((1-xi-nu) + xi*P2P1 + nu * np.exp(M1*M1/2))*np.ones_like(M2)
+
+        else:
+            PR = alpha1/alpha2 * np.sqrt(TR) * M1/M2 * 1./AR * (f1/f2)**(-(k+1)/(2*(k-1)))
+
+            dsR  = k/(k-1) *np.log(TR) - np.log(PR)
+
+            P2P1  = alpha1/alpha2 * np.sqrt(TR) * M1/M2 * 1./AR * np.sqrt(f1/f2)
+
+            P3P1 = ((1 - xi - nu) + xi * P2P1 + nu * f1**(k/(k-1)))*np.ones_like(M2)
 
         T2T1  = TR*(f1/f2)
         p2p1  = P2P1/T2T1
@@ -396,22 +348,22 @@
         args.dsRKE = dsR/(k/2*M1*M1)
         args.dsRKE2= dsR/(k/2*M2*M2)
         args.P3P1  = P3P1
+        args.P3Po1 = P3P1 / (args.f1 ** (k/(k-1)))
         args.wpv    = -np.log(P2P1*V2V1*AR)
         args.wrev    = -np.log(V2V1*AR)
 
-        try:
+        if( k == 1):
+            args.CP    = (P2P1-1)/np.exp(-M1**2/2)
+            args.wloss = (1 - PR)/(1 - np.exp(-M1**2/2))
+            args.zloss = np.exp(M1**2/2)*(1 - PR)/(k/2*M1*M1)
+            args.Theta = k/(k-1+1e-16)* 1/TwTo1*(TR-1)*np.ones_like(M2)
+        else:
             args.CP    = (P2P1 - 1)/(args.f1**(k/(k-1))-1)
             args.wloss = (1 - PR)/(1 - args.f1**(-k/(k-1)))
             args.zloss = f1**(k/(k-1))*(1 - PR)/(k/2*M1**2)
             args.Iq    = k/4*(M2**2+M1**2)*np.log(TR) \
                             + k/(k-1)*(np.log(TR) - 1/TwTo1*(TR-1))
             args.Theta = k/(k-1)* 1/TwTo1*(TR-1)*np.ones_like(M2)
-
-        except:
-            args.CP    = (P2P1-1)/np.exp(-M1**2/2)
-            args.wloss = (1 - PR)/(1 - np.exp(-M1**2/2))
-            args.zloss = np.exp(M1**2/2)*(1 - PR)/(k/2*M1*M1)
-            args.Theta = k/(k-1+1e-16)* 1/TwTo1*(TR-1)*np.ones_like(M2)
 
 
         def get_approx(M2,M1,TR):
@@ -422,14 +374,12 @@
             return(midpoint)
 
 
-        args.ek    = k/(k-1+1e-16)*np.log(f2/f1) + k/2*get_approx(M2,M1,TR)
+        args.dk    = k/(k-1+1e-16)*np.log(f2/f1) + k/2*get_approx(M2,M1,TR)
         args.Iq    = k/2*get_approx(M2,M1,TR) \
                         + k/(k-1+1e-16)*(np.log(TR) - 1/TwTo1*(TR-1))
 
-        args.we    = args.wpv - args.ek
+        args.we    = args.wpv - args.dk
         args.I     = args.we - args.wrev + args.Iq
-        args.f1    = f1
-        args.f2    = f2
         args.CPinc = (P2P1 - 1)/(k/2*M1*M1)
 
         return(args)
@@ -945,7 +895,7 @@
             print("{0:20s} {1: .6e} {2: .6e}".format("v2v1",args.v2v1[0],args.v2v1[1]))
             print("{0:20s} {1: .6e} {2: .6e}".format("p2p1",args.p2p1[0],args.p2p1[1]))
             print("{0:20s} {1: .6e} {2: .6e}".format("wpv",args.wpv[0],args.wpv[1]))
-            print("{0:20s} {1: .6e} {2: .6e}".format("ek",args.ek[0],args.ek[1]))
+            print("{0:20s} {1: .6e} {2: .6e}".format("dk",args.dk[0],args.dk[1]))
             print("{0:20s} {1: .6e} {2: .6e}".format("Iq",args.Iq[0],args.Iq[1]))
             print("{0:20s} {1: .6e} {2: .6e}".format("we",args.we[0],args.we[1]))
             print("{0:20s} {1: .6e} {2: .6e}".format("wrev",args.wrev[0],args.wrev[1]))
@@ -1031,6 +981,7 @@
         #print('Solving sub-elements for larger Mach number branch...')
         args.M2[1] = march(argn,root=1)
         #print('',end='\n')
+        if( args.M2[1] == args.M2[0] ): args.M2[1] = np.nan
 
         args.Lambda = np.zeros(2)
         args.b = np.zeros(2)
@@ -1087,7 +1038,7 @@
                     <div class="label-output-row" title="Inlet Stagnation Temperature">
                         <label for="To1">T<sub>o<sub>1</sub></sub>=</label>
                         <input type="text" id="To1">
-                        <select id="temp-unit">
+                        <select id="input-temp-unit">
                             <option value="kelvin">K&deg;</option>
                             <option value="celsius">C&deg;</option>
                             <option value="rankine">R&deg;</option>
