@@ -1223,7 +1223,7 @@
                         </select>
                     </div>
                     <button id="calculate" onclick="calculateFlow(event)">Calculate</button>
-                    <canvas id="myChart"></canvas>
+                    <canvas id="gui"></canvas>
                 </div>
             </form>
             <p class="error" id="input-error"></p>
@@ -1322,7 +1322,7 @@
                         <label for="P2">P<sub>2</sub>=</label>
                         <input type="text" id="P2">
                         <input type="text" id="P2Second">
-                        <select id="static-pressure2-unit" onchange="convertFromSI()">     
+                        <select id="static-pressure2-unit" onchange="userChangedOutputUnit()">     
                             <option value="pascals">Pa</option>
                             <option value="kpascals">kPa</option>
                             <option value="psi">Psi</option>
@@ -1335,7 +1335,7 @@
                         <label for="T2">T<sub>2</sub>=</label>
                         <input type="text" id="T2">
                         <input type="text" id="T2Second">
-                        <select id="static-temp2-unit" onchange="convertFromSI()">
+                        <select id="static-temp2-unit" onchange="userChangedOutputUnit()">
                             <option value="kelvin">K&deg;</option>
                             <option value="celsius">C&deg;</option>
                             <option value="rankine">R&deg;</option>
@@ -1348,7 +1348,7 @@
                         <label for="To2">T<sub>o<sub>2</sub></sub>=</label>
                         <input type="text" id="To2">
                         <input type="text" id="To2Second">
-                        <select id="stagnation-temp2-unit" onchange="convertFromSI()">
+                        <select id="stagnation-temp2-unit" onchange="userChangedOutputUnit()">
                             <option value="kelvin">K&deg;</option>
                             <option value="celsius">C&deg;</option>
                             <option value="rankine">R&deg;</option>
@@ -1361,7 +1361,7 @@
                         <label for="Po2">P<sub>o<sub>2</sub></sub>=</label>
                         <input type="text" id="Po2">
                         <input type="text" id="Po2Second">
-                        <select id="stagnation-pressure2-unit" onchange="convertFromSI()">
+                        <select id="stagnation-pressure2-unit" onchange="userChangedOutputUnit()">
                             <option value="pascals">Pa</option>
                             <option value="kpascals">kPa</option>
                             <option value="psi">Psi</option>
@@ -1374,7 +1374,7 @@
                         <label for="deltaS">&Delta;s=</label>
                         <input type="text" id="deltaS">
                         <input type="text" id="deltaSSecond">
-                        <select id = "entropy-unit" onchange="convertFromSI()">
+                        <select id = "entropy-unit" onchange="userChangedOutputUnit()">
                         <option>J/K</option>
                         <option>cal/K</option>
                         <option>BTU</option>
@@ -1385,7 +1385,7 @@
                     <div class="label-output-row" title="Static Pressure at Inlet">
                         <label for="P1">P<sub>1</sub>=</label>
                         <input type="text" id="P1">
-                        <select id="static-pressure1-unit" onchange="convertFromSI()">
+                        <select id="static-pressure1-unit" onchange="userChangedOutputUnit()">
                             <option value="pascals">Pa</option>
                             <option value="kpascals">kPa</option>
                             <option value="psi">Psi</option>
@@ -1397,7 +1397,7 @@
                     <div class="label-output-row" title="Static Temperature at Inlet">
                         <label for="T1">T<sub>1</sub>=</label>
                         <input type="text" id="T1">
-                        <select id="static-temp1-unit" onchange="convertFromSI()">
+                        <select id="static-temp1-unit" onchange=userChangedOutputUnit()">
                             <option value="kelvin">K&deg;</option>
                             <option value="celsius">C&deg;</option>
                             <option value="rankine">R&deg;</option>
@@ -1409,7 +1409,7 @@
                     <div class="label-output-row" title="Inlet Velocity">
                         <label for="V1">V1=</label>
                         <input type="text" id="V1">
-                        <select id = "velocity1-unit" onchange="convertFromSI()">
+                        <select id = "velocity1-unit" onchange="userChangedOutputUnit()">
                             <option>m/s</option>
                             <option>m/ms</option>
                             <option>ft/s</option>
@@ -1517,7 +1517,7 @@
                         <label for="V2">V<sub>2</sub>=</label>
                         <input type="text" id="V2">
                         <input type="text" id="V2Second">
-                        <select id = "velocity2-unit" onchange="convertFromSI()">
+                        <select id = "velocity2-unit" onchange="userChangedOutputUnit()">
                             <option>m/s</option>
                             <option>m/ms</option>
                             <option>ft/s</option>
@@ -1529,7 +1529,7 @@
                         <label for="p2">&rho;<sub>2</sub>=</label>
                         <input type="text" id="p2">
                         <input type="text" id="p2Second">
-                        <select id = "density2-unit" onchange="convertFromSI()">
+                        <select id = "density2-unit" onchange="userChangedOutputUnit()">
                             <option value="kg/m^3">kg/m<sup>3</sup></option>
                             <option value="g/m^3">g/m<sup>3</sup></option>
                             <option value="g/cm^3">g/cm<sup>3</sup></option>
@@ -1544,7 +1544,7 @@
                         <label for="P3">P<sub>3</sub>=</label>
                         <input type="text" id="P3">
                         <input type="text" id="P3Second">
-                        <select id="static-pressure3-unit" onchange="convertFromSI()">
+                        <select id="static-pressure3-unit" onchange="userChangedOutputUnit()">
                             <option value="pascals">Pa</option>
                             <option value="kpascals">kPa</option>
                             <option value="psi">Psi</option>
@@ -1556,7 +1556,7 @@
                     <div class="label-output-row" title="Inlet Static Density">
                         <label for="p1">&rho;<sub>1</sub>=</label>
                         <input type="text" id="p1">
-                        <select id="density1-unit" onchange="convertFromSI()">
+                        <select id="density1-unit" onchange="userChangedOutputUnit()">
                             <option value="kg/m^3">kg/m<sup>3</sup></option>
                             <option value="g/m^3">g/m<sup>3</sup></option>
                             <option value="g/cm^3">g/cm<sup>3</sup></option>

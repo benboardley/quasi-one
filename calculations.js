@@ -838,14 +838,17 @@ function convertFromSI() {
       output.ds[0] = joulesPerKelvinToCaloriesPerKelvin(output.ds[0]);
       output.ds[1] = joulesPerKelvinToCaloriesPerKelvin(output.ds[1]);
       break;
-    case 'BTU':
+    case 'BTU/R':
       output.ds[0] = joulesPerKelvinToBTU(output.ds[0]);
       output.ds[1] = joulesPerKelvinToBTU(output.ds[1]);
       break;
   }
-
-  assignOutputs();
   // Return the converted values
+}
+
+function userChangedOutputUnit(){
+  convertFromSI();
+  assignOutputs();
 }
 
 
@@ -891,7 +894,7 @@ function toggleDimension(){
 //--------------------------------------Inlet->Outlet Graphic ----------------------------------
 var myChart;
 function imageGUI() {
-    var ctx = document.getElementById('myChart').getContext('2d');
+    var ctx = document.getElementById('gui').getContext('2d');
     assignInputs();
     var A1 = data.A1 || 1;
     var A2 = data.A2 || 2;
