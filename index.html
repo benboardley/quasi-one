@@ -1021,7 +1021,6 @@
             <form class="inputFields">
                 <div class="Inlet">
                     <h4 class="InputHeaders">Inlet Conditions</h4>
-                        
                     <!-- P1 Input -->
                     <div class="label-output-row" title="Inlet Stagnation Pressure">
                         <label for="Po1">P<sub>o<sub>1</sub></sub>=</label>
@@ -1113,6 +1112,7 @@
                 </div>
 
                 <div class="gui-parameters">
+                <canvas id="gui"></canvas>
                             <h4 class="InputHeaders">Parameters</h4>
                     <div class="label-output-row" title="Ratio of Specific Heats">
                         <label for="gamma">&gamma;=</label>
@@ -1223,7 +1223,7 @@
                         </select>
                     </div>
                     <button id="calculate" onclick="calculateFlow(event)">Calculate</button>
-                    <canvas id="gui"></canvas>
+                
                 </div>
             </form>
             <p class="error" id="input-error"></p>
@@ -1375,9 +1375,7 @@
                         <input type="text" id="deltaS">
                         <input type="text" id="deltaSSecond">
                         <select id = "entropy-unit" onchange="userChangedOutputUnit()">
-                        <option>J/K</option>
-                        <option>cal/K</option>
-                        <option>BTU</option>
+                        <option>J/(kg * K)</option>
                         </select>
                     </div>
 
