@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>quasi one</title>
+  <link rel="icon" href="https://static.nd.edu/images/monogram/monogram.svg" type="image/svg+xml">
   <!-- Additional meta tags, stylesheets, or scripts -->
-  <script src="./calculations.js"></script>
+  <script src="./script/calculations.js"></script>
   <link rel="stylesheet" type="text/css" href="./style.css">
   <link rel="stylesheet" type="text/css" href="./notredame.css">
   <!-- ----------------------Java Script Libraries and Plug Ins -->
@@ -14,7 +15,7 @@
  <script defer src="https://pyscript.net/latest/pyscript.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
 
-  <!-- ----------------------Python Imports -->
+  <!-- ----------------------Python Imports -------------------------------------------------------------------------->
    <py-config>
     packages = ["numpy", "scipy", "tqdm"] 
   </py-config>
@@ -994,7 +995,7 @@
   </py-script>
 </head>
 
-  <!-- ----------------------Website Structure -->
+  <!-- ----------------------Website Structure ----------------------------------------------------------------------->
 <body>
     <header id="header" class="site-header">
             <h1 id="site-title" class="site-title">
@@ -1015,7 +1016,7 @@
         <p class="credits">by Andrew Oliva and Scott Morris <a href="https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/steady-quasionedimensional-internal-compressible-flow-with-area-change-heat-addition-and-friction/941B60C217C6096C6980DFDD4B5F9E34" target="_blank" rel="noopener noreferrer">Here</a></p>
     </div>
 
-  <!-- ----------------------Top Section Input and Output Data --> 
+  <!-- ----------------------Top Section Input and Output Data -------------------------------------------------------> 
     <div class="content">
         <div class="input-container">
             <form class="inputFields">
@@ -1112,8 +1113,12 @@
                 </div>
 
                 <div class="gui-parameters">
-                <canvas id="gui"></canvas>
-                            <h4 class="InputHeaders">Parameters</h4>
+                <!-------------------------------- INLET TO OUTLET IMAGE ------------------------------------>
+                    <canvas id="gui"></canvas>
+                    <h4 class="InputHeaders">Parameters</h4>
+
+
+                    <!------------------------PARAMETERS ----------------------------------------------------->
                     <div class="label-output-row" title="Ratio of Specific Heats">
                         <label for="gamma">&gamma;=</label>
                         <input type="text" id="gamma">
@@ -1192,7 +1197,7 @@
                         </select>
                     </div>
                 </div>
-
+                <!--------------------------------------OUTLET CONDITIONS ------------------------------------------------->
                 <div class="Outlet">
                     <h4 class="InputHeaders">Outlet Conditions</h4>
 
@@ -1222,19 +1227,24 @@
                             <option>-</option>
                         </select>
                     </div>
+                    <!--------------------------------- SUBMISSION BUTTON ---------------------------------------------------->
                     <button id="calculate" onclick="calculateFlow(event)">Calculate</button>
                 
                 </div>
             </form>
             <p class="error" id="input-error"></p>
         </div>
+        <!--------------------------------------------------OUTPUT INFORMATION ----------------------------------------------->
         <div class="output-container">
             <div class="traditional-output">
                 <div class="label-output-row">
                     <h4>Resulting Roots</h4>
+                    <!-----------------------------------CAN CLICK ADDITIONAL OR DIMENSIONAL --------------------------------->
                     <input type="checkbox" id="additional" onclick="toggleData()" checked> Additional
                     <input type="checkbox" id="additional" onclick="toggleDimension()"> Dimensional
                 </div>
+                <!----------------------------------- NON-DIMENSIONAL OUTPUTS FOR NON-ADDITIONAL DATA ---------------------------------------------->
+
                     <!-- Output for M2 -->
                     <div class="label-output-row" title="Mach number at the exit">
                         <label for="M2">M<sub>2</sub>=</label>
@@ -1316,6 +1326,8 @@
                         <select><option>-</option></select>
                     </div>
                 </div>
+
+                <!----------------------------------- DIMENSIONAL OUTPUTS FOR NON-ADDITIONAL DATA ---------------------------------------------->
                 <div class="traditional-output" id="dimensional" style="display:none;">
 
                     <div class="label-output-row" title="Pressure ratio">
@@ -1420,6 +1432,7 @@
                 <div class="label-output-row">
                     <h4>Additional Data</h4>
                 </div>
+                <!----------------------------------- NON-DIMENSIONAL OUTPUTS FOR ADDITIONAL DATA ---------------------------------------------->
                 <div class="additional-1" id = "non-dimensional-additional">
                     <div class="label-output-row" title="Outlet-to-Inlet Velocity Ratio rate">
                         <label for="V2V1">V<sub>2</sub>/V<sub>1</sub>=</label>
@@ -1508,6 +1521,8 @@
                         <select><option>-</option></select>
                     </div>
                 </div>
+
+                <!----------------------------------- DIMENSIONAL OUTPUTS FOR ADDITIONAL DATA STARTS NOT BEING VISIBLE---------------------------------------------->
                 <div class = "additional-1" id = "dimensional-additional" style="display:none;">
 
                     <!-- Output for V2 -->
@@ -1568,8 +1583,10 @@
             </div>
         </div>
     </div>
-  <!-- ---------------------- Graphing --> 
+  <!-- ---------------------- Graphing ------------------------------------------------------------------> 
     <div class = "chart-container">
+
+    <!-------------------------------------TITLE AND VALUE SELECTIONS ------------------------------------>
         <div class= "chart-selection">
             <h4>Output Charts</h4>
             <select class="selection-component" id="chart-y" onchange="outputGraph()">

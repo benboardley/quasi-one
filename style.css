@@ -66,6 +66,7 @@ body {
 .charts{
   display: flex;
   flex-direction: row;
+  justify-content: space-evenly;
 }
 .chart-container{
   display: flex;
@@ -277,8 +278,8 @@ body {
     .charts{
       display: flex;
       flex-direction: column;
+      justify-content: space-evenly;
     }
-    
   }
   @media(max-width: 750px){
     .input-container,

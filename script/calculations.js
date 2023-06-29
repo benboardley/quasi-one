@@ -134,71 +134,34 @@ window.onload = function() {
 function interfaceUNI(){
   //  var sum = P + T + M1 + A1 + gamma + alpha1 + beta1 + w + Fx + m2 + A2 + Q + xi + nu + f + alpha2 + beta2 + N;
     uniflow = pyscript.interpreter.globals.get('main');
-
-    if(false){ //data.N > 1
-      for(var root = 0; root <=1; root++){
-          data.root = root;
-          js_test();
-          js_args = pyscript.interpreter.globals.get('args');
-          output.M2[root] = js_args.M2.toJs()[root];
-          output.PR[root] = js_args.PR.toJs()[root];
-          output.TR[root] = js_args.TR.toJs()[root];
-          output.P2P1[root] = js_args.P2P1.toJs()[root];
-          output.T2T1[root] = js_args.T2T1.toJs()[root];
-          output.dsR[root] = js_args.dsR.toJs()[root];
-          output.dsRKE[root] = js_args.dsRKE.toJs()[root];
-          output.wloss[root] = js_args.wloss.toJs()[root];
-          output.M2M1[root] = output.M2[root] / data.M1;
-          output.cp[root] = js_args.CP.toJs()[root];
-          output.V2V1[root] = js_args.V2V1.toJs()[root];
-          output.v2v1[root] = js_args.v2v1.toJs()[root];
-          output.p2p1[root] = js_args.p2p1.toJs()[root];
-          output.wpv[root] = js_args.wpv.toJs()[root];
-          output.ek[root] = js_args.ek.toJs()[root];
-          output.Iq[root] = js_args.Iq.toJs()[root];
-          output.we[root] = js_args.we.toJs()[root];
-          output.wrev[root] = js_args.wrev.toJs()[root];
-          output.I[root] = js_args.I.toJs()[root];
-          output.Theta[root] = js_args.Theta.toJs()[root];
-          output.dsRKE2[root] = js_args.dsRKE2.toJs()[root];
-          output.zloss[root] = js_args.zloss.toJs()[root];
-          output.CPinc[root] = js_args.CPinc.toJs()[root];
-          output.P3P1[root] = js_args.P3P1.toJs()[root];
-          output.Lambda = js_args.Lambda; //.toJs();
-          output.b = js_args.b; //.toJs();
-          output.c = js_args.c; //.toJs();
-          output.det = js_args.det; //.toJs();
-        }
-      } else {
-        uniflow();
-        js_args = pyscript.interpreter.globals.get('args');
-        output.f1 = js_args.f1
-        output.M2 = js_args.M2.toJs();
-        output.PR = js_args.PR.toJs();
-        output.TR = js_args.TR.toJs();
-        output.P2P1 = js_args.P2P1.toJs();
-        output.T2T1 = js_args.T2T1.toJs();
-        output.dsR = js_args.dsR.toJs();
-        output.dsRKE = js_args.dsRKE.toJs();
-        output.wloss = js_args.wloss.toJs();
-        output.M2M1 = [output.M2[0] / data.M1, output.M2[1] / data.M1];
-        output.cp = js_args.CP.toJs();
-        output.V2V1 = js_args.V2V1.toJs();
-        output.v2v1 = js_args.v2v1.toJs();
-        output.p2p1 = js_args.p2p1.toJs();
-        output.dsRKE2 = js_args.dsRKE2.toJs();
-        output.zloss = js_args.zloss.toJs();
-        output.CPinc = js_args.CPinc.toJs();
-        output.P3P1 = js_args.P3P1.toJs();
-        output.P3Po1 = js_args.P3Po1.toJs();//[output.P3P1[0]/(output.f1**(data.gamma/(data.gamma-1))), output.P3P1[1]/(output.f1**(data.gamma/(data.gamma-1)))]
-        output.Lambda = js_args.Lambda; //.toJs();
-        output.f1 = js_args.f1;
-        output.b = js_args.b; //.toJs();
-        output.c = js_args.c; //.toJs();
-        output.det = js_args.discriminant; //.toJs();
-        data.error = js_args.error;
-      }
-      calculateRootsWithUnits();
+    uniflow();
+    js_args = pyscript.interpreter.globals.get('args');
+    output.f1 = js_args.f1
+    output.M2 = js_args.M2.toJs();
+    output.PR = js_args.PR.toJs();
+    output.TR = js_args.TR.toJs();
+    output.P2P1 = js_args.P2P1.toJs();
+    output.T2T1 = js_args.T2T1.toJs();
+    output.dsR = js_args.dsR.toJs();
+    output.dsRKE = js_args.dsRKE.toJs();
+    output.wloss = js_args.wloss.toJs();
+    output.M2M1 = [output.M2[0] / data.M1, output.M2[1] / data.M1];
+    output.cp = js_args.CP.toJs();
+    output.V2V1 = js_args.V2V1.toJs();
+    output.v2v1 = js_args.v2v1.toJs();
+    output.p2p1 = js_args.p2p1.toJs();
+    output.dsRKE2 = js_args.dsRKE2.toJs();
+    output.zloss = js_args.zloss.toJs();
+    output.CPinc = js_args.CPinc.toJs();
+    output.P3P1 = js_args.P3P1.toJs();
+    output.P3Po1 = js_args.P3Po1.toJs();//[output.P3P1[0]/(output.f1**(data.gamma/(data.gamma-1))), output.P3P1[1]/(output.f1**(data.gamma/(data.gamma-1)))]
+    output.Lambda = js_args.Lambda; //.toJs();
+    output.f1 = js_args.f1;
+    output.b = js_args.b; //.toJs();
+    output.c = js_args.c; //.toJs();
+    output.det = js_args.discriminant; //.toJs();
+    data.error = js_args.error;
+    calculateRootsWithUnits();
 }
 
 //Calculate Dimensional Values
@@ -1236,7 +1199,7 @@ myChart3 = new Chart(ctx2, {
 });
 }
 
-//--------------Allows user to cancel------------------
+//--------------Allows user to cancel Graphing------------------
 let shouldCancel = false;
 function delay(duration) {
   return new Promise(resolve => setTimeout(resolve, duration));
