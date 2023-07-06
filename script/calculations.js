@@ -987,34 +987,37 @@ function exampleFlow(){
     var selectedOption = selectElement.value;
   
     // Perform actions based on the selected option
-    //if (selectedOption === 'Default') {
+    flow_img = document.getElementById("flow-image")
+    document.getElementById("Po1").value = 1;
+    document.getElementById("To1").value = 1;
+    document.getElementById("cd").value = 0;
+    document.getElementById("cd").value = 0;
+    document.getElementById("cf").value = 0;
+    document.getElementById("Ad").value = 1;
+    document.getElementById("Af").value = 1;
+    document.getElementById("qr").value = 0;
+    document.getElementById("M1").value = 1;
+    document.getElementById("A1").value = 1;
+    document.getElementById("gamma").value = 1.4;
+    document.getElementById("alpha1").value = 1;
+    document.getElementById("beta1").value = 1;
+    document.getElementById("A2").value = 2;
+    document.getElementById("xi").value = 0.5;
+    document.getElementById("nu").value = 0;
+    document.getElementById("alpha2").value = 1;
+    document.getElementById("beta2").value = 1;
+    document.getElementById("subelements").value = 1;
+    document.getElementById("isentropic").value = "False";
+     
+    if (selectedOption === 'Default') {
       // Call a function for Isentropic flow with area change
-
-        document.getElementById("Po1").value = 1;
-        document.getElementById("To1").value = 1;
-        document.getElementById("cd").value = 0;
-        document.getElementById("cd").value = 0;
-        document.getElementById("cf").value = 0;
-        document.getElementById("Ad").value = 1;
-        document.getElementById("Af").value = 1;
-        document.getElementById("qr").value = 0;
-        document.getElementById("M1").value = 1;
-        document.getElementById("A1").value = 1;
-        document.getElementById("gamma").value = 1.4;
-        document.getElementById("alpha1").value = 1;
-        document.getElementById("beta1").value = 1;
-        document.getElementById("A2").value = 2;
-        document.getElementById("xi").value = 0.5;
-        document.getElementById("nu").value = 0;
-        document.getElementById("alpha2").value = 1;
-        document.getElementById("beta2").value = 1;
-        document.getElementById("subelements").value = 1;
-        document.getElementById("isentropic").value = "False";
-    //} 
+      flow_img.src = "./images/default.jpg"
+    }
     if (selectedOption === 'Isentropic flow with area change') {
       // Call a function for Isentropic flow with area change
 
         document.getElementById("isentropic").value = "True";
+        flow_img.src = "./images/default.jpg"
     } 
     
     else if (selectedOption === 'Flow across a normal shock') {
@@ -1022,6 +1025,8 @@ function exampleFlow(){
       document.getElementById("M1").value = 2;
       document.getElementById("A1").value = 1;
       document.getElementById("A2").value = 1;
+      flow_img.src = "./images/simultaneous-friction-heat.jpg"
+
     } 
     
     else if (selectedOption === 'Fanno flow') {
@@ -1032,6 +1037,7 @@ function exampleFlow(){
       document.getElementById("Af").value = 100;
       document.getElementById("cf").value = 0.005;
       document.getElementById("subelements").value = 10;
+      flow_img.src = "./images/simultaneous-friction-heat.jpg"
     } 
     
     else if (selectedOption === 'Rayleigh flow') {
@@ -1040,11 +1046,13 @@ function exampleFlow(){
       document.getElementById("A2").value = 1;
       document.getElementById("qr").value = 0.4;
       document.getElementById("subelements").value = 10;
+      flow_img.src = "./images/simultaneous-friction-heat.jpg"
     } 
     
     else if (selectedOption === 'Sudden expansion') {
       // Call a function for Sudden expansion
       document.getElementById("xi").value = 0;
+      flow_img.src = "./images/sudden-expansion.jpg"
     } 
     
     else if (selectedOption === 'Sudden Contraction') {
@@ -1054,6 +1062,7 @@ function exampleFlow(){
       document.getElementById("A2").value = 0.9;
       document.getElementById("xi").value = 0;
       document.getElementById("nu").value = 1;
+      flow_img.src = "./images/sudden-contraction.jpg"
     } 
     
     else if (selectedOption === 'Two-stream mixing layer') {
@@ -1065,6 +1074,7 @@ function exampleFlow(){
       document.getElementById("Af").value = 40;
       document.getElementById("cf").value = 0.005;
       document.getElementById("subelements").value = 1;
+      flow_img.src = "./images/twostream-mixing.jpg"
     } 
     
     else if (selectedOption === 'Ferrari 1 (Simultaneous friction and heat transfer)') {
@@ -1077,6 +1087,7 @@ function exampleFlow(){
       document.getElementById("Af").value = 160;
       document.getElementById("cf").value = 0.005;
       document.getElementById("subelements").value = 10;
+      flow_img.src = "./images/simultaneous-friction-heat.jpg"
     } 
     
     else if (selectedOption === 'Ferrari 2 (Simultaneous area change and friction)') {
@@ -1085,6 +1096,7 @@ function exampleFlow(){
       document.getElementById("Af").value = 100;
       document.getElementById("cf").value = 0.005;
       document.getElementById("subelements").value = 10;
+      flow_img.src = "./images/simultaneous-area-friction.jpg"
     }
     imageGUI();
 }

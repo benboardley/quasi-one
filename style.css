@@ -219,7 +219,9 @@ body {
     text-align: start;
   }
 
-
+  #flow-image{
+    width: 300px;
+  }
 
   .exampleFlows {
     margin-top: 10px;
