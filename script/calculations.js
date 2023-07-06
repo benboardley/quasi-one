@@ -217,7 +217,7 @@ function calculateRootsWithUnits(){
 
 function assignInputs() {
   data.po1 = parseFloat(document.getElementById("Po1").value) || 0;
-  data.to1 = parseFloat(document.getElementById("To1").value) || 0
+  data.to1 = parseFloat(document.getElementById("To1").value) || 0;
   data.cd = parseFloat(document.getElementById("cd").value) || 0;
   data.cf = parseFloat(document.getElementById("cf").value) || 0;
   //data.twr = parseFloat(document.getElementById("twr").value) || 0;
@@ -351,6 +351,7 @@ function calculateFlow(event) {
       return;
     }
     interfaceUNI();
+    convertFromSI();
     assignOutputs();
   } catch (error) {
     console.log(error);
