@@ -21,12 +21,36 @@ Web Calculator for Andrew Oliva and Scott C Morris's Quasi Steady, quasi-one-dim
 calculateFlow -> assignInputs -> convertToSI -> interfaceUNI -> calculateRootsWithUnits -> convertFromSI -> assignOutputs
 -> (outputGraph -> interfaceUNI -> calculateRootsWithUnits -> convertFromSI ... over 300 data points)
 
-**Output Graph is relativley complicated due to making sure the site doesn't crash during excessive computation e.g. 300 data points and 1000 subelements**
+```
+calculateFlow
+|
+| assignInputs
+  |
+  |convertToSI
+|
+|interfaceUNI
+  |
+  | convertFromSI
+  |
+  | assign Outputs
 
+outputGraph Do this for 300 data points
+|
+| assignInputs
+  |
+  |convertToSI
+|
+|interfaceUNI
+  |
+  | convertFromSI
+  |
+  | assign Outputs
+```
 ### User Input
 
 ### Unit Conversion
 userChangedOutputUnit -> convertFromSI -> assignOutputs
+
 
 ### Interface and Calculation
 Describe the interface and calculation process for determining the flow.
