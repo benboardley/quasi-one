@@ -1129,7 +1129,7 @@
                     </div>
 
                     <div class="label-output-row" title="Drag Coefficient">
-                        <label for="cd">C<sub>d</sub>=</label>
+                        <label for="cd">c<sub>d</sub>=</label>
                         <input type="text" id="cd">
                         <select>
                             <option>-</option>
@@ -1137,7 +1137,7 @@
                     </div>
 
                     <div class="label-output-row" title="Friction Coefficient">
-                        <label for="cf">C<sub>f</sub>=</label>
+                        <label for="cf">c<sub>f</sub>=</label>
                         <input type="text" id="cf">
                         <select>
                             <option>-</option>
@@ -1145,7 +1145,7 @@
                     </div>
 
                     <div class="label-output-row" title="Heat transfer normalized by Inlet Stagnation Enthalpy (q/ho)">
-                        <label for="qr">Q<sub>r</sub>=</label>
+                        <label for="qr">q<sub>r</sub>=</label>
                         <input type="text" id="qr">
                         <select>
                             <option>-</option>
@@ -1191,7 +1191,7 @@
                     </div>
 
                     <div class="label-output-row" title="Number of Subelements">
-                        <label for="N">N=</label>
+                        <label for="subelements">N=</label>
                         <input type="text" id="subelements">
                         <select>
                             <option>-</option>
@@ -1239,18 +1239,18 @@
         <div class="output-container">
             <div class="traditional-output">
                 <div class="label-output-row">
-                    <h4>Resulting Roots</h4>
+                    <h4>Resulting solutions</h4>
                     <!-----------------------------------CAN CLICK ADDITIONAL OR DIMENSIONAL --------------------------------->
                     <input type="checkbox" id="additional" onclick="toggleData()" checked> Additional
-                    <input type="checkbox" id="additional" onclick="toggleDimension()"> Dimensional
+                    <input type="checkbox" id="dimension" onclick="toggleDimension()"> Dimensional
                 </div>
                 <!----------------------------------- NON-DIMENSIONAL OUTPUTS FOR NON-ADDITIONAL DATA ---------------------------------------------->
 
                     <!-- Output for M2 -->
                     <div class="label-output-row" title="Mach number at the exit">
                         <label for="M2">M<sub>2</sub>=</label>
-                        <input type="text" id="M2">
-                        <input type="text" id="M2Second">
+                        <input type="text" id="M2" readonly>
+                        <input type="text" id="M2Second" readonly>
                         <select><option>-</option></select>
                     </div>
                 <div class="traditional-output" id="non-dimensional">
@@ -1258,72 +1258,72 @@
                     <!-- Output for P2P1 -->
                     <div class="label-output-row" title="Pressure ratio">
                         <label for="P2P1">P<sub>2</sub>/P<sub>1</sub>=</label>
-                        <input type="text" id="P2P1">
-                        <input type="text" id="P2P1Second">
+                        <input type="text" id="P2P1" readonly>
+                        <input type="text" id="P2P1Second" readonly>
                         <select><option>-</option></select>
                     </div>
 
                     <!-- Output for T2T1 -->
                     <div class="label-output-row" title="Temperature ratio">
                         <label for="T2T1">T<sub>2</sub>/T<sub>1</sub>=</label>
-                        <input type="text" id="T2T1">
-                        <input type="text" id="T2T1Second">
+                        <input type="text" id="T2T1" readonly>
+                        <input type="text" id="T2T1Second" readonly>
                         <select><option>-</option></select>
                     </div>
 
                     <!-- Output for TR -->
                     <div class="label-output-row" title="Stagnation temperature ratio">
                         <label for="TR">T<sub>o<sub>2</sub></sub>/T<sub>o<sub>1</sub></sub>=</label>
-                        <input type="text" id="TR">
-                        <input type="text" id="TRSecond">
+                        <input type="text" id="TR" readonly>
+                        <input type="text" id="TRSecond" readonly>
                         <select><option>-</option></select>
                     </div>
 
                     <!-- Output for PR -->
                     <div class="label-output-row" title="Stagnation pressure ratio">
                         <label for="PR">P<sub>o<sub>2</sub></sub>/P<sub>o<sub>1</sub></sub>=</label>
-                        <input type="text" id="PR">
-                        <input type="text" id="PRSecond">
+                        <input type="text" id="PR" readonly>
+                        <input type="text" id="PRSecond" readonly>
                         <select><option>-</option></select>
                     </div>
 
                     <!-- Output for deltaSR -->
                     <div class="label-output-row" title="Change in entropy normalized by the gas constant">
                         <label for="deltaSR">&Delta;s/R=</label>
-                        <input type="text" id="deltaSR">
-                        <input type="text" id="deltaSRSecond">
+                        <input type="text" id="deltaSR" readonly>
+                        <input type="text" id="deltaSRSecond" readonyly>
                         <select><option>-</option></select>
                     </div>
 
                     <!-- Output for M2M1 -->
                     <div class="label-output-row" title="Ratio of exit Mach number to inlet Mach number">
                         <label for="M2M1">M<sub>2</sub>/M<sub>1</sub>=</label>
-                        <input type="text" id="M2M1">
-                        <input type="text" id="M2M1Second">
+                        <input type="text" id="M2M1" readonly>
+                        <input type="text" id="M2M1Second" readonly>
                         <select><option>-</option></select>
                     </div>
 
                     <!-- Output for dsRKE -->
                     <div class="label-output-row" title="Entropy change normalized by outlet kinetic energy">
                         <label for="dsRKE">(ds/R)/(k/2*M<sub>1</sub><sup>2</sup>)=</label>
-                        <input type="text" id="dsRKE">
-                        <input type="text" id="dsRKESecond">
+                        <input type="text" id="dsRKE" readonly>
+                        <input type="text" id="dsRKESecond" readonly>
                         <select><option>-</option></select>
                     </div>
 
                     <!-- Output for wloss -->
                     <div class="label-output-row" title="Ratio of stagnation pressure loss to total pressure change">
                         <label for="wloss">(P<sub>o<sub>1</sub></sub>-P<sub>o<sub>2</sub></sub>)/(P<sub>o<sub>1</sub></sub>-P<sub>1</sub>)=</label>
-                        <input type="text" id="wloss">
-                        <input type="text" id="wlossSecond">
+                        <input type="text" id="wloss" readonly>
+                        <input type="text" id="wlossSecond" readonly>
                         <select><option>-</option></select>
                     </div>
 
                     <!-- Output for cp -->
                     <div class="label-output-row" title="Pressure recovery coefficient">
                         <label for="cp">(P<sub>2</sub>-P<sub>1</sub>)/(P<sub>o<sub>1</sub></sub>-P<sub>1</sub>)=</label>
-                        <input type="text" id="cp">
-                        <input type="text" id="cpSecond">
+                        <input type="text" id="cp" readonly>
+                        <input type="text" id="cpSecond" readonly>
                         <select><option>-</option></select>
                     </div>
                 </div>
@@ -1333,8 +1333,8 @@
 
                     <div class="label-output-row" title="Pressure ratio">
                         <label for="P2">P<sub>2</sub>=</label>
-                        <input type="text" id="P2">
-                        <input type="text" id="P2Second">
+                        <input type="text" id="P2" readonly>
+                        <input type="text" id="P2Second" readonly>
                         <select id="static-pressure2-unit" onchange="userChangedOutputUnit()">     
                             <option value="pascals">Pa</option>
                             <option value="kpascals">kPa</option>
@@ -1346,10 +1346,10 @@
                     <!-- Output for T2T1 -->
                     <div class="label-output-row" title="Temperature ratio">
                         <label for="T2">T<sub>2</sub>=</label>
-                        <input type="text" id="T2">
-                        <input type="text" id="T2Second">
+                        <input type="text" id="T2" readonly>
+                        <input type="text" id="T2Second" readonly>
                         <select id="static-temp2-unit" onchange="userChangedOutputUnit()">
-                            <option value="kelvin">K&deg;</option>
+                            <option value="kelvin">K;</option>
                             <option value="celsius">C&deg;</option>
                             <option value="rankine">R&deg;</option>
                             <option value="fahrenheit">F&deg;</option>
@@ -1359,10 +1359,10 @@
                     <!-- Output for TR -->
                     <div class="label-output-row" title="Stagnation temperature ratio">
                         <label for="To2">T<sub>o<sub>2</sub></sub>=</label>
-                        <input type="text" id="To2">
-                        <input type="text" id="To2Second">
+                        <input type="text" id="To2" readonly>
+                        <input type="text" id="To2Second" readonly>
                         <select id="stagnation-temp2-unit" onchange="userChangedOutputUnit()">
-                            <option value="kelvin">K&deg;</option>
+                            <option value="kelvin">K;</option>
                             <option value="celsius">C&deg;</option>
                             <option value="rankine">R&deg;</option>
                             <option value="fahrenheit">F&deg;</option>
@@ -1372,8 +1372,8 @@
                     <!-- Output for PR -->
                     <div class="label-output-row" title="Stagnation pressure at outlet">
                         <label for="Po2">P<sub>o<sub>2</sub></sub>=</label>
-                        <input type="text" id="Po2">
-                        <input type="text" id="Po2Second">
+                        <input type="text" id="Po2" readonly>
+                        <input type="text" id="Po2Second" readonly>
                         <select id="stagnation-pressure2-unit" onchange="userChangedOutputUnit()">
                             <option value="pascals">Pa</option>
                             <option value="kpascals">kPa</option>
@@ -1385,8 +1385,8 @@
                     <!-- Output for deltaSR -->
                     <div class="label-output-row" title="Change in entropy normalized by the gas constant">
                         <label for="deltaS">&Delta;s=</label>
-                        <input type="text" id="deltaS">
-                        <input type="text" id="deltaSSecond">
+                        <input type="text" id="deltaS" readonly>
+                        <input type="text" id="deltaSSecond" readonly>
                         <select id = "entropy-unit" onchange="userChangedOutputUnit()">
                         <option>J/(kg * K)</option>
                         </select>
@@ -1395,7 +1395,7 @@
                     <!-- Output for P1 -->
                     <div class="label-output-row" title="Static Pressure at Inlet">
                         <label for="P1">P<sub>1</sub>=</label>
-                        <input type="text" id="P1">
+                        <input type="text" id="P1" readonly>
                         <select id="static-pressure1-unit" onchange="userChangedOutputUnit()">
                             <option value="pascals">Pa</option>
                             <option value="kpascals">kPa</option>
@@ -1407,9 +1407,9 @@
                     <!-- Output for T1 -->
                     <div class="label-output-row" title="Static Temperature at Inlet">
                         <label for="T1">T<sub>1</sub>=</label>
-                        <input type="text" id="T1">
+                        <input type="text" id="T1" readonly>
                         <select id="static-temp1-unit" onchange=userChangedOutputUnit()">
-                            <option value="kelvin">K&deg;</option>
+                            <option value="kelvin">K</option>
                             <option value="celsius">C&deg;</option>
                             <option value="rankine">R&deg;</option>
                             <option value="fahrenheit">F&deg;</option>
@@ -1419,7 +1419,7 @@
                     <!-- Output for V1 -->
                     <div class="label-output-row" title="Inlet Velocity">
                         <label for="V1">V1=</label>
-                        <input type="text" id="V1">
+                        <input type="text" id="V1" readonly>
                         <select id = "velocity1-unit" onchange="userChangedOutputUnit()">
                             <option>m/s</option>
                             <option>m/ms</option>
@@ -1437,88 +1437,88 @@
                 <div class="additional-1" id = "non-dimensional-additional">
                     <div class="label-output-row" title="Outlet-to-Inlet Velocity Ratio rate">
                         <label for="V2V1">V<sub>2</sub>/V<sub>1</sub>=</label>
-                        <input type="text" id="V2V1">
-                        <input type="text" id="V2V1Second">
+                        <input type="text" id="V2V1" readonly>
+                        <input type="text" id="V2V1Second" readonly>
                         <select><option>-</option></select>
                     </div>
 
                     <div class="label-output-row" title="Outlet-to-Inlet Specific Volume Ratio">
                         <label for="v2v1">v<sub>2</sub>/v<sub>1</sub>=</label>
-                        <input type="text" id="v2v1">
-                        <input type="text" id="v2v1Second">
+                        <input type="text" id="v2v1" readonly>
+                        <input type="text" id="v2v1Second" readonly>
                         <select><option>-</option></select>
                     </div>
 
                     <div class="label-output-row" title="Outlet-to-Inlet Static Density Ratio">
                         <label for="p2p1">p<sub>2</sub>/p<sub>1</sub>=</label>
-                        <input type="text" id="p2p1">
-                        <input type="text" id="p2p1Second">
+                        <input type="text" id="p2p1" readonly>
+                        <input type="text" id="p2p1Second" readonly>
                         <select><option>-</option></select>
                     </div>
 
                     <div class="label-output-row" title="Entropy change Normalized by Outlet Kinetic Energy">
                         <label for="dsRKE2">dsR/(k/2*M<sub>2</sub><sup>2</sup>)=</label>
-                        <input type="text" id="dsRKE2">
-                        <input type="text" id="dsRKE2Second">
+                        <input type="text" id="dsRKE2" readonly>
+                        <input type="text" id="dsRKE2Second" readonly>
                         <select><option>-</option></select>
                     </div>
 
                     <div class="label-output-row" title="Ratio of stagnation pressure loss to total energy loss">
                         <label for="zloss">(P<sub>o<sub>1</sub></sub>-P<sub>o<sub>2</sub></sub>)/q=</label>
-                        <input type="text" id="zloss">
-                        <input type="text" id="zlossSecond">
+                        <input type="text" id="zloss" readonly>
+                        <input type="text" id="zlossSecond" readonly>
                         <select><option>-</option></select>
                     </div>
 
                     <div class="label-output-row" title="Increment of pressure recovery coefficient">
                         <label for="CPinc">(P<sub>2</sub>-P<sub>1</sub>)/q=</label>
-                        <input type="text" id="CPinc">
-                        <input type="text" id="CPincSecond">
+                        <input type="text" id="CPinc" readonly>
+                        <input type="text" id="CPincSecond" readonly>
                         <select><option>-</option></select>
                     </div>
 
                     <div class="label-output-row" title="Ratio of the static pressure at point 3 to point 1">
                         <label for="P3P1">P<sub>3</sub>/P<sub>1</sub>=</label>
-                        <input type="text" id="P3P1">
-                        <input type="text" id="P3P1Second">
+                        <input type="text" id="P3P1" readonly>
+                        <input type="text" id="P3P1Second" readonly>
                         <select><option>-</option></select>
                     </div>
 
                     <div class="label-output-row" title="Ratio of the static pressure at point 3 to point 2">
                         <label for="P3P2">P<sub>3</sub>/P<sub>2</sub>=</label>
-                        <input type="text" id="P3P2">
-                        <input type="text" id="P3P2Second">
+                        <input type="text" id="P3P2" readonly>
+                        <input type="text" id="P3P2Second" readonly>
                         <select><option>-</option></select>
                     </div>
 
                     <div class="label-output-row" title="Ratio of the static pressure at point 3 to stagnation pressure at point 1">
                         <label for="P3Po1">P<sub>3</sub>/P<sub>o<sub>1</sub></sub>=</label>
-                        <input type="text" id="P3Po1">
-                        <input type="text" id="P3Po1Second">
+                        <input type="text" id="P3Po1" reaodnly>
+                        <input type="text" id="P3Po1Second" readonly>
                         <select><option>-</option></select>
                     </div>
 
                     <div class="label-output-row" title="Lambda">
                         <label for="Lambda">Lambda=</label>
-                        <input type="text" id="Lambda">
+                        <input type="text" id="Lambda" readonly>
                         <select><option>-</option></select>
                     </div>
 
                     <div class="label-output-row" title="linear coefficient">
                         <label for="b">b=</label>
-                        <input type="text" id="b">
+                        <input type="text" id="b" readonly>
                         <select><option>-</option></select>
                     </div>
 
                     <div class="label-output-row" title="Constant Coefficient">
                         <label for="c">c=</label>
-                        <input type="text" id="c">
+                        <input type="text" id="c" readonly>
                         <select><option>-</option></select>
                     </div>
 
                     <div class="label-output-row" title="Quadtratic Polynomial Discriminant">
                         <label for="det">Discriminant=</label>
-                        <input type="text" id="det">
+                        <input type="text" id="det" readonly>
                         <select><option>-</option></select>
                     </div>
                 </div>
@@ -1529,8 +1529,8 @@
                     <!-- Output for V2 -->
                     <div class="label-output-row" title="Outlet Velocity">
                         <label for="V2">V<sub>2</sub>=</label>
-                        <input type="text" id="V2">
-                        <input type="text" id="V2Second">
+                        <input type="text" id="V2" reaodnly>
+                        <input type="text" id="V2Second" readonly>
                         <select id = "velocity2-unit" onchange="userChangedOutputUnit()">
                             <option>m/s</option>
                             <option>m/ms</option>
@@ -1541,8 +1541,8 @@
                     <!-- Output for rho 2 -->
                     <div class="label-output-row" title="Outlet Static Density">
                         <label for="p2">&rho;<sub>2</sub>=</label>
-                        <input type="text" id="p2">
-                        <input type="text" id="p2Second">
+                        <input type="text" id="p2" readonly>
+                        <input type="text" id="p2Second" readonly>
                         <select id = "density2-unit" onchange="userChangedOutputUnit()">
                             <option value="kg/m^3">kg/m<sup>3</sup></option>
                             <option value="g/m^3">g/m<sup>3</sup></option>
@@ -1556,8 +1556,8 @@
                     <!-- Output for P3 -->
                     <div class="label-output-row" title="Change in entropy normalized by the gas constant">
                         <label for="P3">P<sub>3</sub>=</label>
-                        <input type="text" id="P3">
-                        <input type="text" id="P3Second">
+                        <input type="text" id="P3" readonly>
+                        <input type="text" id="P3Second" readonly>
                         <select id="static-pressure3-unit" onchange="userChangedOutputUnit()">
                             <option value="pascals">Pa</option>
                             <option value="kpascals">kPa</option>
@@ -1569,7 +1569,7 @@
                     <!-- Output for rho 1 -->
                     <div class="label-output-row" title="Inlet Static Density">
                         <label for="p1">&rho;<sub>1</sub>=</label>
-                        <input type="text" id="p1">
+                        <input type="text" id="p1" readonly>
                         <select id="density1-unit" onchange="userChangedOutputUnit()">
                             <option value="kg/m^3">kg/m<sup>3</sup></option>
                             <option value="g/m^3">g/m<sup>3</sup></option>
@@ -1591,40 +1591,42 @@
         <div class= "chart-selection">
             <h4>Output Charts</h4>
             <select class="selection-component" id="chart-y" onchange="outputGraph()">
-                <option value="M2">M<sub>2</sub></option>
-                <option value="P2P1">P<sub>2</sub>/P<sub>1</sub></option>
-                <option value="T2T1">T<sub>2</sub>/T<sub>1</sub></option>
-                <option value="TR">To<sub>2</sub>/To<sub>1</sub></option>
-                <option value="PR">Po<sub>2</sub>/Po<sub>1</sub></option>
-                <option value="dsR">&Delta;s/R</option>
-                <option value="M2M1">M<sub>2</sub>/M<sub>1</sub></option>
-                <option value="dsRKE">(ds/R)/(k/2*M<sub>12</sub>)</option>
-                <option value="wloss">(Po<sub>1</sub>-Po<sub>2</sub>)/(Po<sub>1</sub>-P<sub>1</sub>)</option>
-                <option value="cp">(P<sub>2</sub>-P<sub>1</sub>)/(Po<sub>1</sub>-P<sub>1</sub>)</option>
-                <option value="T2">T<sub>2</sub></option>
-                <option value="P2">P<sub>2</sub></option>
-                <option value="to2">T<sub>o<sub>2</sub></sub></option>
-                <option value="po2">P<sub>o<sub>2</sub></sub></option>
-                <option value="ds">&Delta;s</option>
+            <option value="M2">M&#8322; <!-- M subscript 2 --></option>
+            <option value="P2P1">P&#8322;/P&#8321; <!-- P subscript 2 divided by P subscript 1 --></option>
+            <option value="T2T1">T&#8322;/T&#8321; <!-- T subscript 2 divided by T subscript 1 --></option>
+            <option value="TR">To&#8322;/To&#8321; <!-- To subscript 2 divided by To subscript 1 --></option>
+            <option value="PR">Po&#8322;/Po&#8321; <!-- Po subscript 2 divided by Po subscript 1 --></option>
+            <option value="dsR">&Delta;s/R</option>
+            <option value="M2M1">M&#8322;/M&#8321; <!-- M subscript 2 divided by M subscript 1 --></option>
+            <option value="dsRKE">(ds/R)/(k/2*M&#8321;&sup2;) <!-- (delta s divided by R) divided by (k divided by 2 times M subscript 1 squared) --></option>
+            <option value="wloss">(Po&#8321;-Po&#8322;)/(Po&#8321;-P&#8321;) <!-- (Po subscript 1 minus Po subscript 2) divided by (Po subscript 1 minus P subscript 1) --></option>
+            <option value="cp">(P&#8322;-P&#8321;)/(Po&#8321;-P&#8321;) <!-- (P subscript 2 minus P subscript 1) divided by (Po subscript 1 minus P subscript 1) --></option>
+            <option value="T2">T&#8322; <!-- T subscript 2 --></option>
+            <option value="P2">P&#8322; <!-- P subscript 2 --></option>
+            <option value="to2">To&#8322; <!-- T subscript 2 o subscript 2 --></option>
+            <option value="po2">Po&#8322; <!-- P subscript 2 o subscript 2 --></option>
+            <option value="ds">&Delta;s</option>
             </select>
+
             <h4 style="margin-top: 0px;">vs</h4>
+
             <select class="selection-component" id="chart-x" onchange="outputGraph()">
-                <option value="M1">M<sub>1</sub></option>
-                <option value="A1">A<sub>1</sub></option>
-                <option value="gamma">&gamma;</option>
-                <option value="cd">C<sub>d</sub></option>
-                <option value="cf">C<sub>f</sub></option>
-                <option value="twr">TWR</option>
-                <option value="alpha1">&alpha;<sub>1</sub></option>
-                <option value="beta1">&beta;<sub>1</sub></option>
-                <option value="qr">Q<sub>r</sub></option>
-                <option value="Af">A<sub>f</sub></option>
-                <option value="Ad">A<sub>d</sub></option>
-                <option value="A2">A<sub>2</sub></option>
-                <option value="xi">&xi;</option>
-                <option value="nu">&nu;</option>
-                <option value="alpha2">&alpha;<sub>2</sub></option>
-                <option value="beta2">&beta;<sub>2</sub></option>
+            <option value="M1">M&#8321; <!-- M subscript 1 --></option>
+            <option value="A1">A&#8321; <!-- A subscript 1 --></option>
+            <option value="gamma">&#947; <!-- Gamma --></option>
+            <option value="cd">c&#8322;d <!-- c subscript d --></option>
+            <option value="cf">c&#8322;f <!-- c subscript f --></option>
+            <option value="twr">TWR</option>
+            <option value="alpha1">&#945;&#8321; <!-- Alpha subscript 1 --></option>
+            <option value="beta1">&#946;&#8321; <!-- Beta subscript 1 --></option>
+            <option value="qr">q&#8322;r <!-- q subscript r --></option>
+            <option value="Af">A&#8322;f <!-- A subscript f --></option>
+            <option value="Ad">A&#8322;d <!-- A subscript d --></option>
+            <option value="A2">A&#8322; <!-- A subscript 2 --></option>
+            <option value="xi">&xi; <!-- Xi --></option>
+            <option value="nu">&nu; <!-- Nu --></option>
+            <option value="alpha2">&alpha;&#8322; <!-- Alpha subscript 2 --></option>
+            <option value="beta2">&beta;&#8322; <!-- Beta subscript 2 --></option>
             </select>
             <p id = "processing"></p>
             <p id = "progress"></p>

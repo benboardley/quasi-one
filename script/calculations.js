@@ -175,10 +175,7 @@ function calculateRootsWithUnits(){
   output.V2 = []
   output.p2 = []
   output.P3 = []
-  console.log("Po1")
-  console.log(data.po1)
-  console.log("To1")
-  console.log(data.to1)
+
   output.f1 = 1 + ((data.gamma - 1)/2) * data.M1 ** 2 
   output.P1 = data.po1 * output.f1 ** (-data.gamma/(data.gamma-1))
   output.T1 = data.to1 * output.f1
@@ -289,36 +286,36 @@ document.getElementById("P3P2Second").value = (output.P3P1[1] / output.P2P1[1]).
 document.getElementById("P3Po1").value = (output.P3Po1[0] /*/ f1*/).toFixed(5);
 document.getElementById("P3Po1Second").value = (output.P3Po1[1]/* / f1*/).toFixed(5);
 
-document.getElementById("P1").value = output.P1;
+document.getElementById("P1").value = output.P1.toFixed(5);
 
-document.getElementById("P2").value = output.P2[0];
-document.getElementById("P2Second").value = output.P2[1];
+document.getElementById("P2").value = output.P2[0].toFixed(5);
+document.getElementById("P2Second").value = output.P2[1].toFixed(5);
 
-document.getElementById("T1").value = output.T1;
-document.getElementById("V1").value = output.V1;
+document.getElementById("T1").value = output.T1.toFixed(5);
+document.getElementById("V1").value = output.V1.toFixed(5);
 
-document.getElementById("T2").value = output.T2[0];
-document.getElementById("T2Second").value = output.T2[1];
+document.getElementById("T2").value = output.T2[0].toFixed(5);
+document.getElementById("T2Second").value = output.T2[1].toFixed(5);
 
-document.getElementById("To2").value = output.to2[0];
-document.getElementById("To2Second").value = output.to2[1];
+document.getElementById("To2").value = output.to2[0].toFixed(5);
+document.getElementById("To2Second").value = output.to2[1].toFixed(5);
 
-document.getElementById("Po2").value = output.po2[0];
-document.getElementById("Po2Second").value = output.po2[1];
+document.getElementById("Po2").value = output.po2[0].toFixed(5);
+document.getElementById("Po2Second").value = output.po2[1].toFixed(5);
 
-document.getElementById("deltaS").value = output.ds[0];
-document.getElementById("deltaSSecond").value = output.ds[1];
+document.getElementById("deltaS").value = output.ds[0].toFixed(5);
+document.getElementById("deltaSSecond").value = output.ds[1].toFixed(5);
 
-document.getElementById("p1").value = output.p1;
+document.getElementById("p1").value = output.p1.toFixed(5);
 
-document.getElementById("V2").value = output.V2[0];
-document.getElementById("V2Second").value = output.V2[1];
+document.getElementById("V2").value = output.V2[0].toFixed(5);
+document.getElementById("V2Second").value = output.V2[1].toFixed(5);
 
-document.getElementById("p2").value = output.p2[0];
-document.getElementById("p2Second").value = output.p2[1];
+document.getElementById("p2").value = output.p2[0].toFixed(5);
+document.getElementById("p2Second").value = output.p2[1].toFixed(5);
 
-document.getElementById("P3").value = output.P3[0];
-document.getElementById("P3Second").value = output.P3[1];
+document.getElementById("P3").value = output.P3[0].toFixed(5);
+document.getElementById("P3Second").value = output.P3[1].toFixed(5);
 
 if (data.error) {
   document.getElementById("input-error").textContent = output.data.error;
@@ -345,7 +342,6 @@ function calculateFlow(event) {
   try {
     event.preventDefault(); // Prevents Inputs from Clearing
     assignInputs();
-    console.log(data.to1)
     if(data.N > 1000){
       alert("Please limit your subelemenets to be less than 1000.")
       return;
@@ -1025,7 +1021,7 @@ function exampleFlow(){
       document.getElementById("M1").value = 2;
       document.getElementById("A1").value = 1;
       document.getElementById("A2").value = 1;
-      flow_img.src = "./images/simultaneous-friction-heat.jpg"
+      flow_img.src = "./images/normal-shock.jpg"
 
     } 
     
@@ -1037,7 +1033,7 @@ function exampleFlow(){
       document.getElementById("Af").value = 100;
       document.getElementById("cf").value = 0.005;
       document.getElementById("subelements").value = 10;
-      flow_img.src = "./images/simultaneous-friction-heat.jpg"
+      flow_img.src = "./images/fanno-flow.jpg"
     } 
     
     else if (selectedOption === 'Rayleigh flow') {
@@ -1046,7 +1042,7 @@ function exampleFlow(){
       document.getElementById("A2").value = 1;
       document.getElementById("qr").value = 0.4;
       document.getElementById("subelements").value = 10;
-      flow_img.src = "./images/simultaneous-friction-heat.jpg"
+      flow_img.src = "./images/rayleigh-flow.jpg"
     } 
     
     else if (selectedOption === 'Sudden expansion') {
@@ -1074,7 +1070,7 @@ function exampleFlow(){
       document.getElementById("Af").value = 40;
       document.getElementById("cf").value = 0.005;
       document.getElementById("subelements").value = 1;
-      flow_img.src = "./images/twostream-mixing.jpg"
+      flow_img.src = "./images/non-uniform-inlet-area-mixing.jpg"
     } 
     
     else if (selectedOption === 'Ferrari 1 (Simultaneous friction and heat transfer)') {
@@ -1266,7 +1262,7 @@ async function outputGraph(){
       };
       root1.push(dataPoint1);
       root2.push(dataPoint2);
-      if(data.N > 50){
+      if(data.N >= 10){
         updateProgress(data[X],delta)
         await delay(1);
       }
@@ -1275,17 +1271,12 @@ async function outputGraph(){
     assignInputs();
     interfaceUNI();
     convertFromSI();
-    //if(wasCancelled) {
-    //  document.getElementById('processing').textContent = 'Processing cancelled!';
-    //} else {
-    //    document.getElementById('processing').textContent = 'Processed!';
-   // }
   // Create the chart
   myChart2 = new Chart(ctx, {
     type: 'line',
     data: {
       datasets: [{
-        label: 'root1',
+        label: 'Solution 1',
         data: root1,
         backgroundColor: 'rgba(75, 192, 192, 0.2)',
         borderColor: 'rgba(75, 192, 192, 1)',
@@ -1324,7 +1315,7 @@ async function outputGraph(){
     data: {
       datasets: [
       {
-        label: 'root2',
+        label: 'Solution 2',
         data: root2,
         backgroundColor: 'red',
         borderColor: 'red',
