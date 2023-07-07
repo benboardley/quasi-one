@@ -1,10 +1,10 @@
-If a User Presses Calcualte the flow is:
+If a User Presses Calculate the flow is:
 
 calculateFlow -> assignInputs -> convertToSI -> interfaceUNI -> calculateRootsWithUnits -> convertFromSI -> assignOutputs
 -> (outputGraph -> interfaceUNI -> calculateRootsWithUnits -> convertFromSI ... over 300 data points)
 
 
-**Output Graph is relativley complicated due to making sure the site doesn't crash during excessive computation e.g. 300 data points and 1000 subelements****
+****Output Graph is relativley complicated due to making sure the site doesn't crash during excessive computation e.g. 300 data points and 1000 subelements****
 
 
 If a User Changes a Unit:
