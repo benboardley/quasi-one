@@ -67,6 +67,7 @@ Describe the GUI for the inlet to outlet section and how it functions.
 
 ## How to Add an Output
 1. Add to output section in HTML into either traditional-output or additional-output and then non-dimensional or dimensional:
+```
                     <!-- Output for P2P1 -->
                     <div class="label-output-row" title="Pressure ratio">
                         <label for="P2P1">P<sub>2</sub>/P<sub>1</sub>=</label>
@@ -74,8 +75,8 @@ Describe the GUI for the inlet to outlet section and how it functions.
                         <input type="text" id="P2P1Second">
                         <select><option>-</option></select>
                     </div>
-
-2. dd to interfaceUNI or calculateRootsWithUnits:
+```
+2. add to interfaceUNI or calculateRootsWithUnits:
 
     interfaceUNI if array:
         output.P2P1 = js_args.P2P1.toJs();
@@ -94,7 +95,7 @@ Describe the GUI for the inlet to outlet section and how it functions.
 
 4. If you want it to be graphed add it into this selection 
 make sure value = "" is the same as either the variable name in data or output example data.M2 and <option value="M2">M<sub>2</sub></option>:
-
+```
 <select class="selection-component" id="chart-y" onchange="outputGraph()">
                 <option value="M2">M<sub>2</sub></option>
                 <option value="P2P1">P<sub>2</sub>/P<sub>1</sub></option>
@@ -131,7 +132,7 @@ make sure value = "" is the same as either the variable name in data or output e
                 <option value="alpha2">&alpha;<sub>2</sub></option>
                 <option value="beta2">&beta;<sub>2</sub></option>
             </select>
-
+```
 ## Changing Python Code
 Can copy and past everything from python into the pyscript tags. Do Not Change Mainpy or Args class
 Unless adding a Function Call or adding a value to args. also NOTE tqdm does not work!
