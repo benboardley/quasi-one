@@ -60,8 +60,9 @@ Describe the GUI for the inlet to outlet section and how it functions.
                     </div>
 
 2. add to assignInputs:
+'''
   data.to1 = parseFloat(document.getElementById("To1").value) || 0;
-
+'''
 3. add to python code:
     Args
 
@@ -79,22 +80,30 @@ Describe the GUI for the inlet to outlet section and how it functions.
 2. add to interfaceUNI or calculateRootsWithUnits:
 
     interfaceUNI if array:
+    ```
         output.P2P1 = js_args.P2P1.toJs();
+    ```
     if not array:
+       ```
         output.P2P1 = js_args.P2P1;
-
+        ```
     if units add to calculateRootsWithUnits:
+    ```
     output.P2 = []
     output.P2[0] = output.P1 * output.P2P1[0]
     output.P2[1] = output.P1 * output.P2P1[1]
-
+    ```
 
 3. Add to assignOutputs:
+    ```
     document.getElementById("P2P1").value = output.P2P1[0].toFixed(5);
     document.getElementById("P2P1Second").value = output.P2P1[1].toFixed(5);
-
+    ```
 4. If you want it to be graphed add it into this selection 
+
+```
 make sure value = "" is the same as either the variable name in data or output example data.M2 and <option value="M2">M<sub>2</sub></option>:
+```
 ```
 <select class="selection-component" id="chart-y" onchange="outputGraph()">
                 <option value="M2">M<sub>2</sub></option>
