@@ -18,8 +18,6 @@
 Web Calculator for Andrew Oliva and Scott C Morris's Quasi Steady, quasi-one-dimensional, internal compressible flow with area change, heat addition and friction
 
 ## Flow Calculation
-calculateFlow -> assignInputs -> convertToSI -> interfaceUNI -> calculateRootsWithUnits -> convertFromSI -> assignOutputs
--> (outputGraph -> interfaceUNI -> calculateRootsWithUnits -> convertFromSI ... over 300 data points)
 
 ```
 calculateFlow
@@ -46,26 +44,101 @@ outputGraph Do this for 300 data points
   |
   | assign Outputs
 ```
-### User Input
 
 ### Unit Conversion
-userChangedOutputUnit -> convertFromSI -> assignOutputs
+** action user changes output unit **
+userChangedOutputUnit 
+|
+|convertFromSI
+|
+|assignOutputs
 
+** user changes input unit **
+calcualteFlow
+|
+|assignInputs
+|
+|convertToSI
 
 ### Interface and Calculation
-Describe the interface and calculation process for determining the flow.
 
-### Output Conversion
-Explain how the output values are converted to the desired units.
+### python to javascript
+The Interface with the python code occurs in InterfaceUNI.
+JavaScript Integrates with python through:
+   ```
+    uniflow = pyscript.interpreter.globals.get('main');
+    uniflow();
+    js_args = pyscript.interpreter.globals.get('args');
+  ```
+pyscript.interpreter.globals.get can grab any global variable, global function, or global class in python and import it to javascript.
+To get the variables  `output.M2 = js_args.M2.toJs();` -- TOJS() converts python arrays into javascript ones. If it is not an array you can just use somethign like this: output.Lambda = js_args.Lambda;
+Notice how I grab the objects with the .VariableName. This is because it matches the varaible names in the args python class. For example here are some, but not all of the names. The args class is equivalent to the args class in your original python code.
+```
+class Args:
+        def __init__(self, AR=1.0, Ad=0.0, cd=0.0, cf=0.0, Af=0.0, M1=0.0, xi=0.5, nu=0.0,
+                    qr=0.0, k=1.4, twr=1.0, isentropic=False, b1=1.0, b2=1.0, a1=1.0, a2=1.0, N=1, debug=False):
+            self.AR = AR
+            self.Ad = Ad
+            self.cd = cd
+            self.cf = cf
+            self.Af = Af
+            self.M1 = M1
+            self.xi = xi
+            self.nu = nu
+            self.qr = qr
+            self.k = k
+            self.twr = twr
+            self.isentropic = isentropic
+            self.b1 = b1
+            self.b2 = b2
+            self.a1 = a1
+            self.a2 = a2
+            self.debug = True
+            self.N = N
+            self.error = None
+```
+
+### javascript to python
+Java Script to python is a little simpler. In this the data object from javascript is imported. Again this has to be a global variable. The data object is the inputs from the web calculator.
+```
+    def main():
+      global args
+      from js import data
+```
+
+### Pyscript
+Pyscript is used to bring python to the front end of the application. That way we do not have to have a backend server. This is used in two componenets.
+1. ```
+   <py-config>
+    packages = ["numpy", "scipy", "tqdm"] 
+  </py-config>
+  ```
+  py-config labels the packages that will be imported that are not apart of the default python library (e.g. sys )
+2. ```
+  <py-script>
+    **insert python code**
+  </py-script>
+  ```
+  This is the python code that will be ran when it is interfaced with the javascript.
+
+Note:
+  Pyscript is still under development so there may be small changes that have to be made to the tags or structure as it progresses. These should be small. One example of a recent change was this html code:
+  ```
+    <py-config>
+      packages = ["numpy", "scipy", "tqdm"] 
+    </py-config>
+  ```
+  used to be this:
+  ```
+    <py-env>
+      - numpy
+      -requests
+    </py-env>
+  ```
 
 ### Output Graph
 Provide details about the output graph and the considerations taken to prevent performance issues.
 
-## Changing Units
-Explain the process for changing units and updating the output accordingly.
-
-## Inlet to Outlet GUI
-Describe the GUI for the inlet to outlet section and how it functions.
 
 ## How to Add an Input
 1. add to HTML section in either inlet, parameters or outlet:
