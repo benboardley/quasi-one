@@ -108,13 +108,15 @@ Java Script to python is a little simpler. In this the data object from javascri
 
 ### Pyscript
 Pyscript is used to bring python to the front end of the application. That way we do not have to have a backend server. This is used in two componenets.
-1. ```
+1.
+ ```
    <py-config>
     packages = ["numpy", "scipy", "tqdm"] 
   </py-config>
   ```
   py-config labels the packages that will be imported that are not apart of the default python library (e.g. sys )
-2. ```
+2. 
+  ```
   <py-script>
     **insert python code**
   </py-script>
@@ -143,7 +145,7 @@ Provide details about the output graph and the considerations taken to prevent p
 ## How to Add an Input
 1. add to HTML section in either inlet, parameters or outlet:
 
-
+  ```
                     <!-- Input -->
                     <div class="label-output-row" title="Inlet Stagnation Temperature">
                         <label for="To1">T<sub>o<sub>1</sub></sub>=</label>
@@ -155,7 +157,7 @@ Provide details about the output graph and the considerations taken to prevent p
                             <option value="farenheit">F&deg;</option>
                         </select>
                     </div>
-
+  ```
 2. add to assignInputs:
 '''
   data.to1 = parseFloat(document.getElementById("To1").value) || 0;
@@ -198,9 +200,8 @@ Provide details about the output graph and the considerations taken to prevent p
     ```
 4. If you want it to be graphed add it into this selection 
 
-```
-make sure value = "" is the same as either the variable name in data or output example data.M2 and <option value="M2">M<sub>2</sub></option>:
-```
+make sure value = "" is the same as either the variable name in data or output example `data.M2 and <option value="M2">M<sub>2</sub></option>`:
+
 ```
 <select class="selection-component" id="chart-y" onchange="outputGraph()">
                 <option value="M2">M<sub>2</sub></option>
