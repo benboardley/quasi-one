@@ -17,7 +17,7 @@ Web Calculator for Andrew A Oliva and Scott C Morris's Quasi Steady, quasi-one-d
 
 ## Flow Calculation
 
-![Flow Diagram](flow-charts\calculate-flow.jpg)
+![Flow Diagram](flow-charts/calculate-flow.jpg)
 ```
 calculateFlow
 |
