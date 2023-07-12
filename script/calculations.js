@@ -166,7 +166,6 @@ function interfaceUNI(){
 
 //Calculate Dimensional Values
 function calculateRootsWithUnits(){
-  var R = 287
   output.T2 = []
   output.P2 = []
   output.po2 = []
@@ -187,33 +186,23 @@ function calculateRootsWithUnits(){
   output.po2[1] = data.po1 * output.PR[1]
   output.to2[0] = data.to1 * output.TR[0]
   output.to2[1] = data.to1 * output.TR[1]
-  output.ds[0] = output.dsR[0] * R
-  output.ds[1] = output.dsR[1] * R
-  output.p1 = output.P1 / (R*output.T1)
-  output.V1 = data.M1 * Math.sqrt(data.gamma*R*output.T1)
+  output.ds[0] = output.dsR[0] * data.R
+  output.ds[1] = output.dsR[1] * data.R
+  output.p1 = output.P1 / (data.R*output.T1)
+  output.V1 = data.M1 * Math.sqrt(data.gamma*data.R*output.T1)
   output.V2[0] = output.V2V1[0] * output.V1
   output.V2[1] = output.V2V1[1] * output.V1
   output.p2[0] = output.p2p1[0] * output.p1
   output.p2[1] = output.p2p1[1] * output.p1
   output.P3[0] = output.P3Po1[0] * data.po1
   output.P3[1] = output.P3Po1[1] * data.po1
-
-  var test_wloss = (data.po1 - output.po2[0]) / (data.po1 - output.P1)
-  var test_cp = (output.P2[0] - output.P1) / (data.po1 - output.P1)
-
-  var test_wloss2 = (data.po1 - output.po2[1]) / (data.po1 - output.P1)
-  var test_cp2 = (output.P2[1] - output.P1) / (data.po1 - output.P1)
-
-  var P3P1 = output.P3[0] / output.P1
-  var P3P12 = output.P3[1] / output.P1
-  var P3P2 = output.P3[0] / output.P2[0]
-  var P3P22 = output.P3[1] / output.P2[1]
-  var P3Po1 = output.P3[0] / data.po1
-  var P3Po12 = output.P3[1] / data.po1
+  output.massFlowRate = data.po1 / Math.sqrt(data.to1) * Math.sqrt(data.gamma / data.R) * data.A1 * data.M1 * (1 + (data.gamma-1)/2 * data.M1 ** 2) ** (-(data.gamma+1)/(2*(data.gamma-1)))
+  output.specificFlowRate = output.massFlowRate / data.A1
 }
 
 function assignInputs() {
   data.po1 = parseFloat(document.getElementById("Po1").value) || 0;
+  data.R = parseFloat(document.getElementById("R").value) || 0;
   data.to1 = parseFloat(document.getElementById("To1").value) || 0;
   data.cd = parseFloat(document.getElementById("cd").value) || 0;
   data.cf = parseFloat(document.getElementById("cf").value) || 0;
@@ -316,6 +305,9 @@ document.getElementById("p2Second").value = output.p2[1].toFixed(5);
 
 document.getElementById("P3").value = output.P3[0].toFixed(5);
 document.getElementById("P3Second").value = output.P3[1].toFixed(5);
+
+document.getElementById("mfr").value = output.massFlowRate.toFixed(5);
+document.getElementById("sfr").value = output.specificFlowRate.toFixed(5);
 
 if (data.error) {
   document.getElementById("input-error").textContent = output.data.error;
@@ -850,7 +842,20 @@ function toggleDimension(){
     document.getElementById("non-dimensional-additional").style.display = "none";
   }
 }
-
+function toggleAbstract(){
+  var x = document.getElementById("abstract");
+  var y = document.getElementById("up-arrow");
+  var z = document.getElementById("down-arrow");
+  if (x.style.display === "none") {
+    x.style.display = "flex";
+    y.style.display = "block";
+    z.style.display = "none";
+  } else {
+    x.style.display = "none";
+    y.style.display = "none";
+    z.style.display = "block";
+  }
+}
 //--------------------------------------Inlet->Outlet Graphic ----------------------------------
 var myChart;
 function imageGUI() {
@@ -984,8 +989,9 @@ function exampleFlow(){
   
     // Perform actions based on the selected option
     flow_img = document.getElementById("flow-image")
-    document.getElementById("Po1").value = 1;
-    document.getElementById("To1").value = 1;
+    document.getElementById("Po1").value = 101325;
+    document.getElementById("To1").value = 288.15;
+    document.getElementById("R").value = 287;
     document.getElementById("cd").value = 0;
     document.getElementById("cd").value = 0;
     document.getElementById("cf").value = 0;

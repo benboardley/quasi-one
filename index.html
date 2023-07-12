@@ -1013,15 +1013,46 @@
     </header>
     <div class="title">
         <h3>Steady, quasi-one-dimensional, internal compressible flow with area change, heat addition and friction</h3>
-        <p class="credits">by Andrew Oliva and Scott Morris <a href="https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/steady-quasionedimensional-internal-compressible-flow-with-area-change-heat-addition-and-friction/941B60C217C6096C6980DFDD4B5F9E34" target="_blank" rel="noopener noreferrer">Here</a></p>
+        <p class="credits">by Andrew A. Oliva and Scott C. Morris <a href="https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/steady-quasionedimensional-internal-compressible-flow-with-area-change-heat-addition-and-friction/941B60C217C6096C6980DFDD4B5F9E34" target="_blank" rel="noopener noreferrer">Here</a></p>
     </div>
-
+    <div class="abstract-container">
+        <div class="abstract-header">
+            <label class="checkbox-label">
+            <p id="up-arrow" style="display:none;" onclick="toggleAbstract()">Less Information &nbsp;<i class="arrow up"></i></p>
+            <p id="down-arrow" style="margin-top: 5px;" onclick="toggleAbstract()">More Information &nbsp;<i class="arrow down"></i></p>
+            <!-- <input type="checkbox" class="check" id="abstact-toggle" onclick="toggleAbstract()"> View Abstract -->
+            </label>
+        </div>
+        <div id="abstract" style="flex-direction:row; display: none;">
+            <div style="margin-right: 100px; width: 100%;">
+                <h4>Abstract</h4>
+                <div style="overflow: auto; display:flex; flex-direction:column;">
+                    <img src="./images/abstract.png" class = "abstract-image" style="float: left;margin-right: 10px;text-align: justify;">
+                    <p style="text-align: justify;">
+                        A closed-form solution is presented for internal compressible flows with an arbitrary combination of area change, heat addition, friction and non-uniform flow. 
+                        The approach assumes steady flow of a calorically perfect ideal gas using the integral form of the governing equations. It is shown that the equations reduce to a simple, 
+                        bi-quadratic equation in exit Mach number. This solution is compared to previously known solutions for Rayleigh flow, Fanno flow, isentropic flow and normal shock relations. 
+                        Theoretical solutions for sudden expansion, sudden contraction, and supersonic–supersonic two-stream constant area mixing are also presented. These solutions were found to be in 
+                        agreement with data available in the literature.
+                    </p>
+                </div>
+            </div>
+            <div style="overflow: auto; display:flex; flex-direction: column;">
+                <h4>Why two solutions</h4>
+                <div class="label-output-row" style="overflow: auto; display:flex; flex-direction:column;justify-content: left;">
+                    <img src="./images/why-two-solutions.jpg" class = "abstract-image" style="width: 200px; height: 100px;float: left;">
+                   <p> Due to the fact that the equations reduce to a bi-quadratic, there are two solutions. One solution that subtracts the quadratic (Solution 1) and one solution that adds the quadratic (Solution 2). </p>
+                </div>
+            </div>
+        </div>
+    </div>
   <!-- ----------------------Top Section Input and Output Data -------------------------------------------------------> 
     <div class="content">
         <div class="input-container">
             <form class="inputFields">
                 <div class="Inlet">
-                    <h4 class="InputHeaders">Inlet Conditions</h4>
+                    <h4 class="InputHeaders">Inlet Conditions (Surface 1)</h4>
+                    <p style="color:gray; font-size:8px;">*Hover for more details</p>
                     <!-- P1 Input -->
                     <div class="label-output-row" title="Inlet Stagnation Pressure">
                         <label for="Po1">P<sub>o<sub>1</sub></sub>=</label>
@@ -1096,7 +1127,7 @@
 
                     <!-- Example Flows -->
                     <div class="exampleFlows">
-                        <h4>Example Flows</h4>
+                        <h4>Flow Templates</h4>
                         <select class="selectFlow" onchange="exampleFlow()">
                             <option>Default</option>
                             <option>Isentropic flow with area change</option>
@@ -1116,13 +1147,21 @@
                 <!-------------------------------- INLET TO OUTLET IMAGE ------------------------------------>
                     <canvas id="gui" style="display:None;"></canvas>
                     <img id = "flow-image" src = "./images/default.jpg">
-                    <h4 class="InputHeaders">Parameters</h4>
+                    <h4 class="InputHeaders">Parameters (including Surface 3)</h4>
 
 
                     <!------------------------PARAMETERS ----------------------------------------------------->
                     <div class="label-output-row" title="Ratio of Specific Heats">
                         <label for="gamma">&gamma;=</label>
                         <input type="text" id="gamma">
+                        <select>
+                            <option>-</option>
+                        </select>
+                    </div>
+
+                    <div class="label-output-row" title="Ratio of Specific Heats">
+                        <label for="R">R=</label>
+                        <input type="text" id="R">
                         <select>
                             <option>-</option>
                         </select>
@@ -1152,7 +1191,7 @@
                         </select>
                     </div>
 
-                    <div class="label-output-row" title="Wall-pressure weighting for exit-static-to-inlet-static pressure ratio">
+                    <div class="label-output-row" title="Wall-pressure weighting for exit-static-to-inlet-static pressure ratio (e.g., if xi = 0 and nu = 0 then P3 = P1, if xi = 1 and nu = 0 then P3 = P2, and if xi = 0 and nu = 1 then P3 = Po1)">
                         <label for="xi">&xi;=</label>
                         <input type="text" id="xi">
                         <select>
@@ -1160,7 +1199,7 @@
                         </select>
                     </div>
 
-                    <div class="label-output-row" title="Wall-pressure weighting for inlet-stagnation-to-inlet-static pressure ratio">
+                    <div class="label-output-row" title="Wall-pressure weighting for inlet-stagnation-to-inlet-static pressure ratio (e.g., if xi = 0 and nu = 0 then P3 = P1, if xi = 1 and nu = 0 then P3 = P2, and if xi = 0 and nu = 1 then P3 = Po1)">
                         <label for="nu">&nu;=</label>
                         <input type="text" id="nu">
                         <select>
@@ -1200,7 +1239,7 @@
                 </div>
                 <!--------------------------------------OUTLET CONDITIONS ------------------------------------------------->
                 <div class="Outlet">
-                    <h4 class="InputHeaders">Outlet Conditions</h4>
+                    <h4 class="InputHeaders">Outlet Conditions (Surface 2)</h4>
 
                     <div class="label-output-row" title="Outlet Area">
                         <label for="A2">A<sub>2</sub>=</label>
@@ -1238,16 +1277,22 @@
         <!--------------------------------------------------OUTPUT INFORMATION ----------------------------------------------->
         <div class="output-container">
             <div class="traditional-output">
-                <div class="label-output-row">
-                    <h4>Resulting solutions</h4>
-                    <!-----------------------------------CAN CLICK ADDITIONAL OR DIMENSIONAL --------------------------------->
-                    <input type="checkbox" id="additional" onclick="toggleData()" checked> Additional
-                    <input type="checkbox" id="dimension" onclick="toggleDimension()"> Dimensional
+                <div class="label-output-row" style="margin-bottom:0px;">
+                    <h4 style="margin-bottom:0px;">Resulting solutions</h4>
                 </div>
                 <!----------------------------------- NON-DIMENSIONAL OUTPUTS FOR NON-ADDITIONAL DATA ---------------------------------------------->
-
+               <!-- <div style="display:flex; flex-direction:row; ">
+                    <p style="color:gray; font-size:10px; margin-right: 30px;">*Hover for more details</p>
+                    <p style="color:gray; font-size:10px;margin-right: 5px;">Solution 1</p>
+                    <p style="color:gray; font-size:10px;margin-left: 5px;">Solution 2</p>
+                </div> -->
+                    <div class="label-output-row" title="Change in entropy normalized by the gas constant">
+                        <label style="font-size: 8px; color: gray;">*Hover for more details</label>
+                        <input type="text" value= "Solution 1" style="font-size: 8px; border: none; width: 50px;" readonly>
+                        <input type="text" value = "Solution 2" style="font-size: 8px; border: none; width: 50px; margin-right: 70px;" readonly>
+                    </div>
                     <!-- Output for M2 -->
-                    <div class="label-output-row" title="Mach number at the exit">
+                    <div class="label-output-row" title="Mach number at the exit" style="margin-top:0px;">
                         <label for="M2">M<sub>2</sub>=</label>
                         <input type="text" id="M2" readonly>
                         <input type="text" id="M2Second" readonly>
@@ -1331,7 +1376,7 @@
                 <!----------------------------------- DIMENSIONAL OUTPUTS FOR NON-ADDITIONAL DATA ---------------------------------------------->
                 <div class="traditional-output" id="dimensional" style="display:none;">
 
-                    <div class="label-output-row" title="Pressure ratio">
+                    <div class="label-output-row" title="Pressure at outlet">
                         <label for="P2">P<sub>2</sub>=</label>
                         <input type="text" id="P2" readonly>
                         <input type="text" id="P2Second" readonly>
@@ -1344,7 +1389,7 @@
                     </div>
 
                     <!-- Output for T2T1 -->
-                    <div class="label-output-row" title="Temperature ratio">
+                    <div class="label-output-row" title="Temperature at outlet">
                         <label for="T2">T<sub>2</sub>=</label>
                         <input type="text" id="T2" readonly>
                         <input type="text" id="T2Second" readonly>
@@ -1357,7 +1402,7 @@
                     </div>
 
                     <!-- Output for TR -->
-                    <div class="label-output-row" title="Stagnation temperature ratio">
+                    <div class="label-output-row" title="Stagnation temperature at outlet">
                         <label for="To2">T<sub>o<sub>2</sub></sub>=</label>
                         <input type="text" id="To2" readonly>
                         <input type="text" id="To2Second" readonly>
@@ -1383,7 +1428,7 @@
                     </div>
 
                     <!-- Output for deltaSR -->
-                    <div class="label-output-row" title="Change in entropy normalized by the gas constant">
+                    <div class="label-output-row" title="Change in entropy">
                         <label for="deltaS">&Delta;s=</label>
                         <input type="text" id="deltaS" readonly>
                         <input type="text" id="deltaSSecond" readonly>
@@ -1430,8 +1475,20 @@
                 </div>
             </div>
             <div id="additional-data">
-                <div class="label-output-row">
-                    <h4>Additional Data</h4>
+                <div class="label-output-row" style="margin-bottom:0px;">
+                    <h4 class = "additional-1" style="margin-bottom:0px;">Additional Data</h4>
+                    <!-----------------------------------CAN CLICK ADDITIONAL OR DIMENSIONAL --------------------------------->
+                        <label class="checkbox-label">
+                          <!--  <input type="checkbox" class= "check" id="additional" onclick="toggleData()"checked> Additional -->
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="check" id="dimension" onclick="toggleDimension()"> Dimensional
+                        </label>
+                </div>
+                <div class="label-output-row" style="margin-top: 0px;">
+                        <label style="font-size: 8px; color: gray; margin-top: 0px;"></label>
+                        <input type="text" value= "" style="font-size: 8px; border: none; width: 50px;" readonly>
+                        <input type="text" value = "" style="font-size: 8px; border: none; width: 50px; margin-right: 70px;" readonly>
                 </div>
                 <!----------------------------------- NON-DIMENSIONAL OUTPUTS FOR ADDITIONAL DATA ---------------------------------------------->
                 <div class="additional-1" id = "non-dimensional-additional">
@@ -1579,7 +1636,20 @@
                             <option value="slug/in^3">slug/in&sup3;</option>
                         </select>
                     </div>
-
+                    <div class="label-output-row" title="Mass Flow Rate">
+                        <label for="mfr">Mass Flow Rate=</label>
+                        <input type="text" id="mfr" readonly>
+                        <select id="mass-flow-unit" onchange="userChangedOutputUnit()">
+                            <option value="kg/s">kg/s</option>
+                        </select>
+                    </div>
+                    <div class="label-output-row" title="Mass Flow Rate">
+                        <label for="sfr">Specific Flow Rate=</label>
+                        <input type="text" id="sfr" readonly>
+                        <select id="specific-flow-unit" onchange="userChangedOutputUnit()">
+                            <option value="kg/sm^2">kg/(s*m&sup2;)</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>

@@ -6,10 +6,8 @@
   - [User Input](#user-input)
   - [Unit Conversion](#unit-conversion)
   - [Interface and Calculation](#interface-and-calculation)
-  - [Output Conversion](#output-conversion)
   - [Output Graph](#output-graph)
-- [Changing Units](#changing-units)
-- [Inlet to Outlet GUI](#inlet-to-outlet-gui)
+- [Example Flows](#example-flows)
 - [How to Add an Input](#how-to-add-an-input)
 - [How to Add an Output](#how-to-add-an-output)
 - [Changing Python Code](#changing-python-code)
@@ -47,22 +45,24 @@ outputGraph Do this for 300 data points
 
 ### Unit Conversion
 ** action user changes output unit **
+```
 userChangedOutputUnit 
 |
 |convertFromSI
 |
 |assignOutputs
-
+```
 ** user changes input unit **
+```
 calcualteFlow
 |
 |assignInputs
 |
 |convertToSI
-
+```
 ### Interface and Calculation
 
-### python to javascript
+#### python to javascript
 The Interface with the python code occurs in InterfaceUNI.
 JavaScript Integrates with python through:
    ```
@@ -98,7 +98,7 @@ class Args:
             self.error = None
 ```
 
-### javascript to python
+#### javascript to python
 Java Script to python is a little simpler. In this the data object from javascript is imported. Again this has to be a global variable. The data object is the inputs from the web calculator.
 ```
     def main():
@@ -106,9 +106,9 @@ Java Script to python is a little simpler. In this the data object from javascri
       from js import data
 ```
 
-### Pyscript
+#### Pyscript
 Pyscript is used to bring python to the front end of the application. That way we do not have to have a backend server. This is used in two componenets.
-1.
+1. 
  ```
    <py-config>
     packages = ["numpy", "scipy", "tqdm"] 
@@ -134,13 +134,16 @@ Note:
   ```
     <py-env>
       - numpy
-      -requests
+      - scipy
+      - tqdm
     </py-env>
   ```
 
 ### Output Graph
 Provide details about the output graph and the considerations taken to prevent performance issues.
 
+## Example Flows
+Provide Details about the Output Graph
 
 ## How to Add an Input
 1. add to HTML section in either inlet, parameters or outlet:
@@ -163,7 +166,33 @@ Provide details about the output graph and the considerations taken to prevent p
   data.to1 = parseFloat(document.getElementById("To1").value) || 0;
 '''
 3. add to python code:
-    Args
+    implement it into args so that it can be pulled from your uniflow code.
+    ```
+        class Args:
+        def __init__(self, AR=1.0, Ad=0.0, cd=0.0, cf=0.0, Af=0.0, M1=0.0, xi=0.5, nu=0.0,
+                    qr=0.0, k=1.4, twr=1.0, isentropic=False, b1=1.0, b2=1.0, a1=1.0, a2=1.0, N=1, debug=False):
+            self.AR = AR
+            self.Ad = Ad
+            self.cd = cd
+            self.cf = cf
+            self.Af = Af
+            self.M1 = M1
+            self.xi = xi
+            self.nu = nu
+            self.qr = qr
+            self.k = k
+            self.twr = twr
+            self.isentropic = isentropic
+            self.b1 = b1
+            self.b2 = b2
+            self.a1 = a1
+            self.a2 = a2
+            self.debug = True
+            self.N = N
+            self.error = None
+
+        args = Args(AR=data.A2/data.A1, Ad = data.Ad/data.A1, Af = data.Af/data.A1, qr = data.qr, cd = data.cd, cf = data.cf, M1=data.M1, xi = data.xi, nu = data.nu, k = data.gamma, b1 = data.beta1, b2 = data.beta2, a1 = data.alpha1, a2 = data.alpha2 , N = data.N, isentropic=(data.isent == 'True'))
+    ```
 
 ## How to Add an Output
 1. Add to output section in HTML into either traditional-output or additional-output and then non-dimensional or dimensional:
@@ -241,5 +270,5 @@ make sure value = "" is the same as either the variable name in data or output e
             </select>
 ```
 ## Changing Python Code
-Can copy and past everything from python into the pyscript tags. Do Not Change Mainpy or Args class
-Unless adding a Function Call or adding a value to args. also NOTE tqdm does not work!
+Can copy and past everything from python into the pyscript tags. However, I would not copy and paste the main.py or the Args class
+these I would recommend changing manually because the args class and main function are the only things that differ from uniflow.py. Also NOTE tqdm does not work in pyscript!
