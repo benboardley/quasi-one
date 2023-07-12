@@ -63,8 +63,8 @@
     def main():
       global args
       from js import data
-      ver = str('v1.8')
-      date = str('06/08/23')
+      ver = str('v2.2')
+      date = str('06/21/23')
       
       args = Args(AR=data.A2/data.A1, Ad = data.Ad/data.A1, Af = data.Af/data.A1, qr = data.qr, cd = data.cd, cf = data.cf, M1=data.M1, xi = data.xi, nu = data.nu, k = data.gamma, b1 = data.beta1, b2 = data.beta2, a1 = data.alpha1, a2 = data.alpha2 , N = data.N, isentropic=(data.isent == 'True'))
       #print(args.M1)
@@ -83,9 +83,6 @@
         args = postProcess(args)
       except Exception as e:
         args.error = e
-        print(e)
-      #regurgitate(args)
-      #printOutput(args)
       return()
 
     def intro(string,ver,date):

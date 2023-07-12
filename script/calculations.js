@@ -61,7 +61,6 @@ window.onload = function() {
     // Call the function to create the chart
     imageGUI();
     exampleFlow();
-    //toggleData();
     emptyGraph();
   };
 
@@ -132,7 +131,6 @@ window.onload = function() {
 
 //Interfaces with Uniflow.py (which is in the py-script tags in index.html)
 function interfaceUNI(){
-  //  var sum = P + T + M1 + A1 + gamma + alpha1 + beta1 + w + Fx + m2 + A2 + Q + xi + nu + f + alpha2 + beta2 + N;
     uniflow = pyscript.interpreter.globals.get('main');
     uniflow();
     js_args = pyscript.interpreter.globals.get('args');
@@ -154,12 +152,12 @@ function interfaceUNI(){
     output.zloss = js_args.zloss.toJs();
     output.CPinc = js_args.CPinc.toJs();
     output.P3P1 = js_args.P3P1.toJs();
-    output.P3Po1 = js_args.P3Po1.toJs();//[output.P3P1[0]/(output.f1**(data.gamma/(data.gamma-1))), output.P3P1[1]/(output.f1**(data.gamma/(data.gamma-1)))]
-    output.Lambda = js_args.Lambda; //.toJs();
+    output.P3Po1 = js_args.P3Po1.toJs();
+    output.Lambda = js_args.Lambda; 
     output.f1 = js_args.f1;
-    output.b = js_args.b; //.toJs();
-    output.c = js_args.c; //.toJs();
-    output.det = js_args.discriminant; //.toJs();
+    output.b = js_args.b; 
+    output.c = js_args.c;
+    output.det = js_args.discriminant;
     data.error = js_args.error;
     calculateRootsWithUnits();
 }
@@ -206,7 +204,6 @@ function assignInputs() {
   data.to1 = parseFloat(document.getElementById("To1").value) || 0;
   data.cd = parseFloat(document.getElementById("cd").value) || 0;
   data.cf = parseFloat(document.getElementById("cf").value) || 0;
-  //data.twr = parseFloat(document.getElementById("twr").value) || 0;
   data.qr = parseFloat(document.getElementById("qr").value) || 0;
   data.Af = parseFloat(document.getElementById("Af").value) || 0;
   data.Ad = parseFloat(document.getElementById("Ad").value) || 0;
@@ -461,13 +458,13 @@ function convertToSI() {
 
   switch(outletAreaUnit) {
     case 'centimeters':
-        data.A2 = centimetersToMeters(A1);
+        data.A2 = centimetersToMeters(A2);
         break;
     case 'feet':
-        data.A2 = feetToMeters(A1);
+        data.A2 = feetToMeters(A2);
         break;
     case 'inches':
-        data.A2 = inchesToMeters(A1);
+        data.A2 = inchesToMeters(A2);
         break;
 }
 
@@ -495,8 +492,6 @@ switch(dragAreaUnit) {
       data.Ad = inchesToMeters(Ad);
         break;
 }
-
-  // Return the converted values
 }
 
 // Velocity conversion functions
@@ -579,49 +574,17 @@ function joulesPerKelvinToBTU(joulesPerKelvin) {
 // Conversion function
 function convertFromSI() {
   calculateRootsWithUnits();
-  //assignOutputs();
-  //var P1 = parseFloat(document.getElementById("P1").value) || 0;
   var pressureUnit = document.getElementById("static-pressure1-unit").value;
-
-  //var T1 = document.getElementById("T1").value;
   var tempUnit = document.getElementById("static-temp1-unit").value;
-
-  //var V1 = parseFloat(document.getElementById("V1").value) || 0;
   var velocity1Unit = document.getElementById("velocity1-unit").value;
-
-  //var V2 = parseFloat(document.getElementById("V2").value) || 0;
-  //var V2Second = parseFloat(document.getElementById("V2Second").value) || 0;
   var velocity2Unit = document.getElementById("velocity2-unit").value;
-
-  //var p1 = parseFloat(document.getElementById("p1").value) || 0;
   var density1Unit = document.getElementById("density1-unit").value;
-
-  //var p2 = parseFloat(document.getElementById("p2").value) || 0;
-  //var p2Second = parseFloat(document.getElementById("p2Second").value) || 0;
   var density2Unit = document.getElementById("density2-unit").value;
-
-  //var P2 = parseFloat(document.getElementById("P2").value) || 0;
-  //var P2Second = parseFloat(document.getElementById("P2Second").value) || 0;
   var pressureUnit2 = document.getElementById("static-pressure2-unit").value;
-
-  //var P3 = parseFloat(document.getElementById("P3").value) || 0;
-  //var P3Second = parseFloat(document.getElementById("P3Second").value) || 0;
   var pressureUnit3 = document.getElementById("static-pressure3-unit").value;
-
-  //var T2 = document.getElementById("T2").value;
-  //var T2Second = document.getElementById("T2Second").value;
   var tempUnit2 = document.getElementById("static-temp2-unit").value;
-
-  //var To2 = document.getElementById("To2").value;
-  //var To2Second = document.getElementById("To2Second").value;
   var stagnationtempUnit = document.getElementById("stagnation-temp2-unit").value;
-
-  //var Po2 = parseFloat(document.getElementById("Po2").value) || 0;
-  //var Po2Second = parseFloat(document.getElementById("Po2Second").value) || 0;
   var stagnationpressureUnit = document.getElementById("stagnation-pressure2-unit").value;
-
-  //var deltaS = parseFloat(document.getElementById("deltaS").value) || 0;
-  //var deltaSSecond = parseFloat(document.getElementById("deltaSSecond").value) || 0;
   var deltaSunit = document.getElementById("entropy-unit").value;
   
   switch (pressureUnit) {
@@ -1246,6 +1209,7 @@ async function outputGraph(){
     var root1 = [];
     var root2 = [];
     var delta = 0.01;
+    //Set the Input so it gets progressivley larger
     for(data[X] = delta; data[X] < 3; data[X]+=delta){
         if(shouldCancel) {
           shouldCancel = false;
@@ -1269,6 +1233,7 @@ async function outputGraph(){
       root1.push(dataPoint1);
       root2.push(dataPoint2);
       if(data.N >= 10){
+        // Keep the webpage from crashing updated prgroess meter
         updateProgress(data[X],delta)
         await delay(1);
       }

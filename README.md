@@ -13,7 +13,7 @@
 - [Changing Python Code](#changing-python-code)
 
 ## Introduction
-Web Calculator for Andrew Oliva and Scott C Morris's Quasi Steady, quasi-one-dimensional, internal compressible flow with area change, heat addition and friction
+Web Calculator for Andrew A Oliva and Scott C Morris's Quasi Steady, quasi-one-dimensional, internal compressible flow with area change, heat addition and friction
 
 ## Flow Calculation
 
@@ -60,7 +60,9 @@ calcualteFlow
 |
 |convertToSI
 ```
-### Interface and Calculation
+### User Input
+The javacript command `data.po1 = parseFloat(document.getElementById("Po1").value)` can grab the value stored in this element. (You would want the html input to have this id e.g. `<input type="text" id="Po1">`).
+
 
 #### python to javascript
 The Interface with the python code occurs in InterfaceUNI.
@@ -140,8 +142,89 @@ Note:
   ```
 
 ### Output Graph
-Provide details about the output graph and the considerations taken to prevent performance issues.
 
+This grabs where the charts will be located: 
+  ```
+  var ctx = document.getElementById('outputChart').getContext('2d');
+  var ctx2 = document.getElementById('outputChart2').getContext('2d');
+  ```
+based upon the selected values also make sure to note that the selection values. `vale="M2"` is the same as the variable name in output or data `output.M2`.
+```
+<h4>Output Charts</h4>
+<select class="selection-component" id="chart-y" onchange="outputGraph()">
+<option value="M2">M&#8322; <!-- M subscript 2 --></option>
+<option value="P2P1">P&#8322;/P&#8321; <!-- P subscript 2 divided by P subscript 1 --></option>
+<option value="T2T1">T&#8322;/T&#8321; <!-- T subscript 2 divided by T subscript 1 --></option>
+<option value="TR">To&#8322;/To&#8321; <!-- To subscript 2 divided by To subscript 1 --></option>
+<option value="PR">Po&#8322;/Po&#8321; <!-- Po subscript 2 divided by Po subscript 1 --></option>
+<option value="dsR">&Delta;s/R</option>
+<option value="M2M1">M&#8322;/M&#8321; <!-- M subscript 2 divided by M subscript 1 --></option>
+<option value="dsRKE">(ds/R)/(k/2*M&#8321;&sup2;) <!-- (delta s divided by R) divided by (k divided by 2 times M subscript 1 squared) --></option>
+<option value="wloss">(Po&#8321;-Po&#8322;)/(Po&#8321;-P&#8321;) <!-- (Po subscript 1 minus Po subscript 2) divided by (Po subscript 1 minus P subscript 1) --></option>
+<option value="cp">(P&#8322;-P&#8321;)/(Po&#8321;-P&#8321;) <!-- (P subscript 2 minus P subscript 1) divided by (Po subscript 1 minus P subscript 1) --></option>
+<option value="T2">T&#8322; <!-- T subscript 2 --></option>
+<option value="P2">P&#8322; <!-- P subscript 2 --></option>
+<option value="to2">To&#8322; <!-- T subscript 2 o subscript 2 --></option>
+<option value="po2">Po&#8322; <!-- P subscript 2 o subscript 2 --></option>
+<option value="ds">&Delta;s</option>
+</select>
+
+<h4 style="margin-top: 0px;">vs</h4>
+
+<select class="selection-component" id="chart-x" onchange="outputGraph()">
+<option value="M1">M&#8321; <!-- M subscript 1 --></option>
+<option value="A1">A&#8321; <!-- A subscript 1 --></option>
+<option value="gamma">&#947; <!-- Gamma --></option>
+<option value="cd">c&#8322;d <!-- c subscript d --></option>
+<option value="cf">c&#8322;f <!-- c subscript f --></option>
+<option value="twr">TWR</option>
+<option value="alpha1">&#945;&#8321; <!-- Alpha subscript 1 --></option>
+<option value="beta1">&#946;&#8321; <!-- Beta subscript 1 --></option>
+<option value="qr">q&#8322;r <!-- q subscript r --></option>
+<option value="Af">A&#8322;f <!-- A subscript f --></option>
+<option value="Ad">A&#8322;d <!-- A subscript d --></option>
+<option value="A2">A&#8322; <!-- A subscript 2 --></option>
+<option value="xi">&xi; <!-- Xi --></option>
+<option value="nu">&nu; <!-- Nu --></option>
+<option value="alpha2">&alpha;&#8322; <!-- Alpha subscript 2 --></option>
+<option value="beta2">&beta;&#8322; <!-- Beta subscript 2 --></option>
+</select>
+```
+The selected value is then incremented and y value updated accordingly:
+```
+    var root1 = [];
+    var root2 = [];
+    var delta = 0.01;
+    //Set the Input so it gets progressivley larger
+    for(data[X] = delta; data[X] < 3; data[X]+=delta){
+        if(shouldCancel) {
+          shouldCancel = false;
+          break;
+        }
+        //Calculate Flow
+        interfaceUNI();
+        convertFromSI();
+        if(js_args.error){
+          document.getElementById("graph-error").text = js_args.error
+        }
+
+        var dataPoint1 = {
+            x: data[X],
+            y: output[Y][0]
+        };
+        var dataPoint2 = {
+          x: data[X],
+          y: output[Y][1]
+      };
+      root1.push(dataPoint1);
+      root2.push(dataPoint2);
+      if(data.N >= 10){
+        // Keep the webpage from crashing updated prgroess meter
+        updateProgress(data[X],delta)
+        await delay(1);
+      }
+    }
+```
 ## Example Flows
 Provide Details about the Output Graph
 
@@ -270,5 +353,56 @@ make sure value = "" is the same as either the variable name in data or output e
             </select>
 ```
 ## Changing Python Code
-Can copy and past everything from python into the pyscript tags. However, I would not copy and paste the main.py or the Args class
-these I would recommend changing manually because the args class and main function are the only things that differ from uniflow.py. Also NOTE tqdm does not work in pyscript!
+Can copy and past everything from python into the pyscript tags (tqdm does not work). However, I would not copy and paste the main.py or the Args class
+these I would recommend changing manually because the args class and main function are the only things that differ from uniflow.py. 
+e.g. differences between mains:
+```
+pyscript:
+    def main():
+      global args
+      from js import data
+      ver = str('v2.2')
+      date = str('06/21/23')
+      
+      args = Args(AR=data.A2/data.A1, Ad = data.Ad/data.A1, Af = data.Af/data.A1, qr = data.qr, cd = data.cd, cf = data.cf, M1=data.M1, xi = data.xi, nu = data.nu, k = data.gamma, b1 = data.beta1, b2 = data.beta2, a1 = data.alpha1, a2 = data.alpha2 , N = data.N, isentropic=(data.isent == 'True'))
+      try:
+        if( args.isentropic ):
+            args = isentropic(args)
+            args = coefsBiquadratic(args)
+
+        else:
+            if( args.N  == 1 ):
+                args = coefsBiquadratic(args)
+                args = solveBiquadratic(args)
+            else:
+                args = subelements(args)
+
+        args = postProcess(args)
+      except Exception as e:
+        args.error = e
+      return()
+```
+```
+uniflow:
+def main():
+    ver = str('v2.2')
+    date = str('06/21/23')
+    intro('UNIfied steady quasi-1d compressible FLOW',ver,date)
+
+    args = getArgs()
+    regurgitate(args)
+
+    if( args.isentropic ):
+        args = isentropic(args)
+        args = coefsBiquadratic(args)
+
+    else:
+        args = subelements(args)
+
+    args = postProcess(args)
+
+    printOutput(args)
+
+    return()
+```
+## Also NOTE tqdm does not work in pyscript!
