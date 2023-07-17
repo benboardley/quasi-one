@@ -1015,12 +1015,12 @@
     <div class="abstract-container">
         <div class="abstract-header">
             <label class="checkbox-label">
-            <p id="up-arrow" style="display:none;" onclick="toggleAbstract()">Less Information &nbsp;<i class="arrow up"></i></p>
-            <p id="down-arrow" style="margin-top: 5px;" onclick="toggleAbstract()">More Information &nbsp;<i class="arrow down"></i></p>
+            <p id="up-arrow" onclick="toggleAbstract()">Less Information &nbsp;<i class="arrow up"></i></p>
+            <p id="down-arrow" style="margin-top: 5px;display:none;" onclick="toggleAbstract()">More Information &nbsp;<i class="arrow down"></i></p>
             <!-- <input type="checkbox" class="check" id="abstact-toggle" onclick="toggleAbstract()"> View Abstract -->
             </label>
         </div>
-        <div id="abstract" style="flex-direction:row; display: none;">
+        <div id="abstract" style="flex-direction:row;">
             <div style="margin-right: 100px; width: 100%;">
                 <h4>Abstract</h4>
                 <div style="overflow: auto; display:flex; flex-direction:column;">
@@ -1557,7 +1557,7 @@
                         <input type="text" id="SFROutlet" readonly>
                         <input type="text" id="SFROutletSecond" readonly>
                         <select id="specific-flow-outlet-unit" onchange="userChangedOutputUnit()">
-                            <option value="kg/sm^2">kg/(s*m&sup2;)</option>
+                            <option value="kg/sm^2">-</option>
                         </select>
                     </div>
 
@@ -1565,7 +1565,7 @@
                         <label for="SFRInlet">&#x1E41;&radic;<span style="text-decoration:overline;">RT&nbsp;</span><sub>o<sub>1</sub></sub>/(P<sub>o<sub>1</sub></sub>A)=</label>
                         <input type="text" id="SFRInlet" readonly>
                         <select id="specific-flow-inlet-unit" onchange="userChangedOutputUnit()">
-                            <option value="kg/sm^2">kg/(s*m&sup2;)</option>
+                            <option value="kg/sm^2">-</option>
                         </select>
                     </div>
 

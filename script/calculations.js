@@ -1221,20 +1221,32 @@ async function outputGraph(){
           break;
         }
         //Calculate Flow
-        interfaceUNI();
-        convertFromSI();
-        if(js_args.error){
-          document.getElementById("graph-error").text = js_args.error
-        }
+        try{
+          interfaceUNI();
+          convertFromSI();
+          if(js_args.error){
+            document.getElementById("graph-error").text = js_args.error
+          }
 
-        var dataPoint1 = {
+          var dataPoint1 = {
+              x: data[X],
+              y: output[Y][0]
+          };
+          var dataPoint2 = {
             x: data[X],
-            y: output[Y][0]
-        };
-        var dataPoint2 = {
-          x: data[X],
-          y: output[Y][1]
-      };
+            y: output[Y][1]
+          };
+        }
+        catch{   
+            var dataPoint1 = {
+              x: data[X],
+              y: NaN
+          };
+          var dataPoint2 = {
+            x: data[X],
+            y: NaN
+          };
+        }
       root1.push(dataPoint1);
       root2.push(dataPoint2);
       if(data.N >= 10){
