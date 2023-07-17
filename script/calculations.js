@@ -172,7 +172,7 @@ function calculateRootsWithUnits(){
   output.V2 = []
   output.p2 = []
   output.P3 = []
-
+  output.specificMassFlowRateOutlet = []
   output.f1 = 1 + ((data.gamma - 1)/2) * data.M1 ** 2 
   output.P1 = data.po1 * output.f1 ** (-data.gamma/(data.gamma-1))
   output.T1 = data.to1 * output.f1
@@ -196,6 +196,9 @@ function calculateRootsWithUnits(){
   output.P3[1] = output.P3Po1[1] * data.po1
   output.massFlowRate = data.po1 / Math.sqrt(data.to1) * Math.sqrt(data.gamma / data.R) * data.A1 * data.M1 * (1 + (data.gamma-1)/2 * data.M1 ** 2) ** (-(data.gamma+1)/(2*(data.gamma-1)))
   output.specificFlowRate = output.massFlowRate / data.A1
+  output.specificMassFlowRateInlet = Math.sqrt(data.gamma) * data.M1 * (1 + (data.gamma - 1) / 2 * data.M1 ** 2) ** (-(data.gamma+1)/(2*(data.gamma-1)))
+  output.specificMassFlowRateOutlet[0] = Math.sqrt(data.gamma) * output.M2[0] * (1 + (data.gamma - 1) / 2 * output.M2[0] ** 2) ** (-(data.gamma+1)/(2*(data.gamma-1)))
+  output.specificMassFlowRateOutlet[1] = Math.sqrt(data.gamma) * output.M2[1] * (1 + (data.gamma - 1) / 2 * output.M2[1] ** 2) ** (-(data.gamma+1)/(2*(data.gamma-1)))
 }
 
 function assignInputs() {
@@ -304,7 +307,9 @@ document.getElementById("P3").value = output.P3[0].toFixed(5);
 document.getElementById("P3Second").value = output.P3[1].toFixed(5);
 
 document.getElementById("mfr").value = output.massFlowRate.toFixed(5);
-document.getElementById("sfr").value = output.specificFlowRate.toFixed(5);
+document.getElementById("SFRInlet").value = output.specificMassFlowRateInlet.toFixed(5);
+document.getElementById("SFROutlet").value = output.specificMassFlowRateOutlet[0].toFixed(5);
+document.getElementById("SFROutletSecond").value = output.specificMassFlowRateOutlet[1].toFixed(5);
 
 if (data.error) {
   document.getElementById("input-error").textContent = output.data.error;

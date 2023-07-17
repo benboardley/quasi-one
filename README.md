@@ -17,7 +17,8 @@ Web Calculator for Andrew A Oliva and Scott C Morris's Quasi Steady, quasi-one-d
 
 ## Flow Calculation
 
-![Flow Diagram](flow-charts\calculate-flow.jpg)
+![Flow Diagram](flow-charts/calculate-flow.jpg)
+<!--
 ```
 calculateFlow
 |
@@ -44,9 +45,9 @@ outputGraph Do this for 300 data points
   |
   | assign Outputs
 ```
-
+-->
 ### Unit Conversion
-** action user changes output unit **
+Action: user changes output unit
 ```
 userChangedOutputUnit 
 |
@@ -54,7 +55,7 @@ userChangedOutputUnit
 |
 |assignOutputs
 ```
-** user changes input unit **
+Action: user changes input unit
 ```
 calcualteFlow
 |
