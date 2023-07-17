@@ -3,173 +3,1726 @@
 <head>
   <meta charset="UTF-8">
   <title>quasi one</title>
+  <link rel="icon" href="https://static.nd.edu/images/monogram/monogram.svg" type="image/svg+xml">
   <!-- Additional meta tags, stylesheets, or scripts -->
-  <script src="./calculations.js"></script>
-  <link rel="stylesheet" type="text/css" href="./style.css">
+  <script src="./script/calculations.js"></script>
+  <link rel="stylesheet" type="text/css" href="./style/style.css">
+  <link rel="stylesheet" type="text/css" href="./style/notredame.css">
+  <!-- ----------------------Java Script Libraries and Plug Ins -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.0/dist/chartjs-plugin-annotation.min.js"></script>
- <!-- <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" /> -->
- <!-- <script defer src="https://pyscript.net/latest/pyscript.js"></script> -->
+ <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+ <script defer src="https://pyscript.net/latest/pyscript.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
+
+  <!-- ----------------------Python Imports -------------------------------------------------------------------------->
+   <py-config>
+    packages = ["numpy", "scipy", "tqdm"] 
+  </py-config>
+
+   <!-- ----------------------Python Code -->
+  <py-script>
+    import numpy as np
+    import sys
+    import scipy.optimize as scopt
+    #import scipy.special as spec
+    from scipy.special import lambertw
+    import fractions as frac
+    import copy
+    import warnings
+    from tqdm import tqdm
+
+    warnings.filterwarnings('error')
+
+    #mimic argparse
+    class Args:
+        def __init__(self, AR=1.0, Ad=0.0, cd=0.0, cf=0.0, Af=0.0, M1=0.0, xi=0.5, nu=0.0,
+                    qr=0.0, k=1.4, twr=1.0, isentropic=False, b1=1.0, b2=1.0, a1=1.0, a2=1.0, N=1, debug=False):
+            self.AR = AR
+            self.Ad = Ad
+            self.cd = cd
+            self.cf = cf
+            self.Af = Af
+            self.M1 = M1
+            self.xi = xi
+            self.nu = nu
+            self.qr = qr
+            self.k = k
+            self.twr = twr
+            self.isentropic = isentropic
+            self.b1 = b1
+            self.b2 = b2
+            self.a1 = a1
+            self.a2 = a2
+            self.debug = True
+            self.N = N
+            self.error = None
+
+
+    args = None
+    def main():
+      global args
+      from js import data
+      ver = str('v2.2')
+      date = str('06/21/23')
+      
+      args = Args(AR=data.A2/data.A1, Ad = data.Ad/data.A1, Af = data.Af/data.A1, qr = data.qr, cd = data.cd, cf = data.cf, M1=data.M1, xi = data.xi, nu = data.nu, k = data.gamma, b1 = data.beta1, b2 = data.beta2, a1 = data.alpha1, a2 = data.alpha2 , N = data.N, isentropic=(data.isent == 'True'))
+      #print(args.M1)
+      try:
+        if( args.isentropic ):
+            args = isentropic(args)
+            args = coefsBiquadratic(args)
+
+        else:
+            if( args.N  == 1 ):
+                args = coefsBiquadratic(args)
+                args = solveBiquadratic(args)
+            else:
+                args = subelements(args)
+
+        args = postProcess(args)
+      except Exception as e:
+        args.error = e
+      return()
+
+    def intro(string,ver,date):
+        '''
+        print the intro - code name, version, and date
+        '''
+        print("\n\n",end='',sep='')
+        print("+","-"*78,"+",end="\n",sep='')
+        print("|",str(string).center(78,' '),"|",end="\n",sep='')
+        print("|",str(ver+' '+date).center(78,' '),"|",end="\n",sep='')
+        print("+","-"*78,"+",end="\n\n",sep='')
+        sys.stdout.flush()
+
+        return()
+
+    def getArgs():
+        '''
+        use argparse to get user inputs from command line
+        '''
+        parser = argparse.ArgumentParser(description="Steady Quasi-1D Compressible Flow."\
+                +"Assumes Calorically Perfect Ideal Gas.",\
+                formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        parser.add_argument('--area-ratio','-ar',default=1.0,dest='AR',\
+                            help="Exit Area / Inlet Area",type=np.float64)
+
+        parser.add_argument('--drag-area-ratio','-ad',default=np.float64(1.0),dest='Ad',\
+                            help='Drag Area / Inlet Area',type=np.float64)
+
+        parser.add_argument('--drag-coefficient','--drag-coef','-cd',type=np.float64,\
+                            default=np.float64(0.0),dest='cd',help='Drag Coefficient')
+
+        parser.add_argument('-friction-coefficient','--friction-coef','-cf',type=np.float64,\
+                            default=np.float64(0.0),dest='cf',help='Friction Coefficient')
+
+        parser.add_argument('--friction-area-ratio','-af',default=np.float64(1.0),dest='Af',\
+                            help='Friction Surface Area / Inlet Area',type=np.float64)
+
+        parser.add_argument('--inlet-mach','-m1',default=np.float64(0.0),type=np.float64,dest='M1',help="Inlet Mach Number")
+
+        parser.add_argument('-xi',default=np.float64(0.5),dest='xi',type=np.float64,\
+                            help="Wall-pressure weighting for exit-static-to-inlet-static pressure ratio")
+
+        parser.add_argument('-nu',default=np.float64(0.0),type=np.float64,help='Wall-pressure weighting for inlet-stagnation-to-inlet-static pressure ratio',\
+                            dest='nu')
+
+        parser.add_argument('--heat-transfer-ratio','-qr',default=np.float64(0.0),dest='qr',type=np.float64,\
+                            help='heat transfer / inlet specific total enthalpy (q/ho)')
+
+        parser.add_argument('--cp/cv','-k',default=str(1.4),type=str,\
+                            dest='k',help="Ratio of Specific Heats")
+
+        parser.add_argument('--TwTo1','-twr',default=np.float64(1.0),type=np.float64,\
+                            dest='twr',help="Ratio of wall temperature to inlet stagnation temperature")
+
+        parser.add_argument('--isentropic','-s',default=False,help='Force entropy change to zero',\
+                            action='store_true',dest='isentropic')
+
+        parser.add_argument('--sub-elements','-n',default=np.int64(1),help='Break problem up into multiple sub-elements (advanced)',\
+                            dest='N',type=np.int64)
+
+        parser.add_argument('--inlet-momentum-flux-correction-factor','--beta1','-b1',default=np.float64(1.0),\
+                                help='inlet momentum flux correction factor',dest='b1',type=np.float64)
+        parser.add_argument('--outlet-momentum-flux-correction-factor','--beta2','-b2',default=np.float64(1.0),\
+                                help='inlet momentum flux correction factor',dest='b2',type=np.float64)
+        parser.add_argument('--inlet-mass-flux-correction-factor','--alpha1','-a1',default=np.float64(1.0),\
+                                help='inlet momentum flux correction factor',dest='a1',type=np.float64)
+        parser.add_argument('--outlet-mass-flux-correction-factor','--alpha2','-a2',default=np.float64(1.0),\
+                                help='inlet momentum flux correction factor',dest='a2',type=np.float64)
+
+        parser.add_argument('--debug',default=False,help='debug mode',action='store_true',dest='debug')
+
+        args = parser.parse_args()
+        args = checkArgs(args)
+
+        return(args)
+
+    def checkArgs(args):
+        '''
+        see if the user is begin dumb
+        '''
+        if( args.AR == None):
+            raise ValueError('Area Ratio not given')
+
+        if( args.M1 == None):
+            raise ValueError('Inlet Mach Number not given')
+
+        if( args.M1 == 0.0 ):
+            raise ValueError('Inlet Mach Number is zero')
+
+        try:
+            args.k = np.float64(k)
+        except:
+            args.k = np.float64(frac.Fraction(args.k))
+
+        return(args)
+
+    def regurgitate(args):
+        '''
+        print user input to the screen
+        '''
+        print("Inputs\n","-"*48,end="\n",sep='')
+        print("{0:20s} {1: .6e}".format("M1",np.float64(args.M1)),end="\n",sep='')
+        print("{0:20s} {1: .6e}".format("In. Mom Flux Corr",np.float64(args.b1)),end="\n",sep='')
+        print("{0:20s} {1: .6e}".format("Ex. Mom Flux Corr",np.float64(args.b2)),end="\n",sep='')
+        print("{0:20s} {1: .6e}".format("In. Mass Flux Corr",np.float64(args.a1)),end="\n",sep='')
+        print("{0:20s} {1: .6e}".format("Ex. Mass Flux Corr",np.float64(args.a2)),end="\n",sep='')
+        print("{0:20s} {1: .6e}".format("Wall P2 Weight",np.float64(args.xi)),end="\n",sep='')
+        print("{0:20s} {1: .6e}".format("Wall Pt1 Weight",np.float64(args.nu)),end="\n",sep='')
+        print("{0:20s} {1: .6e}".format("Area Ratio",np.float64(args.AR)),end="\n",sep='')
+        print("{0:20s} {1: .6e}".format("Drag Area Ratio",np.float64(args.Ad)),end="\n",sep='')
+        print("{0:20s} {1: .6e}".format("Drag Coef",np.float64(args.cd)),end="\n",sep='')
+        print("{0:20s} {1: .6e}".format("Friction Area Ratio",np.float64(args.Af)),end="\n",sep='')
+        print("{0:20s} {1: .6e}".format("Friction Coef",np.float64(args.cf)),end="\n",sep='')
+        print("{0:20s} {1: .6e}".format("Heat Xfer Ratio",np.float64(args.qr)),end="\n",sep='')
+        print("{0:20s} {1: .6e}".format("cp/cv",np.float64(args.k)),end="\n",sep='')
+        print("{0:20s} {1: >13d}".format("Subelements",args.N),end="\n",sep='')
+        print("{0:20s} {1: >13s}".format("Isentropic",str(args.isentropic)),end="\n",sep='')
+
+        print("\n\n",end='',sep='')
+
+        return()
+
+    def coefsBiquadratic(args):
+        '''
+        calculate the 2nd and zeroth order coefficients of the bi-quadratic polynomial
+        '''
+        M1 = args.M1
+        k  = args.k
+        AR = args.AR
+        Ad = args.Ad
+        cd = args.cd
+        cf = args.cf
+        Af = args.Af
+        nu = args.nu
+        qr = args.qr
+        xi = args.xi
+        beta1 = args.b1
+        beta2 = args.b2
+        alpha1 = args.a1
+        alpha2 = args.a2
+
+        TR = np.float64(bool(k-1))*(1 + args.qr) + np.float64(not bool(k-1))*1
+
+        G = (k-1)/2
+
+        f1 = 1 + G * M1*M1
+
+        if( k == 1):
+            Lambda = np.complex128(\
+                        ((1 + beta1*k*(1-cf/4*Af - cd/2*Ad)*M1**2 + (1-xi+nu*(np.exp(-M1**2)-1))*(AR-1) ) \
+                        /(alpha1/alpha2*M1*np.sqrt(f1*TR))) \
+                        )
+            Lambda *= Lambda
+
+        else:
+            Lambda = np.complex128(\
+                        ((1 + beta1*k*(1-cf/4*Af - cd/2*Ad)*M1**2 + (1-xi+nu*(f1**(k/(k-1))-1))*(AR-1) ) \
+                        /(alpha1/alpha2*M1*np.sqrt(f1*TR))) \
+                        )
+            Lambda *= Lambda
+
+        b = (Lambda - 2*k*beta2*(1+xi*(1/AR-1))*(1+cf/4*Af/AR)) \
+                /(Lambda * G  -(k*beta2*(1+cf/4*Af/AR))**2)
+        c = -(1+xi*(1/AR-1))**2 \
+                /(Lambda * G  -(k*beta2*(1+cf/4*Af/AR))**2)
+
+        discriminant = (b/2)*(b/2)-c
+
+        args.Lambda = np.real(Lambda)
+        args.b = np.real(b)
+        args.c = np.real(c)
+        args.discriminant = np.real(discriminant)
+
+        return(args)
+
+    def solveBiquadratic(args):
+        '''
+        Solution to mass, momentum, and energy balance equations.
+        Mass balance is simple inlet nad outlet balance
+        Momentum balance as 1 friction force and 1 drag force
+        Energy balance has 1 heat addition term
+        Gravity and other sources of Potential Energy have been ignored.
+        Uses calorically perfect ideal gas assumption.
+        '''
+
+        b = args.b
+        c = args.c
+        discriminant = np.complex128(args.discriminant)
+
+        roots = np.array([-b/2+np.sqrt(discriminant),-b/2-np.sqrt(discriminant)],\
+                dtype=np.complex128)
+
+        # reject non-physical roots and replace with nans
+        args.M2 = np.sqrt(rejectNonphysicalRoots(roots,keepNans=True))
+
+        return(args)
+
+    def postProcess(args):
+        '''
+        standard post-processing routine for all solutions
+        '''
+        M2 = args.M2
+
+        M1 = args.M1
+        k  = args.k
+        AR = args.AR
+        xi = args.xi
+        nu = args.nu
+        qr = args.qr
+        cf = args.cf
+        Af = args.Af
+        cd = args.cd
+        Ad = args.Ad
+        TwTo1 = args.twr
+        alpha1 = args.a1
+        alpha2 = args.a2
+        beta1 = args.b1
+        beta2 = args.b2
+
+        G = (k-1)/2
+
+        f1 = 1 + G * M1*M1
+        f2 = 1 + G * M2*M2
+        args.f1    = f1
+        args.f2    = f2
+
+        TR = np.float64(bool(k-1))*(1 + qr) + np.float64(not bool(k-1))*1
+
+        if( k == 1):
+            PR = alpha1/alpha2*np.sqrt(TR) * M1/M2 * 1/AR * np.exp(0.5*(M2*M2-M1*M1))
+
+            dsR = - np.log(PR)
+
+            P2P1  = alpha1/alpha2*np.sqrt(TR) * M1/M2 * 1./AR * np.sqrt(f1/f2)
+
+            P3P1 = ((1-xi-nu) + xi*P2P1 + nu * np.exp(M1*M1/2))*np.ones_like(M2)
+
+        else:
+            PR = alpha1/alpha2 * np.sqrt(TR) * M1/M2 * 1./AR * (f1/f2)**(-(k+1)/(2*(k-1)))
+
+            dsR  = k/(k-1) *np.log(TR) - np.log(PR)
+
+            P2P1  = alpha1/alpha2 * np.sqrt(TR) * M1/M2 * 1./AR * np.sqrt(f1/f2)
+
+            P3P1 = ((1 - xi - nu) + xi * P2P1 + nu * f1**(k/(k-1)))*np.ones_like(M2)
+
+        T2T1  = TR*(f1/f2)
+        p2p1  = P2P1/T2T1
+        v2v1  = 1/p2p1
+        M2M1  = M2/M1
+        V2V1  = M2M1 *np.sqrt(T2T1)
+
+        args.V2V1  = V2V1
+        args.v2v1  = v2v1
+        args.p2p1  = p2p1
+        args.PR    = PR
+        args.TR    = TR*np.ones_like(M2)
+        args.P2P1  = P2P1
+        args.T2T1  = TR * (f1/f2)
+        args.dsR   = dsR
+        args.dsRKE = dsR/(k/2*M1*M1)
+        args.dsRKE2= dsR/(k/2*M2*M2)
+        args.P3P1  = P3P1
+        args.P3Po1 = P3P1 / (args.f1 ** (k/(k-1)))
+        args.wpv    = -np.log(P2P1*V2V1*AR)
+        args.wrev    = -np.log(V2V1*AR)
+
+        if( k == 1):
+            args.CP    = (P2P1-1)/np.exp(-M1**2/2)
+            args.wloss = (1 - PR)/(1 - np.exp(-M1**2/2))
+            args.zloss = np.exp(M1**2/2)*(1 - PR)/(k/2*M1*M1)
+            args.Theta = k/(k-1+1e-16)* 1/TwTo1*(TR-1)*np.ones_like(M2)
+        else:
+            args.CP    = (P2P1 - 1)/(args.f1**(k/(k-1))-1)
+            args.wloss = (1 - PR)/(1 - args.f1**(-k/(k-1)))
+            args.zloss = f1**(k/(k-1))*(1 - PR)/(k/2*M1**2)
+            args.Iq    = k/4*(M2**2+M1**2)*np.log(TR) \
+                            + k/(k-1)*(np.log(TR) - 1/TwTo1*(TR-1))
+            args.Theta = k/(k-1)* 1/TwTo1*(TR-1)*np.ones_like(M2)
+
+
+        def get_approx(M2,M1,TR):
+            trapezoid = (M1**2 + M2**2/TR)/2*(TR-1)
+            midpoint  = (M1 + M2)**2/(TR+1)/2*(TR-1)
+            #return( 2/3*midpoint + 1/3*trapezoid)
+            #return(trapezoid)
+            return(midpoint)
+
+
+        args.dk    = k/(k-1+1e-16)*np.log(f2/f1) + k/2*get_approx(M2,M1,TR)
+        args.Iq    = k/2*get_approx(M2,M1,TR) \
+                        + k/(k-1+1e-16)*(np.log(TR) - 1/TwTo1*(TR-1))
+
+        args.we    = args.wpv - args.dk
+        args.I     = args.we - args.wrev + args.Iq
+        args.CPinc = (P2P1 - 1)/(k/2*M1*M1)
+
+        return(args)
+
+    def isentropic(args):
+        '''
+        guess isentropic exit Mach number and then iterate to find true value
+        guess uses optimal projection (in an L2 sense) on a domain defined by
+        the solutions of the complex gas and the monoatomic gas
+        '''
+        M1 = args.M1
+        AR = args.AR
+        k = args.k
+
+        G = (k-1)/2
+        f1 = 1 + G*M1*M1
+
+        class soln():
+            def __init__(self):
+                self.iterations = np.uint32(0)
+                self.function_calls = np.uint32(1)
+                self.root = np.float64(0)
+
+        def dsR(M2,M1=M1,AR=AR,f1=f1,k=k):
+
+            f2 = 1 + (k-1)/2*M2*M2
+
+            dsR = np.float64(bool(k-1))*(np.log(M2/M1*AR) - (k+1)/(2*(k-1)) * np.log(f2/f1)) \
+                    + np.float64(not bool(k-1))*(np.log(M2/M1*AR) - 1/2*(M2*M2-M1*M1))
+
+            return(dsR)
+
+        #monatomicM2 = np.zeros((2,),dtype=np.float64)
+        infinatomicM2 = np.zeros((2,),dtype=np.float64)
+        diatomicM2 = np.zeros_like(infinatomicM2)
+        polyatomicM2 = np.zeros_like(infinatomicM2)
+        M2 = np.zeros_like(infinatomicM2)
+
+        monatomicM2 = isentropicMonoatomicGas(args)
+        infinatomicM2 = isentropicInfinitatomicGas(args)
+
+        if( np.size(monatomicM2) == 1 ):
+            monatomicM2 = np.sort(np.array([monatomicM2[0],np.nan],dtype=np.float64))
+        elif( np.size(monatomicM2) == 0):
+            monatomicM2 = np.nan*np.ones((2,),dtype=np.float64)
+
+
+        nanFlag = np.isnan(monatomicM2)
+
+        order2Lagrange = ((k-5/3)*infinatomicM2 / (1-5/3) \
+                + (k-1)*np.nan_to_num(monatomicM2,nan=1) / (5/3-1))
+
+        llim = np.array([min(infinatomicM2[0],monatomicM2[0]),\
+                max(infinatomicM2[1],monatomicM2[1])])
+
+        llim[1] = ~nanFlag[1]*llim[1] + nanFlag[1]
+
+        ulim = np.array([max(infinatomicM2[0],monatomicM2[0]),\
+                max(infinatomicM2[1],monatomicM2[1])])
+
+        ulim[0] = ~nanFlag[0]*ulim[0] + nanFlag[0]
+
+        # use 2nd order Lagrange interpolation polynomial to estimate new bounds
+        # of solution for diatomic gas
+        diatomicM2[0] = isentropicDiatomicGasApprox(args, \
+                a=(llim[0]+order2Lagrange[0])/2,\
+                b=(ulim[0]+order2Lagrange[0])/2).min()
+
+        diatomicM2[1] = isentropicDiatomicGasApprox(args,\
+                a=(llim[1]+order2Lagrange[1])/2,\
+                b=(ulim[1]+order2Lagrange[1])/2).max()
+
+        # create 3rd order Lagrange interpolation polynomial
+        order3Lagrange = (k-7/5)*(k-5/3)*infinatomicM2 / (1-7/5)/(1-5/3) \
+                                    + (k-1)*(k-5/3)*diatomicM2 / (7/5-1)/(7/5-5/3) \
+                                    + (k-1)*(k-7/5)*monatomicM2 / (5/3-1)/(5/3-7/5)
+
+        # use 3rd order and 2nd order Lagrange interpolation polynomials to estimate
+        # new bounds of solution for diatomic gas
+        diatomicM2[0] = isentropicDiatomicGasApprox(args, \
+                a=order2Lagrange[0],\
+                b=order3Lagrange[0]).min()
+
+        diatomicM2[1] = isentropicDiatomicGasApprox(args,\
+                a=order2Lagrange[1],\
+                b=order3Lagrange[1]).max()
+
+        if( k == 7/5):
+
+            soln1 = soln()
+            soln2 = soln()
+            soln1.root = diatomicM2[0]
+            soln2.root = diatomicM2[1]
+
+            polyatomicM2 = diatomicM2
+
+            soln1 = scopt.root_scalar(dsR,x1=soln1.root,x0=order2Lagrange[0],\
+                    method='secant',\
+                    bracket=[min(llim[0],ulim[0]),\
+                            max(llim[0],ulim[0])])
+
+            soln2 = scopt.root_scalar(dsR,x1=soln2.root,x0=order2Lagrange[1],\
+                    method='secant',\
+                    bracket=[min(llim[1],ulim[1]),\
+                            max(llim[1],ulim[1])])
+
+        elif( k == 5/3 ):
+
+            soln1 = soln()
+            soln2 = soln()
+            soln1.root = monatomicM2[0]
+            soln2.root = monatomicM2[1]
+
+            polyatomicM2 = monatomicM2
+
+        elif( k == 9/7 ):
+
+            soln1 = soln()
+            soln2 = soln()
+
+            soln1.root = isentropicTriatomicGasApprox(args,a=order2Lagrange[0],b=order3Lagrange[0])[0]
+            soln2.root = isentropicTriatomicGasApprox(args,a=order2Lagrange[1],b=order3Lagrange[1])[1]
+
+            polyatomicM2 = np.array([soln1.root,soln2.root])
+
+            soln1 = scopt.root_scalar(dsR,x1=soln1.root,x0=order3Lagrange[0],\
+                    method='secant',\
+                    bracket=[min(llim[0],ulim[0]),\
+                            max(llim[0],ulim[0])])
+
+            soln2 = scopt.root_scalar(dsR,x1=soln2.root,x0=order3Lagrange[1],\
+                    method='secant',\
+                    bracket=[min(llim[1],ulim[1]),\
+                            max(llim[1],ulim[1])])
+
+        elif( args.k == 1):
+
+            soln1 = soln()
+            soln2 = soln()
+            soln1.root = infinatomicM2[0]
+            soln2.root = infinatomicM2[1]
+
+            polyatomicM2 = infinatomicM2
+
+        else:
+            polyatomicM2[0] = isentropicPolyatomicGasApprox(args,\
+                    a=order3Lagrange[0],b=order2Lagrange[0])[0]
+            polyatomicM2[1] = isentropicPolyatomicGasApprox(args,\
+                    a=order3Lagrange[1],b=order2Lagrange[1])[1]
+            #polyatomicM2[0]  = order3Lagrange[0]
+            #polyatomicM2[1] = order3Lagrange[1]
+
+            soln1 = scopt.root_scalar(dsR,x1=order3Lagrange[0],x0=order2Lagrange[0],\
+                    method='secant',\
+                    bracket=[min(llim[0],ulim[0]),\
+                            max(llim[0],ulim[0])])
+
+            soln2 = scopt.root_scalar(dsR,x1=order3Lagrange[1],x0=order2Lagrange[1],\
+                    method='secant',\
+                    bracket=[min(llim[1],ulim[1]),\
+                            max(llim[1],ulim[1])])
+
+        M2[0] = soln1.root
+        M2[1] = soln2.root
+
+        f2 = 1 + G*M2*M2
+
+        P2P1 = 1/AR * M1/M2 *np.sqrt(f1/f2)
+        P3P1 = (P2P1*AR*(1+k*M2*M2) - (1+k*M1*M1))/(AR-1)
+
+        args.M2 = M2
+        args.xi = (P3P1 - 1)/(P2P1 - 1)
+
+        args.initialM2 = polyatomicM2
+        args.monatomicM2 = monatomicM2
+        args.infinatomicM2 = infinatomicM2
+        args.diatomicM2 = diatomicM2
+        args.iter = np.array([soln1.iterations,soln2.iterations])
+        args.nfev = np.array([soln1.function_calls,soln2.function_calls])
+
+        return(args)
+
+    def isentropicPolyatomicGasApprox(args,a,b):
+        '''
+        weighted-residual method projection of generic non-linear term onto
+        4th order polynomial using collocation method
+
+        collocation points are chosen for convenience as a, b, and (a+b)/2
+        '''
+        M1 = args.M1
+        AR = args.AR
+        k = args.k
+        G = (k - 1)/2
+
+        f1 = 1 + G*M1*M1
+
+        A = G*a*a
+        B = G*b*b
+
+        # polynomial approximation for isentropic flow for arbitrary cp/cv
+        # this uses a coordinate transform: y= G*M**2
+        # this allows leveraging of properties of logarithms
+
+        C = (k-1)/(k+1)*np.log(G) - np.log(f1) -2*(k-1)/(k+1)*np.log(AR/M1)
+
+        c4 = 2*(A**2*np.log(B + 1) + A*B*np.log(A + 1) + A*B*np.log(B + 1) \
+                - 4*A*B*np.log(A/2 + B/2 + 1) + B**2*np.log(A + 1))\
+                /(A*B*(A**3 - A**2*B - A*B**2 + B**3))
+
+        c3 = (-3*A**2*np.log(B + 1) - A*B*np.log(A + 1) - A*B*np.log(B + 1) \
+                + 8*A*B*np.log(A/2 + B/2 + 1) - 3*B**2*np.log(A + 1)) \
+                /(A*B*(A**2 - 2*A*B + B**2))
+
+        c2 = (A*B*(A**3 - A**2*B - A*B**2 + B**3)*(-A*B*k*np.log(A) \
+                + A*B*k*np.log(B) + A*B*np.log(A) - A*B*np.log(B) + A*k*np.log(A) \
+                - A*np.log(A) - B*k*np.log(B) + B*np.log(B)) + (A**4*np.log(B + 1) \
+                + 2*A**3*B*np.log(B + 1) + A**2*B**2*np.log(A + 1) \
+                + A**2*B**2*np.log(B + 1) - 8*A**2*B**2*np.log(A/2 + B/2 + 1) \
+                + 2*A*B**3*np.log(A + 1) + B**4*np.log(A + 1))*(A**2*B*k + A**2*B \
+                - A**2*k - A**2 - A*B**2*k - A*B**2 + A*k + A + B**2*k + B**2 \
+                - B*k - B))\
+                /(A*B*(A**3 - A**2*B - A*B**2 + B**3)*(A**2*B*k \
+                + A**2*B - A**2*k - A**2 - A*B**2*k - A*B**2 + A*k + A + B**2*k \
+                + B**2 - B*k - B))
+
+        c1 = (-A**2*B*k*np.log(B) + A**2*B*np.log(B) + A*B**2*k*np.log(A) \
+                - A*B**2*np.log(A) - A*k*np.log(A) + A*np.log(A) + B*k*np.log(B) \
+                - B*np.log(B))/(A**2*B*k + A**2*B - A**2*k - A**2 - A*B**2*k \
+                - A*B**2 + A*k + A + B**2*k + B**2 - B*k - B) + C
+
+        c0 = A*B*(A*k*np.log(B) - A*np.log(B) - B*k*np.log(A) + B*np.log(A) \
+                + k*np.log(A) - k*np.log(B) - np.log(A) + np.log(B))\
+                /(A**2*B*k + A**2*B - A**2*k - A**2 - A*B**2*k - A*B**2 \
+                + A*k + A + B**2*k + B**2 - B*k - B)
+
+        # get roots in transformed coordinates then transform roots back to M2
+        # M2 = sqrt(y/G)
+        roots = np.sqrt(solveMonicQuartic(c3/c4,c2/c4,c1/c4,c0/c4)/G)
+
+        return(rejectNonphysicalRoots(roots))
+
+    def isentropicApprox(args,a,b,switch=False):
+        M1 = args.M1
+        AR = args.AR
+        k = args.k
+        G = (k - 1)/2
+        AoAs = 1/M1 * ((1+G)/(1+G*M1*M1))**(-(k+1)/(2*(k-1)))
+
+        AR = np.float64(switch) * AR*AoAs + np.float64(not switch)*AR
+        M1 = np.float64(switch) + np.float64(not switch) * M1
+
+        f1 = 1 + G*M1*M1
+
+        a0 = a**5/252 + 25*a**4*b/252 + 25*a**3*b**2/63 + 25*a**2*b**3/63 + 25*a*b**4/252 + b**5/252
+        a1 = -5*a**4/42 - 25*a**3*b/21 - 50*a**2*b**2/21 - 25*a*b**3/21 - 5*b**4/42
+        a2 = 5*a**3/6 + 25*a**2*b/6 + 25*a*b**2/6 + 5*b**3/6
+        a3 = -20*a**2/9 - 50*a*b/9 - 20*b**2/9
+        a4 = 5*a/2 + 5*b/2
+
+        c5 = G/3*AR**3*(5*k-11)
+        c4 = -3*G*(k+1)*M1*AR**2/c5 + a4
+        c3 = AR/3*(AR**2*((11*k - 5)*f1 + 5*k - 11) - 9*G*M1**2*(k+1))/c5 + a3
+        c2 = M1/3*(9*(k+1)*AR**2*(f1-1) + G*M1**2*(5-11*k))/c5 + a2
+        c1 = (3*(k+1)*AR*M1**2*(f1-1))/c5 + a1
+        c0 = 1/3*M1**3*(f1*(11-5*k) + (5-11*k))/c5 + a0
+
+        roots = solveMonicQuartic(c3/c4,c2/c4,c1/c4,c0/c4)
+
+        return(rejectNonphysicalRoots(roots))
+
+    def rejectNonphysicalRoots(roots,keepNans=False):
+
+        # set any roots with negative real part to nan
+        roots[np.real(roots)<0] = np.nan
+
+        # set any roots with non-zero imaginary part to nan 
+        roots[~np.isclose(np.imag(roots),0,atol=1e-6)] = np.nan
+
+
+        # sort values from lowest to highest
+        roots.sort()
+
+        # remove any nans from roots, cast as real, and return
+        if( keepNans):
+            return(np.real(roots))
+        else:
+            return(np.real(roots[~np.isnan(roots)]))
+
+    def solveCubic(c3,c2,c1,c0):
+        c3 = np.complex128(c3)
+        c2 = np.complex128(c2)
+        c1 = np.complex128(c1)
+        c0 = np.complex128(c0)
+
+        # transform to depressed cubic
+        P = (3*c3*c1 - c2**2)/(3*c3**2)
+        Q = (2*c2**3 - 9*c3*c2*c1 + 27*c3**2*c0)/(27*c3**3)
+
+        discriminant = -4*P**3 - 27*Q**2
+
+        # depressed cubic roots
+        R1 = P/(27*Q/2 + np.sqrt(108*P**3 + 729*Q**2)/2)**(1/3) - (27*Q/2 + np.sqrt(108*P**3 + 729*Q**2)/2)**(1/3)/3
+        R2 = P/((-1/2 - np.sqrt(3)*1j/2)*(27*Q/2 + np.sqrt(108*P**3 + 729*Q**2)/2)**(1/3)) \
+                -(-1/2 - np.sqrt(3)*1j/2)*(27*Q/2 + np.sqrt(108*P**3 + 729*Q**2)/2)**(1/3)/3
+        R3 = R3 = P/((-1/2 + np.sqrt(3)*1j/2)*(27*Q/2 + np.sqrt(108*P**3 + 729*Q**2)/2)**(1/3)) \
+                - (-1/2 + np.sqrt(3)*1j/2)*(27*Q/2 + np.sqrt(108*P**3 + 729*Q**2)/2)**(1/3)/3
+
+        S = c2/(3*c3)
+
+        r1 = R1 - S
+        r2 = R2 - S
+        r3 = R3 - S
+
+        return(np.array([r1,r2,r3]))
+
+    def solveMonicDepressedQuartic(c2,c1,c0):
+        '''
+        takes monic monic depressed quartic: x**4 + c2*x**2 + c1*x + c0
+        and calculates roots using c2, c1, and c0
+        '''
+        c2 = np.complex128(c2)
+        c1 = np.complex128(c1)
+        c0 = np.complex128(c0)
+
+        cubicRoots = solveCubic(1,2*c2,(c2**2-4*c0),-c1*c1)
+
+        u = np.sqrt(cubicRoots[0])
+
+        t = (u**3 + c2*u + c1)/(2*u)
+        v = t - c1/u
+
+        s = -u
+
+        r1 = -(u/2) + np.sqrt((u/2)**2-v)
+        r2 = -(u/2) - np.sqrt((u/2)**2-v)
+
+        r3 = -(s/2) + np.sqrt((s/2)**2-t)
+        r4 = -(s/2) - np.sqrt((s/2)**2-t)
+
+        return(np.array([r1,r2,r3,r4]))
+
+    def isentropicDiatomicGasApprox(args,a,b):
+        M1 = args.M1
+        k = np.float64(7/5)
+        AR = args.AR
+
+        G = (k-1)/2
+        f1 = 1 + G*M1*M1
+
+        # minimize L2norm between x**6 and sum(an*x**n,(n,0,4)) over domain (a,b)
+        a0 = 5*a**6/462 + 125*a**5*b/462 + 575*a**4*b**2/462 + 150*a**3*b**3/77 \
+                + 575*a**2*b**4/462 + 125*a*b**5/462 + 5*b**6/462
+        a1 = -24*a**5/77 - 250*a**4*b/77 - 650*a**3*b**2/77 - 650*a**2*b**3/77 \
+                - 250*a*b**4/77 - 24*b**5/77
+        a2 = 45*a**4/22 + 125*a**3*b/11 + 200*a**2*b**2/11 + 125*a*b**3/11 \
+                + 45*b**4/22
+        a3 = -160*a**3/33 - 500*a**2*b/33 - 500*a*b**2/33 - 160*b**3/33
+        a4 = 45*a**2/11 + 75*a*b/11 + 45*b**2/11
+
+        # normalize coefficients to form monic quartic polynomial
+        c3 = a3                         /(3/G + a4)
+        c2 = (3/(G*G)+ a2)               /(3/G + a4)
+        c1 = -(AR/M1/G**3 * f1**3 - a1) /(3/G + a4)
+        c0 = (1/G**3 + a0)              /(3/G + a4)
+
+        roots = solveMonicQuartic(c3,c2,c1,c0)
+
+        return(rejectNonphysicalRoots(roots))
+
+    def isentropicTriatomicGasApprox(args,a,b):
+
+        M1 = args.M1
+        k = np.float64(9/7)
+        AR = args.AR
+
+        G = (k-1)/2
+        f1 = 1 + G*M1**2
+
+        # minimize L2norm between x**8/2401 + 4*x**6/343 and sum(an*x**n,(n,0,4)) over domain (a,b)
+        a0 = 5*a**8/441441 + 125*a**7*b/441441 + 4625*a**6*b**2/3090087 + 10*a**6/79233 \
+                + 10375*a**5*b**3/3090087 + 250*a**5*b/79233 + 13225*a**4*b**4/3090087 \
+                + 1150*a**4*b**2/79233 + 10375*a**3*b**5/3090087 + 600*a**3*b**3/26411 \
+                + 4625*a**2*b**6/3090087 + 1150*a**2*b**4/79233 + 125*a*b**7/441441 \
+                + 250*a*b**5/79233 + 5*b**8/441441 + 10*b**6/79233
+
+        a1 = -320*a**7/1030029 - 500*a**6*b/147147 - 11500*a**5*b**2/1030029 \
+                - 96*a**5/26411 - 19000*a**4*b**3/1030029 - 1000*a**4*b/26411 \
+                - 19000*a**3*b**4/1030029 - 2600*a**3*b**2/26411 \
+                - 11500*a**2*b**5/1030029 - 2600*a**2*b**3/26411 - 500*a*b**6/147147 \
+                - 1000*a*b**4/26411 - 320*b**7/1030029 - 96*b**5/26411
+
+        a2 = 40*a**6/21021 + 250*a**5*b/21021 + 4000*a**4*b**2/147147 + 90*a**4/3773 \
+                + 1700*a**3*b**3/49049 + 500*a**3*b/3773 + 4000*a**2*b**4/147147 \
+                + 800*a**2*b**2/3773 + 250*a*b**5/21021 + 500*a*b**3/3773 \
+                + 40*b**6/21021 + 90*b**4/3773
+
+        a3 = -256*a**5/63063 - 1000*a**4*b/63063 - 11800*a**3*b**2/441441 \
+                - 640*a**3/11319 - 11800*a**2*b**3/441441 - 2000*a**2*b/11319 \
+                - 1000*a*b**4/63063 - 2000*a*b**2/11319 - 256*b**5/63063 \
+                - 640*b**3/11319
+
+        a4 = 20*a**4/7007 + 50*a**3*b/7007 + 450*a**2*b**2/49049 + 180*a**2/3773 \
+                + 50*a*b**3/7007 + 300*a*b/3773 + 20*b**4/7007 + 180*b**2/3773
+
+        # normalize coefficients to form monic quartic polynomial
+        c3 = a3/(6/49+a4)
+        c2 = (a2 + 4/7)/(6/49+a4)
+        c1 = (a1 - AR/M1*f1**4)/(6/49+a4)
+        c0 = (1 + a0)/(6/49+a4)
+
+        roots = solveMonicQuartic(c3,c2,c1,c0)
+
+        return(rejectNonphysicalRoots(roots))
+
+
+    def solveMonicQuartic(c3,c2,c1,c0):
+        '''
+        takes monic quartic: x**4 + c3*x**3 + c2*x**2 + c1*x + c0
+        and calculates roots using c3, c2, c1, and c0
+        '''
+        c3 = np.complex128(c3)
+        c2 = np.complex128(c2)
+        c1 = np.complex128(c1)
+        c0 = np.complex128(c0)
+
+        # transform to monic depressed quartic: y = x + c3/4
+        # and calculate new coefficients: p, q, and r
+        p = (8*c2 - 3*c3**2)/8
+        q = (c3**3 - 4*c3*c2 + 8*c1)/8
+        r = (-3*c3**4 + 256*c0 - 64*c3*c1 + 16*c3*c3*c2)/256
+
+        tmp = solveMonicDepressedQuartic(p,q,r)
+
+        # transform roots back to original monic quartic roots
+        out = tmp - c3/4
+
+        return(out)
+
+    def isentropicMonoatomicGas(args):
+        '''
+        solves isentropic flow for k=5/3 calorically perfect, ideal gas
+        '''
+        M1 = args.M1
+        k  = np.float64(5/3)
+        AR = args.AR
+
+        G = (k-1)/2
+        f1 = 1 + G*M1*M1
+
+        c0 = 1/G**2
+        c1 = -(f1/G)*(f1/G) * AR/M1
+        c2 = 2/G
+
+        roots = solveMonicDepressedQuartic(c2,c1,c0)
+
+        return(rejectNonphysicalRoots(roots))
+
+    def isentropicInfinitatomicGas(args):
+        '''
+        solves isentropic flow for k->1 calorically perfect, ideal gas
+        '''
+        a = 2*np.log(args.AR/args.M1) + args.M1**2
+
+        roots = np.zeros((2,),dtype=np.complex128)
+
+        roots[0] = np.sqrt(-lambertw(-np.exp(-a), 0))
+        roots[1] = np.sqrt(-lambertw(-np.exp(-a),-1))
+
+        return(rejectNonphysicalRoots(roots))
+
+    def printOutput(args):
+        '''
+        take previous calculations and output them to screen for user
+        '''
+
+        # if not isentropic then make these values an array with 2 elements of the same value
+        # this is done for later printing
+        # does not affect the values if they are already an array with 2 elements
+        args.Lambda = args.Lambda * np.ones((2,),dtype=np.float64)
+        args.b = args.b * np.ones((2,),dtype=np.float64)
+        args.c = args.c * np.ones((2,),dtype=np.float64)
+        args.discriminant = args.discriminant * np.ones((2,),dtype=np.float64)
+
+        print("{0:20s} {1: >13s} {2: >13s}".format('Outputs','Root 1','Root 2'))
+        print("-"*48)
+        if( args.isentropic ):
+            print("{0:20s} {1: .6e} {2: .6e}".format("xi (ds=0)",args.xi[0],args.xi[1]))
+
+        print("{0:20s} {1: .6e} {2: .6e}".format("M2",args.M2[0],args.M2[1]))
+        print("{0:20s} {1: .6e} {2: .6e}".format("M2/M1",args.M2[0]/args.M1,args.M2[1]/args.M1))
+        print("{0:20s} {1: .6e} {2: .6e}".format("ds/R",args.dsR[0],args.dsR[1]))
+        print("{0:20s} {1: .6e} {2: .6e}".format("(ds/R)/(k/2*M1**2)",args.dsRKE[0],args.dsRKE[1]))
+        print("{0:20s} {1: .6e} {2: .6e}".format("(Po1-Po2)/(Po1-P1)",args.wloss[0],args.wloss[1]))
+        print("{0:20s} {1: .6e} {2: .6e}".format("Po2/Po1",args.PR[0],args.PR[1]))
+        print("{0:20s} {1: .6e} {2: .6e}".format("P2/P1",args.P2P1[0],args.P2P1[1]))
+        print("{0:20s} {1: .6e} {2: .6e}".format("(P2-P1)/(Po1-P1)",args.CP[0],args.CP[1]))
+        print("{0:20s} {1: .6e} {2: .6e}".format("To2/To1",args.TR[0],args.TR[1]))
+        print("{0:20s} {1: .6e} {2: .6e}".format("T2/T1",args.T2T1[0],args.T2T1[1]))
+
+        if( args.debug ):
+            print("\n\n",end='')
+            print("{0:20s} {1: >13s} {2: >13s}".format('Debug','Root 1','Root 2'))
+            print("-"*48)
+            if( args.isentropic):
+                print("{0:20s} {1: 13d} {2: 13d}".format("iter",args.iter[0],args.iter[1]))
+                print("{0:20s} {1: 13d} {2: 13d}".format("nfev",args.nfev[0],args.nfev[1]))
+                print("{0:20s} {1: .6e} {2: .6e}".format("M2 (apprx)",args.initialM2[0],args.initialM2[1]))
+                print("{0:20s} {1: .6e} {2: .6e}".format("M2 (k->1 )",args.infinatomicM2[0],args.infinatomicM2[1]))
+                print("{0:20s} {1: .6e} {2: .6e}".format("M2 (k~7/5)",args.diatomicM2[0],args.diatomicM2[1]))
+                print("{0:20s} {1: .6e} {2: .6e}".format("M2 (k=5/3)",args.monatomicM2[0],args.monatomicM2[1]))
+
+            print("{0:20s} {1: .6e} {2: .6e}".format("V2V1",args.V2V1[0],args.V2V1[1]))
+            print("{0:20s} {1: .6e} {2: .6e}".format("v2v1",args.v2v1[0],args.v2v1[1]))
+            print("{0:20s} {1: .6e} {2: .6e}".format("p2p1",args.p2p1[0],args.p2p1[1]))
+            print("{0:20s} {1: .6e} {2: .6e}".format("wpv",args.wpv[0],args.wpv[1]))
+            print("{0:20s} {1: .6e} {2: .6e}".format("dk",args.dk[0],args.dk[1]))
+            print("{0:20s} {1: .6e} {2: .6e}".format("Iq",args.Iq[0],args.Iq[1]))
+            print("{0:20s} {1: .6e} {2: .6e}".format("we",args.we[0],args.we[1]))
+            print("{0:20s} {1: .6e} {2: .6e}".format("wrev",args.wrev[0],args.wrev[1]))
+            print("{0:20s} {1: .6e} {2: .6e}".format("I",args.I[0],args.I[1]))
+            print("{0:20s} {1: .6e} {2: .6e}".format("Theta",args.Theta[0],args.Theta[1]))
+            print("{0:20s} {1: .6e} {2: .6e}".format("I+Theta",args.I[0]+args.Theta[0],args.I[1]+args.Theta[1]))
+            print("{0:20s} {1: .6e} {2: .6e}".format("dsR/(k/2*M2**2)",args.dsRKE2[0],args.dsRKE2[1]))
+            print("{0:20s} {1: .6e} {2: .6e}".format("(Po1-Po2)/q",args.zloss[0],args.zloss[1]))
+            print("{0:20s} {1: .6e} {2: .6e}".format("(P2-P1)/q",args.CPinc[0],args.CPinc[1]))
+            print("{0:20s} {1: .6e} {2: .6e}".format("P3/P1",args.P3P1[0],args.P3P1[1]))
+            print("{0:20s} {1: .6e} {2: .6e}".format("P3/P2",args.P3P1[0]/args.P2P1[0],args.P3P1[1]/args.P2P1[1]))
+            print("{0:20s} {1: .6e} {2: .6e}".format("P3/Po1",args.P3P1[0]/args.f1,args.P3P1[1]/args.f1))
+            print("{0:20s} {1: .6e} {2: .6e}".format("Lambda",args.Lambda[0],args.Lambda[1]))
+            print("{0:20s} {1: .6e} {2: .6e}".format("b",args.b[0],args.b[1]))
+            print("{0:20s} {1: .6e} {2: .6e}".format("c",args.c[0],args.c[1]))
+            print("{0:20s} {1: .6e} {2: .6e}".format("discriminant",args.discriminant[0],args.discriminant[1]))
+
+        return()
+
+    def subelements(args):
+        '''
+        Break problem into N subelements per user input.
+        Then march through each sub-element. This feeds the output of one element
+        into the input of the next sub-element.
+        '''
+        N = args.N
+        xi = np.linspace(0,1,N+1)
+
+        AR = args.AR
+        localAR = ((np.sqrt(AR)-1)*xi + 1)**2
+        ARn = localAR[1:] / localAR[:-1]
+        args.ARn = ARn
+
+        TRn = 1 + (args.qr/N * np.ones(N)).cumsum()
+        args.TRn = TRn
+
+        qrn = np.zeros_like(TRn)
+        qrn[0] = args.qr/N
+        qrn[1:] = args.qr/N / TRn[:-1]
+        args.qrn = qrn
+
+        # length / inlet diameter i.e., L/D1
+        LD1 = args.Af / (2*(1+np.sqrt(AR)))
+        thetaWall = np.arctan((np.sqrt(AR)-1)/LD1/2)
+        # local wetted surface area / inlet area
+        localAfA1 = 4*LD1 * (0.5*(np.sqrt(AR)-1)*xi**2 + xi)
+        args.Afn = (localAfA1[1:] - localAfA1[:-1]) / localAR[1:] * np.cos(thetaWall)
+
+        argn = copy.deepcopy(args)
+
+        argn.AR = argn.ARn[0]
+        argn.qr = argn.qrn[0]
+        argn.Af = argn.Afn[0]
+        args.M2 = np.zeros(2)
+
+        argn = coefsBiquadratic(argn)
+        argn = solveBiquadratic(argn)
+
+        def march(argn,root=0):
+            tmp = copy.deepcopy(argn)
+
+            for i in range(1,argn.N):#tqdm(range(1,argn.N)):
+                try:
+                    tmp.M1 = np.nanmin(tmp.M2) * np.float64(1-root) + np.nanmax(tmp.M2) * np.float64(root)
+                except:
+                    return(np.nan)
+
+                tmp.AR = tmp.ARn[i]
+                tmp.qr = tmp.qrn[i]
+                tmp.Af = tmp.Afn[i]
+                tmp = coefsBiquadratic(tmp)
+                tmp = solveBiquadratic(tmp)
+
+            try:
+                return(np.nanmin(tmp.M2) * np.float64(1-root) + np.nanmax(tmp.M2) * np.float64(root))
+            except:
+                return(np.nan)
+
+        #print('Solving sub-elements for smaller Mach number branch...')
+        args.M2[0] = march(argn,root=0)
+        #print('',end='\n')
+
+        #print('Solving sub-elements for larger Mach number branch...')
+        args.M2[1] = march(argn,root=1)
+        #print('',end='\n')
+        if( args.M2[1] == args.M2[0] ): args.M2[1] = np.nan
+
+        args.Lambda = np.zeros(2)
+        args.b = np.zeros(2)
+        args.c = np.zeros(2)
+        args.discriminant = np.zeros(2)
+
+        return(args)
+
+
+  </py-script>
 </head>
+
+  <!-- ----------------------Website Structure ----------------------------------------------------------------------->
 <body>
+    <header id="header" class="site-header">
+            <h1 id="site-title" class="site-title">
+            <span class="logo-container">
+            <a href="https://ndtl.nd.edu" ><img class="logo" src="ndtl_logo_v2.svg" alt="NDTL Logo"> </a>
+            <!--<span class="fallback-text">NDTL Propulsion &amp; Power</span> -->
+            </span>
+        </h1>
+        <p id="ndtl" class="mark-header"><a href="https://www.nd.edu/">University of Notre Dame</a></p>
+        <div class="site-title-group">
+        </div>
+
+        <div class="nav-header">
+        </div>
+    </header>
     <div class="title">
         <h3>Steady, quasi-one-dimensional, internal compressible flow with area change, heat addition and friction</h3>
-        <p class="credits">Thesis by Andrew Oliva and Scott Morris <a href="https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/steady-quasionedimensional-internal-compressible-flow-with-area-change-heat-addition-and-friction/941B60C217C6096C6980DFDD4B5F9E34" target="_blank" rel="noopener noreferrer">Here</a></p>
+        <p class="credits">by Andrew A. Oliva and Scott C. Morris <a href="https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/steady-quasionedimensional-internal-compressible-flow-with-area-change-heat-addition-and-friction/941B60C217C6096C6980DFDD4B5F9E34" target="_blank" rel="noopener noreferrer">Here</a></p>
     </div>
+    <div class="abstract-container">
+        <div class="abstract-header">
+            <label class="checkbox-label">
+            <p id="up-arrow" style="display:none;" onclick="toggleAbstract()">Less Information &nbsp;<i class="arrow up"></i></p>
+            <p id="down-arrow" style="margin-top: 5px;" onclick="toggleAbstract()">More Information &nbsp;<i class="arrow down"></i></p>
+            <!-- <input type="checkbox" class="check" id="abstact-toggle" onclick="toggleAbstract()"> View Abstract -->
+            </label>
+        </div>
+        <div id="abstract" style="flex-direction:row; display: none;">
+            <div style="margin-right: 100px; width: 100%;">
+                <h4>Abstract</h4>
+                <div style="overflow: auto; display:flex; flex-direction:column;">
+                    <img src="./images/abstract.png" class = "abstract-image" style="float: left;margin-right: 10px;text-align: justify;">
+                    <p style="text-align: justify;">
+                        A closed-form solution is presented for internal compressible flows with an arbitrary combination of area change, heat addition, friction and non-uniform flow. 
+                        The approach assumes steady flow of a calorically perfect ideal gas using the integral form of the governing equations. It is shown that the equations reduce to a simple, 
+                        bi-quadratic equation in exit Mach number. This solution is compared to previously known solutions for Rayleigh flow, Fanno flow, isentropic flow and normal shock relations. 
+                        Theoretical solutions for sudden expansion, sudden contraction, and supersonic–supersonic two-stream constant area mixing are also presented. These solutions were found to be in 
+                        agreement with data available in the literature.
+                    </p>
+                </div>
+            </div>
+            <div style="overflow: auto; display:flex; flex-direction: column;">
+                <h4>Solution 1 and Solution 2</h4>
+                <div class="label-output-row" style="overflow: auto; display:flex; flex-direction:column;justify-content: left;">
+                    <img src="./images/why-two-solutions.jpg" class = "abstract-image" style="width: 200px; height: 100px;float: left;">
+                   <p> Due to the fact that the equations reduce to a bi-quadratic, there are two solutions. One solution that subtracts the root (Solution 1) and one solution that adds the root (Solution 2). </p>
+                </div>
+            </div>
+        </div>
+    </div>
+  <!-- ----------------------Top Section Input and Output Data -------------------------------------------------------> 
     <div class="content">
-    <div class="input-container">
-        <form class="inputFields">
-            <div class="InputIn">
-                <h4 class="InputHeaders">Inlet Conditions</h4>
-                <div class="label-input-row">
-                <label for="P">P=</label>
-                <input type="text" id="P">
+        <div class="input-container">
+            <form class="inputFields">
+                <div class="Inlet">
+                    <h4 class="InputHeaders">Inlet Conditions (Surface 1)</h4>
+                    <p style="color:gray; font-size:8px;">*Hover for more details</p>
+                    <!-- P1 Input -->
+                    <div class="label-output-row" title="Inlet Stagnation Pressure">
+                        <label for="Po1">P<sub>o<sub>1</sub></sub>=</label>
+                        <input type="text" id="Po1">
+                        <select id="pressure-unit">
+                            <option value="pascals">Pa</option>
+                            <option value="kpascals">kPa</option>
+                            <option value="psi">Psi</option>
+                            <option value="psf">Psf</option>
+                        </select>
+                    </div>
+
+                    <!-- T1 Input -->
+                    <div class="label-output-row" title="Inlet Stagnation Temperature">
+                        <label for="To1">T<sub>o<sub>1</sub></sub>=</label>
+                        <input type="text" id="To1">
+                        <select id="input-temp-unit">
+                            <option value="kelvin">K</option>
+                            <option value="celsius">C&deg;</option>
+                            <option value="rankine">R&deg;</option>
+                            <option value="farenheit">F&deg;</option>
+                        </select>
+                    </div>
+
+                    <!-- M1 Input -->
+                    <div class="label-output-row" title="Inlet Mach Number">
+                        <label for="M1">M<sub>1</sub>=</label>
+                        <input type="text" id="M1">
+                        <select>
+                            <option>-</option>
+                        </select>
+                    </div>
+
+                    <!-- A1 Input -->
+                    <div class="label-output-row" title="Inlet Area">
+                        <label for="A1">A<sub>1</sub>=</label>
+                        <input type="text" id="A1" oninput="imageGUI()">
+                        <select id="inlet-area-unit" onchange="imageGUI()">
+                            <option value="meters">m&sup2;</option>
+                            <option value="centimeters">cm&sup2;</option>
+                            <option value="feet">ft&sup2;</option>
+                            <option value="inches">in&sup2;</option>
+                        </select>
+                    </div>
+
+                    <!-- Alpha1 Input -->
+                    <div class="label-output-row" title="Inlet mass flux correction factor">
+                        <label for="alpha1">&alpha;<sub>1</sub>=</label>
+                        <input type="text" id="alpha1">
+                        <select>
+                            <option>-</option>
+                        </select>
+                    </div>
+
+                    <!-- Beta1 Input -->
+                    <div class="label-output-row" title="Inlet momentum flux correction factor">
+                        <label for="beta1">&beta;<sub>1</sub>=</label>
+                        <input type="text" id="beta1">
+                        <select>
+                            <option>-</option>
+                        </select>
+                    </div>
+
+                    <!-- Isentropic Input -->
+                    <div class="label-output-row" title="Force entropy change to zero">
+                        <label for="isentropic">Isentropic</label>
+                        <select id="isentropic">
+                            <option>False</option>
+                            <option>True</option>
+                        </select>
+                    </div>
+
+                    <!-- Example Flows -->
+                    <div class="exampleFlows">
+                        <h4>Flow Templates</h4>
+                        <select class="selectFlow" onchange="exampleFlow()">
+                            <option>Default</option>
+                            <option>Isentropic flow with area change</option>
+                            <option>Flow across a normal shock</option>
+                            <option>Fanno flow</option>
+                            <option>Rayleigh flow</option>
+                            <option>Sudden expansion</option>
+                            <option>Sudden Contraction</option>
+                            <option>Two-stream mixing layer</option>
+                            <option>Ferrari 1 (Simultaneous friction and heat transfer)</option>
+                            <option>Ferrari 2 (Simultaneous area change and friction)</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="label-input-row">
-                <label for="T">T=</label>
-                <input type="text" id="T">
+                <div class="gui-parameters">
+                <!-------------------------------- INLET TO OUTLET IMAGE ------------------------------------>
+                    <canvas id="gui" style="display:None;"></canvas>
+                    <img id = "flow-image" src = "./images/default.jpg">
+                    <h4 class="InputHeaders">Parameters (including Surface 3)</h4>
+
+
+                    <!------------------------PARAMETERS ----------------------------------------------------->
+                    <div class="label-output-row" title="Ratio of Specific Heats">
+                        <label for="gamma">&gamma;=</label>
+                        <input type="text" id="gamma">
+                        <select>
+                            <option>-</option>
+                        </select>
+                    </div>
+
+                    <div class="label-output-row" title="Ratio of Specific Heats">
+                        <label for="R">R=</label>
+                        <input type="text" id="R">
+                        <select>
+                            <option>-</option>
+                        </select>
+                    </div>
+
+                    <div class="label-output-row" title="Drag Coefficient">
+                        <label for="cd">c<sub>d</sub>=</label>
+                        <input type="text" id="cd">
+                        <select>
+                            <option>-</option>
+                        </select>
+                    </div>
+
+                    <div class="label-output-row" title="Friction Coefficient">
+                        <label for="cf">c<sub>f</sub>=</label>
+                        <input type="text" id="cf">
+                        <select>
+                            <option>-</option>
+                        </select>
+                    </div>
+
+                    <div class="label-output-row" title="Heat transfer normalized by Inlet Stagnation Enthalpy (q/ho)">
+                        <label for="qr">q<sub>r</sub>=</label>
+                        <input type="text" id="qr">
+                        <select>
+                            <option>-</option>
+                        </select>
+                    </div>
+
+                    <div class="label-output-row" title="Wall-pressure weighting for exit-static-to-inlet-static pressure ratio (e.g., if xi = 0 and nu = 0 then P3 = P1, if xi = 1 and nu = 0 then P3 = P2, and if xi = 0 and nu = 1 then P3 = Po1)">
+                        <label for="xi">&xi;=</label>
+                        <input type="text" id="xi">
+                        <select>
+                            <option>-</option>
+                        </select>
+                    </div>
+
+                    <div class="label-output-row" title="Wall-pressure weighting for inlet-stagnation-to-inlet-static pressure ratio (e.g., if xi = 0 and nu = 0 then P3 = P1, if xi = 1 and nu = 0 then P3 = P2, and if xi = 0 and nu = 1 then P3 = Po1)">
+                        <label for="nu">&nu;=</label>
+                        <input type="text" id="nu">
+                        <select>
+                            <option>-</option>
+                        </select>
+                    </div>
+
+                    <div class="label-output-row" title="Friction Area">
+                        <label for="Af">A<sub>f</sub>=</label>
+                        <input type="text" id="Af">
+                        <select id="friction-area-unit">
+                            <option value="meters">m&sup2;</option>
+                            <option value="centimeters">cm&sup2;</option>
+                            <option value="feet">ft&sup2;</option>
+                            <option value="inches">in&sup2;</option>
+                        </select>
+                    </div>
+
+                    <div class="label-output-row" title="Drag Area">
+                        <label for="Ad">A<sub>d</sub>=</label>
+                        <input type="text" id="Ad">
+                        <select id="drag-area-unit">
+                            <option value="meters">m&sup2;</option>
+                            <option value="centimeters">cm&sup2;</option>
+                            <option value="feet">ft&sup2;</option>
+                            <option value="inches">in&sup2;</option>
+                        </select>
+                    </div>
+
+                    <div class="label-output-row" title="Number of Subelements">
+                        <label for="subelements">N=</label>
+                        <input type="text" id="subelements">
+                        <select>
+                            <option>-</option>
+                        </select>
+                    </div>
+                </div>
+                <!--------------------------------------OUTLET CONDITIONS ------------------------------------------------->
+                <div class="Outlet">
+                    <h4 class="InputHeaders">Outlet Conditions (Surface 2)</h4>
+
+                    <div class="label-output-row" title="Outlet Area">
+                        <label for="A2">A<sub>2</sub>=</label>
+                        <input type="text" id="A2" oninput="imageGUI()">
+                        <select id="outlet-area-unit" onchange="imageGUI()">
+                            <option value="meters">m&sup2;</option>
+                            <option value="centimeters">cm&sup2;</option>
+                            <option value="feet">ft&sup2;</option>
+                            <option value="inches">in&sup2;</option>
+                        </select>
+                    </div>
+
+                    <div class="label-output-row" title="Outlet mass flux correction factor">
+                        <label for="alpha2">&alpha;<sub>2</sub>=</label>
+                        <input type="text" id="alpha2">
+                        <select>
+                            <option>-</option>
+                        </select>
+                    </div>
+
+                    <div class="label-output-row" title="Outlet momentum flux correction factor">
+                        <label for="beta2">&beta;<sub>2</sub>=</label>
+                        <input type="text" id="beta2">
+                        <select>
+                            <option>-</option>
+                        </select>
+                    </div>
+                    <!--------------------------------- SUBMISSION BUTTON ---------------------------------------------------->
+                    <button id="calculate" onclick="calculateFlow(event)">Calculate</button>
+                
+                </div>
+            </form>
+            <p class="error" id="input-error"></p>
+        </div>
+        <!--------------------------------------------------OUTPUT INFORMATION ----------------------------------------------->
+        <div class="output-container">
+            <div class="traditional-output">
+                <div class="label-output-row" style="margin-bottom:0px;">
+                    <h4 style="margin-bottom:0px;">Resulting solutions</h4>
+                </div>
+                <!----------------------------------- NON-DIMENSIONAL OUTPUTS FOR NON-ADDITIONAL DATA ---------------------------------------------->
+               <!-- <div style="display:flex; flex-direction:row; ">
+                    <p style="color:gray; font-size:10px; margin-right: 30px;">*Hover for more details</p>
+                    <p style="color:gray; font-size:10px;margin-right: 5px;">Solution 1</p>
+                    <p style="color:gray; font-size:10px;margin-left: 5px;">Solution 2</p>
+                </div> -->
+                    <div class="label-output-row" title="Change in entropy normalized by the gas constant">
+                        <label style="font-size: 8px; color: gray;">*Hover for more details</label>
+                        <input type="text" value= "Solution 1" style="font-size: 8px; border: none; width: 50px;" readonly>
+                        <input type="text" value = "Solution 2" style="font-size: 8px; border: none; width: 50px; margin-right: 70px;" readonly>
+                    </div>
+                    <!-- Output for M2 -->
+                    <div class="label-output-row" title="Mach number at the exit" style="margin-top:0px;">
+                        <label for="M2">M<sub>2</sub>=</label>
+                        <input type="text" id="M2" readonly>
+                        <input type="text" id="M2Second" readonly>
+                        <select><option>-</option></select>
+                    </div>
+                <div class="traditional-output" id="non-dimensional">
+
+                    <!-- Output for P2P1 -->
+                    <div class="label-output-row" title="Pressure ratio">
+                        <label for="P2P1">P<sub>2</sub>/P<sub>1</sub>=</label>
+                        <input type="text" id="P2P1" readonly>
+                        <input type="text" id="P2P1Second" readonly>
+                        <select><option>-</option></select>
+                    </div>
+
+                    <!-- Output for T2T1 -->
+                    <div class="label-output-row" title="Temperature ratio">
+                        <label for="T2T1">T<sub>2</sub>/T<sub>1</sub>=</label>
+                        <input type="text" id="T2T1" readonly>
+                        <input type="text" id="T2T1Second" readonly>
+                        <select><option>-</option></select>
+                    </div>
+
+                    <!-- Output for TR -->
+                    <div class="label-output-row" title="Stagnation temperature ratio">
+                        <label for="TR">T<sub>o<sub>2</sub></sub>/T<sub>o<sub>1</sub></sub>=</label>
+                        <input type="text" id="TR" readonly>
+                        <input type="text" id="TRSecond" readonly>
+                        <select><option>-</option></select>
+                    </div>
+
+                    <!-- Output for PR -->
+                    <div class="label-output-row" title="Stagnation pressure ratio">
+                        <label for="PR">P<sub>o<sub>2</sub></sub>/P<sub>o<sub>1</sub></sub>=</label>
+                        <input type="text" id="PR" readonly>
+                        <input type="text" id="PRSecond" readonly>
+                        <select><option>-</option></select>
+                    </div>
+
+                    <!-- Output for deltaSR -->
+                    <div class="label-output-row" title="Change in entropy normalized by the gas constant">
+                        <label for="deltaSR">&Delta;s/R=</label>
+                        <input type="text" id="deltaSR" readonly>
+                        <input type="text" id="deltaSRSecond" readonyly>
+                        <select><option>-</option></select>
+                    </div>
+
+                    <!-- Output for M2M1 -->
+                    <div class="label-output-row" title="Ratio of exit Mach number to inlet Mach number">
+                        <label for="M2M1">M<sub>2</sub>/M<sub>1</sub>=</label>
+                        <input type="text" id="M2M1" readonly>
+                        <input type="text" id="M2M1Second" readonly>
+                        <select><option>-</option></select>
+                    </div>
+
+                    <!-- Output for dsRKE -->
+                    <div class="label-output-row" title="Entropy change normalized by outlet kinetic energy">
+                        <label for="dsRKE">(ds/R)/(k/2*M<sub>1</sub><sup>2</sup>)=</label>
+                        <input type="text" id="dsRKE" readonly>
+                        <input type="text" id="dsRKESecond" readonly>
+                        <select><option>-</option></select>
+                    </div>
+
+                    <!-- Output for wloss -->
+                    <div class="label-output-row" title="Ratio of stagnation pressure loss to total pressure change">
+                        <label for="wloss">(P<sub>o<sub>1</sub></sub>-P<sub>o<sub>2</sub></sub>)/(P<sub>o<sub>1</sub></sub>-P<sub>1</sub>)=</label>
+                        <input type="text" id="wloss" readonly>
+                        <input type="text" id="wlossSecond" readonly>
+                        <select><option>-</option></select>
+                    </div>
+
+                    <!-- Output for cp -->
+                    <div class="label-output-row" title="Pressure recovery coefficient">
+                        <label for="cp">(P<sub>2</sub>-P<sub>1</sub>)/(P<sub>o<sub>1</sub></sub>-P<sub>1</sub>)=</label>
+                        <input type="text" id="cp" readonly>
+                        <input type="text" id="cpSecond" readonly>
+                        <select><option>-</option></select>
+                    </div>
                 </div>
 
-                <div class="label-input-row">
-                <label for="M1">M<sub>1</sub>=</label>
-                <input type="text" id="M1">
-                </div>
+                <!----------------------------------- DIMENSIONAL OUTPUTS FOR NON-ADDITIONAL DATA ---------------------------------------------->
+                <div class="traditional-output" id="dimensional" style="display:none;">
 
-                <div class="label-input-row">
-                <label for="A1">A<sub>1</sub>=</label>
-                <input type="text" id="A1" oninput="imageGUI()">
-                </div>
+                    <div class="label-output-row" title="Pressure at outlet">
+                        <label for="P2">P<sub>2</sub>=</label>
+                        <input type="text" id="P2" readonly>
+                        <input type="text" id="P2Second" readonly>
+                        <select id="static-pressure2-unit" onchange="userChangedOutputUnit()">     
+                            <option value="pascals">Pa</option>
+                            <option value="kpascals">kPa</option>
+                            <option value="psi">Psi</option>
+                            <option value="psf">Psf</option>
+                        </select>
+                    </div>
 
-                <div class="label-input-row">
-                <label for="gamma">&gamma;=</label>
-                <input type="text" id="gamma">
-                </div>
+                    <!-- Output for T2T1 -->
+                    <div class="label-output-row" title="Temperature at outlet">
+                        <label for="T2">T<sub>2</sub>=</label>
+                        <input type="text" id="T2" readonly>
+                        <input type="text" id="T2Second" readonly>
+                        <select id="static-temp2-unit" onchange="userChangedOutputUnit()">
+                            <option value="kelvin">K</option>
+                            <option value="celsius">C&deg;</option>
+                            <option value="rankine">R&deg;</option>
+                            <option value="fahrenheit">F&deg;</option>
+                        </select>
+                    </div>
 
-                <div class="label-input-row">
-                <label for="alpha1">&alpha;<sub>1</sub>=</label>
-                <input type="text" id="alpha1">
-                </div>
+                    <!-- Output for TR -->
+                    <div class="label-output-row" title="Stagnation temperature at outlet">
+                        <label for="To2">T<sub>o<sub>2</sub></sub>=</label>
+                        <input type="text" id="To2" readonly>
+                        <input type="text" id="To2Second" readonly>
+                        <select id="stagnation-temp2-unit" onchange="userChangedOutputUnit()">
+                            <option value="kelvin">K</option>
+                            <option value="celsius">C&deg;</option>
+                            <option value="rankine">R&deg;</option>
+                            <option value="fahrenheit">F&deg;</option>
+                        </select>
+                    </div>
 
-                <div class="label-input-row">
-                <label for="beta1">&beta;<sub>1</sub>=</label>
-                <input type="text" id="beta1">
+                    <!-- Output for PR -->
+                    <div class="label-output-row" title="Stagnation pressure at outlet">
+                        <label for="Po2">P<sub>o<sub>2</sub></sub>=</label>
+                        <input type="text" id="Po2" readonly>
+                        <input type="text" id="Po2Second" readonly>
+                        <select id="stagnation-pressure2-unit" onchange="userChangedOutputUnit()">
+                            <option value="pascals">Pa</option>
+                            <option value="kpascals">kPa</option>
+                            <option value="psi">Psi</option>
+                            <option value="psf">Psf</option>
+                        </select>
+                    </div>
+
+                    <!-- Output for deltaSR -->
+                    <div class="label-output-row" title="Change in entropy">
+                        <label for="deltaS">&Delta;s=</label>
+                        <input type="text" id="deltaS" readonly>
+                        <input type="text" id="deltaSSecond" readonly>
+                        <select id = "entropy-unit" onchange="userChangedOutputUnit()">
+                        <option>J/(kg * K)</option>
+                        </select>
+                    </div>
+
+                    <!-- Output for P1 -->
+                    <div class="label-output-row" title="Static Pressure at Inlet">
+                        <label for="P1">P<sub>1</sub>=</label>
+                        <input type="text" id="P1" readonly>
+                        <select id="static-pressure1-unit" onchange="userChangedOutputUnit()">
+                            <option value="pascals">Pa</option>
+                            <option value="kpascals">kPa</option>
+                            <option value="psi">Psi</option>
+                            <option value="psf">Psf</option>
+                        </select>
+                    </div>
+
+                    <!-- Output for T1 -->
+                    <div class="label-output-row" title="Static Temperature at Inlet">
+                        <label for="T1">T<sub>1</sub>=</label>
+                        <input type="text" id="T1" readonly>
+                        <select id="static-temp1-unit" onchange=userChangedOutputUnit()">
+                            <option value="kelvin">K</option>
+                            <option value="celsius">C&deg;</option>
+                            <option value="rankine">R&deg;</option>
+                            <option value="fahrenheit">F&deg;</option>
+                        </select>
+                    </div>
+
+                    <!-- Output for V1 -->
+                    <div class="label-output-row" title="Inlet Velocity">
+                        <label for="V1">V1=</label>
+                        <input type="text" id="V1" readonly>
+                        <select id = "velocity1-unit" onchange="userChangedOutputUnit()">
+                            <option>m/s</option>
+                            <option>m/ms</option>
+                            <option>ft/s</option>
+                        </select>
+                    </div>
+
                 </div>
             </div>
-            <div class="Gui">
-              <canvas id="myChart"></canvas>
-          </div>
-            <div class="InputOut">
-                <h4 class="InputHeaders">Outlet Conditions</h4>
-                <div class="label-input-row">
-                <label for="w">w=</label>
-                <input type="text" id="w">
+            <div id="additional-data">
+                <div class="label-output-row" style="margin-bottom:0px;">
+                    <h4 class = "additional-1" style="margin-bottom:0px;">Additional Data</h4>
+                    <!-----------------------------------CAN CLICK ADDITIONAL OR DIMENSIONAL --------------------------------->
+                        <label class="checkbox-label">
+                          <!--  <input type="checkbox" class= "check" id="additional" onclick="toggleData()"checked> Additional -->
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="check" id="dimension" onclick="toggleDimension()"> Dimensional
+                        </label>
+                </div>
+                <div class="label-output-row" style="margin-top: 0px;">
+                        <label style="font-size: 8px; color: gray; margin-top: 0px;"></label>
+                        <input type="text" value= "" style="font-size: 8px; border: none; width: 50px;" readonly>
+                        <input type="text" value = "" style="font-size: 8px; border: none; width: 50px; margin-right: 70px;" readonly>
+                </div>
+                <!----------------------------------- NON-DIMENSIONAL OUTPUTS FOR ADDITIONAL DATA ---------------------------------------------->
+                <div class="additional-1" id = "non-dimensional-additional">
+                    <div class="label-output-row" title="Outlet-to-Inlet Velocity Ratio rate">
+                        <label for="V2V1">V<sub>2</sub>/V<sub>1</sub>=</label>
+                        <input type="text" id="V2V1" readonly>
+                        <input type="text" id="V2V1Second" readonly>
+                        <select><option>-</option></select>
+                    </div>
+
+                    <div class="label-output-row" title="Outlet-to-Inlet Specific Volume Ratio">
+                        <label for="v2v1">v<sub>2</sub>/v<sub>1</sub>=</label>
+                        <input type="text" id="v2v1" readonly>
+                        <input type="text" id="v2v1Second" readonly>
+                        <select><option>-</option></select>
+                    </div>
+
+                    <div class="label-output-row" title="Outlet-to-Inlet Static Density Ratio">
+                        <label for="p2p1">p<sub>2</sub>/p<sub>1</sub>=</label>
+                        <input type="text" id="p2p1" readonly>
+                        <input type="text" id="p2p1Second" readonly>
+                        <select><option>-</option></select>
+                    </div>
+
+                    <div class="label-output-row" title="Entropy change Normalized by Outlet Kinetic Energy">
+                        <label for="dsRKE2">dsR/(k/2*M<sub>2</sub><sup>2</sup>)=</label>
+                        <input type="text" id="dsRKE2" readonly>
+                        <input type="text" id="dsRKE2Second" readonly>
+                        <select><option>-</option></select>
+                    </div>
+
+                    <div class="label-output-row" title="Ratio of stagnation pressure loss to total energy loss">
+                        <label for="zloss">(P<sub>o<sub>1</sub></sub>-P<sub>o<sub>2</sub></sub>)/q=</label>
+                        <input type="text" id="zloss" readonly>
+                        <input type="text" id="zlossSecond" readonly>
+                        <select><option>-</option></select>
+                    </div>
+
+                    <div class="label-output-row" title="Increment of pressure recovery coefficient">
+                        <label for="CPinc">(P<sub>2</sub>-P<sub>1</sub>)/q=</label>
+                        <input type="text" id="CPinc" readonly>
+                        <input type="text" id="CPincSecond" readonly>
+                        <select><option>-</option></select>
+                    </div>
+
+                    <div class="label-output-row" title="Ratio of the static pressure at point 3 to point 1">
+                        <label for="P3P1">P<sub>3</sub>/P<sub>1</sub>=</label>
+                        <input type="text" id="P3P1" readonly>
+                        <input type="text" id="P3P1Second" readonly>
+                        <select><option>-</option></select>
+                    </div>
+
+                    <div class="label-output-row" title="Ratio of the static pressure at point 3 to point 2">
+                        <label for="P3P2">P<sub>3</sub>/P<sub>2</sub>=</label>
+                        <input type="text" id="P3P2" readonly>
+                        <input type="text" id="P3P2Second" readonly>
+                        <select><option>-</option></select>
+                    </div>
+
+                    <div class="label-output-row" title="Ratio of the static pressure at point 3 to stagnation pressure at point 1">
+                        <label for="P3Po1">P<sub>3</sub>/P<sub>o<sub>1</sub></sub>=</label>
+                        <input type="text" id="P3Po1" reaodnly>
+                        <input type="text" id="P3Po1Second" readonly>
+                        <select><option>-</option></select>
+                    </div>
+
+                    <div class="label-output-row" title="Specific Mass Flow Rate Outlet">
+                        <label for="SFROutlet">&#x1E41;&radic;<span style="text-decoration:overline;">RT</span><sub>o<sub>2</sub></sub>/(P<sub>o<sub>2</sub></sub>A)=</label>
+                        <input type="text" id="SFROutlet" readonly>
+                        <input type="text" id="SFROutletSecond" readonly>
+                        <select id="specific-flow-outlet-unit" onchange="userChangedOutputUnit()">
+                            <option value="kg/sm^2">kg/(s*m&sup2;)</option>
+                        </select>
+                    </div>
+
+                    <div class="label-output-row" title="Specific Mass Flow Rate Inlet">
+                        <label for="SFRInlet">&#x1E41;&radic;<span style="text-decoration:overline;">RT&nbsp;</span><sub>o<sub>1</sub></sub>/(P<sub>o<sub>1</sub></sub>A)=</label>
+                        <input type="text" id="SFRInlet" readonly>
+                        <select id="specific-flow-inlet-unit" onchange="userChangedOutputUnit()">
+                            <option value="kg/sm^2">kg/(s*m&sup2;)</option>
+                        </select>
+                    </div>
+
+                    <div class="label-output-row" title="Lambda">
+                        <label for="Lambda">Lambda=</label>
+                        <input type="text" id="Lambda" readonly>
+                        <select><option>-</option></select>
+                    </div>
+
+                    <div class="label-output-row" title="linear coefficient">
+                        <label for="b">b=</label>
+                        <input type="text" id="b" readonly>
+                        <select><option>-</option></select>
+                    </div>
+
+                    <div class="label-output-row" title="Constant Coefficient">
+                        <label for="c">c=</label>
+                        <input type="text" id="c" readonly>
+                        <select><option>-</option></select>
+                    </div>
+
+                    <div class="label-output-row" title="Quadtratic Polynomial Discriminant">
+                        <label for="det">Discriminant=</label>
+                        <input type="text" id="det" readonly>
+                        <select><option>-</option></select>
+                    </div>
                 </div>
 
-                <div class="label-input-row">
-                <label for="Fx">F<sub>x</sub>=</label>
-                <input type="text" id="Fx">
-                </div>
+                <!----------------------------------- DIMENSIONAL OUTPUTS FOR ADDITIONAL DATA STARTS NOT BEING VISIBLE---------------------------------------------->
+                <div class = "additional-1" id = "dimensional-additional" style="display:none;">
 
-                <div class="label-input-row">
-                <label for="m2">m<sub>2</sub>=</label>
-                <input type="text" id="m2">
-                </div>
+                    <!-- Output for V2 -->
+                    <div class="label-output-row" title="Outlet Velocity">
+                        <label for="V2">V<sub>2</sub>=</label>
+                        <input type="text" id="V2" reaodnly>
+                        <input type="text" id="V2Second" readonly>
+                        <select id = "velocity2-unit" onchange="userChangedOutputUnit()">
+                            <option>m/s</option>
+                            <option>m/ms</option>
+                            <option>ft/s</option>
+                        </select>
+                    </div>
 
-                <div class="label-input-row">
-                <label for="Q">Q=</label>
-                <input type="text" id="Q">
-                </div>
+                    <!-- Output for rho 2 -->
+                    <div class="label-output-row" title="Outlet Static Density">
+                        <label for="p2">&rho;<sub>2</sub>=</label>
+                        <input type="text" id="p2" readonly>
+                        <input type="text" id="p2Second" readonly>
+                        <select id = "density2-unit" onchange="userChangedOutputUnit()">
+                            <option value="kg/m^3">kg/m&sup3;</option>
+                            <option value="g/m^3">g/m&sup3;</option>
+                            <option value="g/cm^3">g/cm&sup3;</option>
+                            <option value="mg/cm^3">mg/cm&sup3;</option>
+                            <option value="slug/ft^3">slug/ft&sup3;</option>
+                            <option value="slug/in^3">slug/in&sup3;</option>
+                        </select>
+                    </div>
 
-                <div class="label-input-row">
-                <label for="A2">A<sub>2</sub>=</label>
-                <input type="text" id="A2" oninput="imageGUI()">
-                </div>
+                    <!-- Output for P3 -->
+                    <div class="label-output-row" title="Change in entropy normalized by the gas constant">
+                        <label for="P3">P<sub>3</sub>=</label>
+                        <input type="text" id="P3" readonly>
+                        <input type="text" id="P3Second" readonly>
+                        <select id="static-pressure3-unit" onchange="userChangedOutputUnit()">
+                            <option value="pascals">Pa</option>
+                            <option value="kpascals">kPa</option>
+                            <option value="psi">Psi</option>
+                            <option value="psf">Psf</option>
+                        </select>
+                    </div>
 
-                <div class="label-input-row">
-                <label for="xi">&xi;=</label>
-                <input type="text" id="xi">
-                </div>
-
-                <div class="label-input-row">
-                <label for="nu">&nu;=</label>
-                <input type="text" id="nu">
-                </div>
-
-                <div class="label-input-row">
-                <label for="f">f=</label>
-                <input type="text" id="f">
-                </div>
-
-                <div class="label-input-row">
-                <label for="alpha2">&alpha;<sub>2</sub>=</label>
-                <input type="text" id="alpha2">
-                </div>
-
-                <div class="label-input-row">
-                <label for="beta2">&beta;<sub>2</sub>=</label>
-                <input type="text" id="beta2">
-                </div>
-
-                <div class="label-input-row">
-                <label for="subelements">N=</label>
-                <input type="text" id="subelements" min="1" step="1" value="1">
+                    <!-- Output for rho 1 -->
+                    <div class="label-output-row" title="Inlet Static Density">
+                        <label for="p1">&rho;<sub>1</sub>=</label>
+                        <input type="text" id="p1" readonly>
+                        <select id="density1-unit" onchange="userChangedOutputUnit()">
+                            <option value="kg/m^3">kg/m&sup3;</option>
+                            <option value="g/m^3">g/m&sup3;</option>
+                            <option value="g/cm^3">g/cm&sup3;</option>
+                            <option value="mg/cm^3">mg/cm&sup3;</option>
+                            <option value="slug/ft^3">slug/ft&sup3;</option>
+                            <option value="slug/in^3">slug/in&sup3;</option>
+                        </select>
+                    </div>
+                    <div class="label-output-row" title="Mass Flow Rate">
+                        <label for="mfr">&#x1E41;=</label>
+                        <input type="text" id="mfr" readonly>
+                        <select id="mass-flow-unit" onchange="userChangedOutputUnit()">
+                            <option value="kg/s">kg/s</option>
+                        </select>
+                    </div>
+                   <!-- <div class="label-output-row" title="Mass Flow Rate">
+                        <label for="sfr">Specific Flow Rate=</label>
+                        <input type="text" id="sfr" readonly>
+                        <select id="specific-flow-unit" onchange="userChangedOutputUnit()">
+                            <option value="kg/sm^2">kg/(s*m&sup2;)</option>
+                        </select>
+                    </div> -->
                 </div>
             </div>
-        </form>
-        <div class="exampleFlows">
-            <h4>Example Flows</h4>
-            <select class="selectFlow" onchange="exampleFlow()">
-              <option>Isentropic flow with area change</option>
-              <option>Flow across a normal shock</option>
-              <option>Fanno flow</option>
-              <option>Rayleigh flow</option>
-              <option>Sudden expansion</option>
-              <option>Sudden Contraction</option>
-              <option>Two-stream mixing layer</option>
-              <option>Simultaneous friction and heat transfer</option>
-              <option>Simultaneous area change and friction</option>
+        </div>
+    </div>
+  <!-- ---------------------- Graphing ------------------------------------------------------------------> 
+    <div class = "chart-container">
+
+    <!-------------------------------------TITLE AND VALUE SELECTIONS ------------------------------------>
+        <div class= "chart-selection">
+            <h4>Output Charts</h4>
+            <select class="selection-component" id="chart-y" onchange="outputGraph()">
+            <option value="M2">M&#8322; <!-- M subscript 2 --></option>
+            <option value="P2P1">P&#8322;/P&#8321; <!-- P subscript 2 divided by P subscript 1 --></option>
+            <option value="T2T1">T&#8322;/T&#8321; <!-- T subscript 2 divided by T subscript 1 --></option>
+            <option value="TR">To&#8322;/To&#8321; <!-- To subscript 2 divided by To subscript 1 --></option>
+            <option value="PR">Po&#8322;/Po&#8321; <!-- Po subscript 2 divided by Po subscript 1 --></option>
+            <option value="dsR">&Delta;s/R</option>
+            <option value="M2M1">M&#8322;/M&#8321; <!-- M subscript 2 divided by M subscript 1 --></option>
+            <option value="dsRKE">(ds/R)/(k/2*M&#8321;&sup2;) <!-- (delta s divided by R) divided by (k divided by 2 times M subscript 1 squared) --></option>
+            <option value="wloss">(Po&#8321;-Po&#8322;)/(Po&#8321;-P&#8321;) <!-- (Po subscript 1 minus Po subscript 2) divided by (Po subscript 1 minus P subscript 1) --></option>
+            <option value="cp">(P&#8322;-P&#8321;)/(Po&#8321;-P&#8321;) <!-- (P subscript 2 minus P subscript 1) divided by (Po subscript 1 minus P subscript 1) --></option>
+            <option value="T2">T&#8322; <!-- T subscript 2 --></option>
+            <option value="P2">P&#8322; <!-- P subscript 2 --></option>
+            <option value="to2">To&#8322; <!-- T subscript 2 o subscript 2 --></option>
+            <option value="po2">Po&#8322; <!-- P subscript 2 o subscript 2 --></option>
+            <option value="ds">&Delta;s</option>
             </select>
+
+            <h4 style="margin-top: 0px;">vs</h4>
+
+            <select class="selection-component" id="chart-x" onchange="outputGraph()">
+            <option value="M1">M&#8321; <!-- M subscript 1 --></option>
+            <option value="A1">A&#8321; <!-- A subscript 1 --></option>
+            <option value="gamma">&#947; <!-- Gamma --></option>
+            <option value="cd">c&#8322;d <!-- c subscript d --></option>
+            <option value="cf">c&#8322;f <!-- c subscript f --></option>
+            <option value="twr">TWR</option>
+            <option value="alpha1">&#945;&#8321; <!-- Alpha subscript 1 --></option>
+            <option value="beta1">&#946;&#8321; <!-- Beta subscript 1 --></option>
+            <option value="qr">q&#8322;r <!-- q subscript r --></option>
+            <option value="Af">A&#8322;f <!-- A subscript f --></option>
+            <option value="Ad">A&#8322;d <!-- A subscript d --></option>
+            <option value="A2">A&#8322; <!-- A subscript 2 --></option>
+            <option value="xi">&xi; <!-- Xi --></option>
+            <option value="nu">&nu; <!-- Nu --></option>
+            <option value="alpha2">&alpha;&#8322; <!-- Alpha subscript 2 --></option>
+            <option value="beta2">&beta;&#8322; <!-- Beta subscript 2 --></option>
+            </select>
+            <p id = "processing"></p>
+            <p id = "progress"></p>
+            <button id="cancel-button" onclick="cancel()">Cancel</button>
+            <button id="cancel-button" onclick="outputGraph()">Refresh</button>
+        </div>
+        <div class="charts">
+            <p class="error" id="graph-error"></p>
+           <span class="rootGraph"> <canvas id="outputChart" class="rootGraph"></canvas> </span>
+            <span class="rootGraph"> <canvas id="outputChart2" class="rootGraph"></canvas> </span>
         </div>
     </div>
-    <div class="output-container">
-        <button id="calculate" onclick="calculateFlow(event)">Calculate</button>
-        <div class="outputLabels">
-            <h4>Results</h4>
-            <div class="label-input-row">
-              <label for="M2">M<sub>2</sub>=</label>
-              <input type="text" id="M2">
-            </div>
-
-            <div class="label-input-row">
-              <label for="PT2">P<sub>T<sub>2</sub></sub>=</label>
-              <input type="text" id="PT2" name="Label">
-            </div>
-
-            <div class="label-input-row">
-              <label for="P2">P<sub>2</sub>=</label>
-              <input type="text" id="P2">
-            </div>
-
-            <div class="label-input-row">
-              <label for="TT2">T<sub>T<sub>2</sub></sub>=</label>
-              <input type="text" id="TT2">
-            </div>
-
-            <div class="label-input-row">
-              <label for="T2">T<sub>2</sub>=</label>
-              <input type="text" id="T2">
-            </div>
-
-            <div class="label-input-row">
-              <label for="deltaS">&Delta;s=</label>
-              <input type="text" id="deltaS">
-            </div>
-        </div>
-        <canvas id="outputChart"></canvas>
-    </div>
-</div>
 </body>
 
 </html>

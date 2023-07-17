@@ -1,0 +1,5 @@
+INSPECT ELEMENT -> CONSOLE. This should give you an error message for either python or JavaScript!
+
+Do Not Worry about these:
+DevTools failed to load source map: Could not load content for https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.0/dist/chartjs-plugin-annotation.min.js.map: HTTP error: status code 404, net::ERR_HTTP_RESPONSE_CODE_FAILURE
+DevTools failed to load source map: Could not load content for https://cdn.jsdelivr.net/npm/chart.umd.js.map: HTTP error: status code 404, net::ERR_HTTP_RESPONSE_CODE_FAILURE
