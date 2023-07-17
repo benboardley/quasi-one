@@ -248,9 +248,9 @@ Provide Details about the Output Graph
                     </div>
   ```
 2. add to assignInputs:
-'''
+```
   data.to1 = parseFloat(document.getElementById("To1").value) || 0;
-'''
+```
 3. add to python code:
     implement it into args so that it can be pulled from your uniflow code.
     ```
