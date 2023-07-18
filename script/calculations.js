@@ -346,6 +346,7 @@ function calculateFlow(event) {
   } catch (error) {
     console.log(error);
     document.getElementById("input-error").text = error
+    alert("There was an error calculating with this input")
   }
   try{
    setTimeout(outputGraph, 0);
@@ -353,6 +354,7 @@ function calculateFlow(event) {
   catch(error){
     console.log(error)
     document.getElementById("graph-error").text = error
+    alert("There was an error calculating with this input")
   }
 }
 
@@ -1234,7 +1236,7 @@ async function outputGraph(){
           };
           var dataPoint2 = {
             x: data[X],
-            y: output[Y][1]
+            y: output[Y][1].toFixed(5)
           };
         }
         catch{   
