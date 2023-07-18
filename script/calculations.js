@@ -1236,7 +1236,7 @@ async function outputGraph(){
 
           var dataPoint1 = {
               x: data[X],
-              y: output[Y][0]
+              y: output[Y][0].toFixed(5)
           };
           var dataPoint2 = {
             x: data[X],
