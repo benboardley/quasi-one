@@ -190,7 +190,7 @@ body {
     flex-direction: column;
   }
   .abstract-image{
-    width: 180px;
+    width: 200px;
     height: 150px;
   }
   .abstract-container,
@@ -291,7 +291,9 @@ body {
   #calculate:hover {
     background-color: #45a049;
   }
-  
+  #down-arrow{
+    display: none;
+  }
   /* Added CSS for responsive layout */
   @media (max-width: 1200px) {
     .content {
@@ -338,6 +340,15 @@ body {
     .inputFields{
       display: flex;
       flex-direction: column;
+    }
+    #abstract{
+      display: none;
+    }
+    #up-arrow{
+      display: none;
+    }
+    #down-arrow{
+      display: block;
     }
   }
   @media(min-width: 1900px){
