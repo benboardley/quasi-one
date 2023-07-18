@@ -340,13 +340,17 @@ function calculateFlow(event) {
       alert("Please limit your subelemenets to be less than 1000.")
       return;
     }
+    try{
     interfaceUNI();
+    }
+    catch{
+      alert("There was an error calculating with this input")
+    }
     convertFromSI();
     assignOutputs();
   } catch (error) {
     console.log(error);
     document.getElementById("input-error").text = error
-    alert("There was an error calculating with this input")
   }
   try{
    setTimeout(outputGraph, 0);
@@ -354,7 +358,7 @@ function calculateFlow(event) {
   catch(error){
     console.log(error)
     document.getElementById("graph-error").text = error
-    alert("There was an error calculating with this input")
+    document.getElementById("graph-error").text = "There was an error graphing with this input"
   }
 }
 
