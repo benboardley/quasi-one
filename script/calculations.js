@@ -1233,18 +1233,26 @@ async function outputGraph(){
           if(js_args.error){
             document.getElementById("graph-error").text = js_args.error
           }
-
-          var dataPoint1 = {
+          if(output[Y] instanceof Float64Array || Array.isArray(output[Y])){
+            var dataPoint1 = {
+                x: data[X],
+                y: output[Y][0].toFixed(5)
+            };
+            var dataPoint2 = {
               x: data[X],
-              y: output[Y][0].toFixed(5)
-          };
-          var dataPoint2 = {
-            x: data[X],
-            y: output[Y][1].toFixed(5)
+              y: output[Y][1].toFixed(5)
           };
         }
-        catch{   
-            var dataPoint1 = {
+        else{
+          console.log(output[Y])
+          var dataPoint1 = {
+            x: data[X],
+            y: output[Y].toFixed(5)
+        };
+        }
+        }
+        catch{
+          var dataPoint1 = {
               x: data[X],
               y: NaN
           };
