@@ -5,9 +5,8 @@
 - [Flow Calculation](#flow-calculation)
   - [User Input](#user-input)
   - [Unit Conversion](#unit-conversion)
-  - [Interface and Calculation](#interface-and-calculation)
+  - [Interfacing with Python and JavaScript](#Interfacing-with-Python-and-JavaScript)
   - [Output Graph](#output-graph)
-- [Example Flows](#example-flows)
 - [How to Add an Input](#how-to-add-an-input)
 - [How to Add an Output](#how-to-add-an-output)
 - [Changing Python Code](#changing-python-code)
@@ -63,11 +62,7 @@ calcualteFlow
 |
 |convertToSI
 ```
-### User Input
-The javacript command `data.po1 = parseFloat(document.getElementById("Po1").value)` can grab the value stored in this element. (You would want the html input to have this id e.g. `<input type="text" id="Po1">`).
-
-
-#### python to javascript
+#### Interfacing with Python and JavaScript
 The Interface with the python code occurs in InterfaceUNI.
 JavaScript Integrates with python through:
    ```
@@ -145,6 +140,7 @@ Note:
   ```
 
 ### Output Graph
+![Flow Diagram](flow-charts/output-graph.jpg)
 
 This grabs where the charts will be located: 
   ```
@@ -228,9 +224,6 @@ The selected value is then incremented and y value updated accordingly:
       }
     }
 ```
-## Example Flows
-Provide Details about the Output Graph
-
 ## How to Add an Input
 1. add to HTML section in either inlet, parameters or outlet:
 
