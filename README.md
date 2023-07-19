@@ -45,8 +45,7 @@ JavaScript Integrates with python through interaction with global objects:
     js_args = pyscript.interpreter.globals.get('args');
   ```
 pyscript.interpreter.globals.get can grab any global variable, global function, or global class in python and import it to javascript.
-Java script can retrieve global python arrays through  `output.M2 = js_args.M2.toJs();` -- TOJS() converts python arrays into javascript ones. If it is not an array you can just use `output.Lambda = js_args.Lambda;`
-Notice how the objects are retrieved with the .VariableName. This is because it matches the variable names in the args python class. For example here are some, but not all of the names. The args class is equivalent to the args class in your original python code.
+Java script can retrieve arrays from the argys class through  `output.M2 = js_args.M2.toJs();` -- TOJS() converts python arrays into javascript ones. If it is not an array you can just use `output.Lambda = js_args.Lambda;` Notice how the objects are retrieved with the .VariableName. This is because it matches the variable names in the args python class. For example here are some, but not all of the names. The args class is equivalent to the args class in your original python code.
 ```
 class Args:
         def __init__(self, AR=1.0, Ad=0.0, cd=0.0, cf=0.0, Af=0.0, M1=0.0, xi=0.5, nu=0.0,
@@ -73,7 +72,7 @@ class Args:
 ```
 
 #### javascript to python
-Java Script to python is a little simpler. In this the data object from javascript is imported. Again this has to be a global variable. The data object is the inputs from the web calculator.
+Java Script to python is a little simpler. In this the data object from javascript is imported, data contains all inputs. Again this has to be a global variable. The data object is the inputs from the web calculator.
 ```
     def main():
       global args
@@ -117,48 +116,7 @@ Note:
 ![Flow Diagram](flow-charts/output-graph.jpg)
 
 This process is at the bottom of the script file.
-One thing to note is that it is decided based upon the selected values also make sure to note that the option values. `value="M2"` is the same as the variable name in output or data `output.M2`. The actual text for the option does not matter.
-```
-<h4>Output Charts</h4>
-<select class="selection-component" id="chart-y" onchange="outputGraph()">
-<option value="M2">M&#8322; <!-- M subscript 2 --></option>
-<option value="P2P1">P&#8322;/P&#8321; <!-- P subscript 2 divided by P subscript 1 --></option>
-<option value="T2T1">T&#8322;/T&#8321; <!-- T subscript 2 divided by T subscript 1 --></option>
-<option value="TR">To&#8322;/To&#8321; <!-- To subscript 2 divided by To subscript 1 --></option>
-<option value="PR">Po&#8322;/Po&#8321; <!-- Po subscript 2 divided by Po subscript 1 --></option>
-<option value="dsR">&Delta;s/R</option>
-<option value="M2M1">M&#8322;/M&#8321; <!-- M subscript 2 divided by M subscript 1 --></option>
-<option value="dsRKE">(ds/R)/(k/2*M&#8321;&sup2;) <!-- (delta s divided by R) divided by (k divided by 2 times M subscript 1 squared) --></option>
-<option value="wloss">(Po&#8321;-Po&#8322;)/(Po&#8321;-P&#8321;) <!-- (Po subscript 1 minus Po subscript 2) divided by (Po subscript 1 minus P subscript 1) --></option>
-<option value="cp">(P&#8322;-P&#8321;)/(Po&#8321;-P&#8321;) <!-- (P subscript 2 minus P subscript 1) divided by (Po subscript 1 minus P subscript 1) --></option>
-<option value="T2">T&#8322; <!-- T subscript 2 --></option>
-<option value="P2">P&#8322; <!-- P subscript 2 --></option>
-<option value="to2">To&#8322; <!-- T subscript 2 o subscript 2 --></option>
-<option value="po2">Po&#8322; <!-- P subscript 2 o subscript 2 --></option>
-<option value="ds">&Delta;s</option>
-</select>
 
-<h4 style="margin-top: 0px;">vs</h4>
-
-<select class="selection-component" id="chart-x" onchange="outputGraph()">
-<option value="M1">M&#8321; <!-- M subscript 1 --></option>
-<option value="A1">A&#8321; <!-- A subscript 1 --></option>
-<option value="gamma">&#947; <!-- Gamma --></option>
-<option value="cd">c&#8322;d <!-- c subscript d --></option>
-<option value="cf">c&#8322;f <!-- c subscript f --></option>
-<option value="twr">TWR</option>
-<option value="alpha1">&#945;&#8321; <!-- Alpha subscript 1 --></option>
-<option value="beta1">&#946;&#8321; <!-- Beta subscript 1 --></option>
-<option value="qr">q&#8322;r <!-- q subscript r --></option>
-<option value="Af">A&#8322;f <!-- A subscript f --></option>
-<option value="Ad">A&#8322;d <!-- A subscript d --></option>
-<option value="A2">A&#8322; <!-- A subscript 2 --></option>
-<option value="xi">&xi; <!-- Xi --></option>
-<option value="nu">&nu; <!-- Nu --></option>
-<option value="alpha2">&alpha;&#8322; <!-- Alpha subscript 2 --></option>
-<option value="beta2">&beta;&#8322; <!-- Beta subscript 2 --></option>
-</select>
-```
 ## How to Add an Input
 1. add to HTML section in either inlet, parameters or outlet:
 
@@ -241,48 +199,50 @@ One thing to note is that it is decided based upon the selected values also make
     document.getElementById("P2P1").value = output.P2P1[0].toFixed(5);
     document.getElementById("P2P1Second").value = output.P2P1[1].toFixed(5);
     ```
-4. If you want it to be graphed add it into this selection 
+4. If you want it to be graphed add it into this selection section. Either y or x for output, input respectivley.
 
-make sure value = "" is the same as either the variable name in data or output example `data.M2 and <option value="M2">M<sub>2</sub></option>`:
+  One thing to note is that it is decided based upon the selected values also make sure to note that the option values. `value="M2"` is the same as the variable name in output or data `output.M2`. The actual text for the option does not matter.
+  ```
+  <h4>Output Charts</h4>
+  <select class="selection-component" id="chart-y" onchange="outputGraph()">
+  <option value="M2">M&#8322; <!-- M subscript 2 --></option>
+  <option value="P2P1">P&#8322;/P&#8321; <!-- P subscript 2 divided by P subscript 1 --></option>
+  <option value="T2T1">T&#8322;/T&#8321; <!-- T subscript 2 divided by T subscript 1 --></option>
+  <option value="TR">To&#8322;/To&#8321; <!-- To subscript 2 divided by To subscript 1 --></option>
+  <option value="PR">Po&#8322;/Po&#8321; <!-- Po subscript 2 divided by Po subscript 1 --></option>
+  <option value="dsR">&Delta;s/R</option>
+  <option value="M2M1">M&#8322;/M&#8321; <!-- M subscript 2 divided by M subscript 1 --></option>
+  <option value="dsRKE">(ds/R)/(k/2*M&#8321;&sup2;) <!-- (delta s divided by R) divided by (k divided by 2 times M subscript 1 squared) --></option>
+  <option value="wloss">(Po&#8321;-Po&#8322;)/(Po&#8321;-P&#8321;) <!-- (Po subscript 1 minus Po subscript 2) divided by (Po subscript 1 minus P subscript 1) --></option>
+  <option value="cp">(P&#8322;-P&#8321;)/(Po&#8321;-P&#8321;) <!-- (P subscript 2 minus P subscript 1) divided by (Po subscript 1 minus P subscript 1) --></option>
+  <option value="T2">T&#8322; <!-- T subscript 2 --></option>
+  <option value="P2">P&#8322; <!-- P subscript 2 --></option>
+  <option value="to2">To&#8322; <!-- T subscript 2 o subscript 2 --></option>
+  <option value="po2">Po&#8322; <!-- P subscript 2 o subscript 2 --></option>
+  <option value="ds">&Delta;s</option>
+  </select>
 
-```
-<select class="selection-component" id="chart-y" onchange="outputGraph()">
-                <option value="M2">M<sub>2</sub></option>
-                <option value="P2P1">P<sub>2</sub>/P<sub>1</sub></option>
-                <option value="T2T1">T<sub>2</sub>/T<sub>1</sub></option>
-                <option value="TR">To<sub>2</sub>/To<sub>1</sub></option>
-                <option value="PR">Po<sub>2</sub>/Po<sub>1</sub></option>
-                <option value="dsR">&Delta;s/R</option>
-                <option value="M2M1">M<sub>2</sub>/M<sub>1</sub></option>
-                <option value="dsRKE">(ds/R)/(k/2*M<sub>12</sub>)</option>
-                <option value="wloss">(Po<sub>1</sub>-Po<sub>2</sub>)/(Po<sub>1</sub>-P<sub>1</sub>)</option>
-                <option value="cp">(P<sub>2</sub>-P<sub>1</sub>)/(Po<sub>1</sub>-P<sub>1</sub>)</option>
-                <option value="T2">T<sub>2</sub></option>
-                <option value="P2">P<sub>2</sub></option>
-                <option value="to2">T<sub>o<sub>2</sub></sub></option>
-                <option value="po2">P<sub>o<sub>2</sub></sub></option>
-                <option value="ds">&Delta;s</option>
-            </select>
-            <h4 style="margin-top: 0px;">vs</h4>
-            <select class="selection-component" id="chart-x" onchange="outputGraph()">
-                <option value="M1">M<sub>1</sub></option>
-                <option value="A1">A<sub>1</sub></option>
-                <option value="gamma">&gamma;</option>
-                <option value="cd">C<sub>d</sub></option>
-                <option value="cf">C<sub>f</sub></option>
-                <option value="twr">TWR</option>
-                <option value="alpha1">&alpha;<sub>1</sub></option>
-                <option value="beta1">&beta;<sub>1</sub></option>
-                <option value="qr">Q<sub>r</sub></option>
-                <option value="Af">A<sub>f</sub></option>
-                <option value="Ad">A<sub>d</sub></option>
-                <option value="A2">A<sub>2</sub></option>
-                <option value="xi">&xi;</option>
-                <option value="nu">&nu;</option>
-                <option value="alpha2">&alpha;<sub>2</sub></option>
-                <option value="beta2">&beta;<sub>2</sub></option>
-            </select>
-```
+  <h4 style="margin-top: 0px;">vs</h4>
+
+  <select class="selection-component" id="chart-x" onchange="outputGraph()">
+  <option value="M1">M&#8321; <!-- M subscript 1 --></option>
+  <option value="A1">A&#8321; <!-- A subscript 1 --></option>
+  <option value="gamma">&#947; <!-- Gamma --></option>
+  <option value="cd">c&#8322;d <!-- c subscript d --></option>
+  <option value="cf">c&#8322;f <!-- c subscript f --></option>
+  <option value="twr">TWR</option>
+  <option value="alpha1">&#945;&#8321; <!-- Alpha subscript 1 --></option>
+  <option value="beta1">&#946;&#8321; <!-- Beta subscript 1 --></option>
+  <option value="qr">q&#8322;r <!-- q subscript r --></option>
+  <option value="Af">A&#8322;f <!-- A subscript f --></option>
+  <option value="Ad">A&#8322;d <!-- A subscript d --></option>
+  <option value="A2">A&#8322; <!-- A subscript 2 --></option>
+  <option value="xi">&xi; <!-- Xi --></option>
+  <option value="nu">&nu; <!-- Nu --></option>
+  <option value="alpha2">&alpha;&#8322; <!-- Alpha subscript 2 --></option>
+  <option value="beta2">&beta;&#8322; <!-- Beta subscript 2 --></option>
+  </select>
+  ```
 ## Changing Python Code
 Can copy and past everything from python into the pyscript tags (tqdm does not work). However, I would not copy and paste the main.py or the Args class
 these I would recommend changing manually because the args class and main function are the only things that differ from uniflow.py. 
