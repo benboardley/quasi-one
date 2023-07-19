@@ -5,7 +5,7 @@
 - [Flow Calculation](#flow-calculation)
   - [User Input](#user-input)
   - [Unit Conversion](#unit-conversion)
-  - [Interfacing with Python and JavaScript](#Interfacing-with-Python-and-JavaScript)
+  - [Interfacing Python and JavaScript](#Interfacing-with-Python-and-JavaScript)
   - [Output Graph](#output-graph)
 - [How to Add an Input](#how-to-add-an-input)
 - [How to Add an Output](#how-to-add-an-output)
@@ -14,39 +14,12 @@
 ## Introduction
 Web Calculator for Andrew A Oliva and Scott C Morris's Quasi Steady, quasi-one-dimensional, internal compressible flow with area change, heat addition and friction
 
-## Flow Calculation
+## Calculation Work Flow
 
 ![Flow Diagram](flow-charts/calculate-flow.jpg)
-<!--
-```
-calculateFlow
-|
-| assignInputs
-  |
-  |convertToSI
-|
-|interfaceUNI
-  |
-  |calculateRootsWithUnits 
-  |convertFromSI
-  |
-  | assign Outputs
 
-outputGraph Do this for 300 data points
-|
-| assignInputs
-  |
-  |convertToSI
-|
-|interfaceUNI
-  |
-  | convertFromSI
-  |
-  | assign Outputs
-```
--->
 ### Unit Conversion
-Action: user changes output unit
+Action: User changes output unit
 ```
 userChangedOutputUnit 
 |
@@ -54,7 +27,7 @@ userChangedOutputUnit
 |
 |assignOutputs
 ```
-Action: user changes input unit
+Action: User changes input unit
 ```
 calcualteFlow
 |
@@ -63,16 +36,17 @@ calcualteFlow
 |convertToSI
 ```
 #### Interfacing with Python and JavaScript
-The Interface with the python code occurs in InterfaceUNI.
-JavaScript Integrates with python through:
+The Interface with the python code occurs in InterfaceUNI in the JavaScript Code.
+
+JavaScript Integrates with python through interaction with global objects:
    ```
     uniflow = pyscript.interpreter.globals.get('main');
     uniflow();
     js_args = pyscript.interpreter.globals.get('args');
   ```
 pyscript.interpreter.globals.get can grab any global variable, global function, or global class in python and import it to javascript.
-To get the variables  `output.M2 = js_args.M2.toJs();` -- TOJS() converts python arrays into javascript ones. If it is not an array you can just use somethign like this: output.Lambda = js_args.Lambda;
-Notice how I grab the objects with the .VariableName. This is because it matches the varaible names in the args python class. For example here are some, but not all of the names. The args class is equivalent to the args class in your original python code.
+Java script can retrieve global python arrays through  `output.M2 = js_args.M2.toJs();` -- TOJS() converts python arrays into javascript ones. If it is not an array you can just use `output.Lambda = js_args.Lambda;`
+Notice how the objects are retrieved with the .VariableName. This is because it matches the variable names in the args python class. For example here are some, but not all of the names. The args class is equivalent to the args class in your original python code.
 ```
 class Args:
         def __init__(self, AR=1.0, Ad=0.0, cd=0.0, cf=0.0, Af=0.0, M1=0.0, xi=0.5, nu=0.0,
@@ -142,12 +116,8 @@ Note:
 ### Output Graph
 ![Flow Diagram](flow-charts/output-graph.jpg)
 
-This grabs where the charts will be located: 
-  ```
-  var ctx = document.getElementById('outputChart').getContext('2d');
-  var ctx2 = document.getElementById('outputChart2').getContext('2d');
-  ```
-based upon the selected values also make sure to note that the selection values. `vale="M2"` is the same as the variable name in output or data `output.M2`.
+This process is at the bottom of the script file.
+One thing to note is that it is decided based upon the selected values also make sure to note that the option values. `value="M2"` is the same as the variable name in output or data `output.M2`. The actual text for the option does not matter.
 ```
 <h4>Output Charts</h4>
 <select class="selection-component" id="chart-y" onchange="outputGraph()">
@@ -189,41 +159,6 @@ based upon the selected values also make sure to note that the selection values.
 <option value="beta2">&beta;&#8322; <!-- Beta subscript 2 --></option>
 </select>
 ```
-The selected value is then incremented and y value updated accordingly:
-```
-    var root1 = [];
-    var root2 = [];
-    var delta = 0.01;
-    //Set the Input so it gets progressivley larger
-    for(data[X] = delta; data[X] < 3; data[X]+=delta){
-        if(shouldCancel) {
-          shouldCancel = false;
-          break;
-        }
-        //Calculate Flow
-        interfaceUNI();
-        convertFromSI();
-        if(js_args.error){
-          document.getElementById("graph-error").text = js_args.error
-        }
-
-        var dataPoint1 = {
-            x: data[X],
-            y: output[Y][0]
-        };
-        var dataPoint2 = {
-          x: data[X],
-          y: output[Y][1]
-      };
-      root1.push(dataPoint1);
-      root2.push(dataPoint2);
-      if(data.N >= 10){
-        // Keep the webpage from crashing updated prgroess meter
-        updateProgress(data[X],delta)
-        await delay(1);
-      }
-    }
-```
 ## How to Add an Input
 1. add to HTML section in either inlet, parameters or outlet:
 
@@ -240,11 +175,11 @@ The selected value is then incremented and y value updated accordingly:
                         </select>
                     </div>
   ```
-2. add to assignInputs:
+2. add to assignInputs in script:
 '''
   data.to1 = parseFloat(document.getElementById("To1").value) || 0;
 '''
-3. add to python code:
+3. add to python code in html `<py-script>` tags:
     implement it into args so that it can be pulled from your uniflow code.
     ```
         class Args:
