@@ -11,7 +11,7 @@
   <!-- ----------------------Java Script Libraries and Plug Ins -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.0/dist/chartjs-plugin-annotation.min.js"></script>
-  
+
  <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
  <script defer src="https://pyscript.net/latest/pyscript.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
@@ -1123,8 +1123,11 @@
                             <option>True</option>
                         </select>
                     </div>
+                </div>
 
-                    <!-- Example Flows -->
+                <div class="gui-parameters">
+                <!-------------------------------- INLET TO OUTLET IMAGE ------------------------------------>
+                                            <!-- Example Flows -->
                     <div class="exampleFlows">
                         <h4>Flow Templates</h4>
                         <select class="selectFlow" onchange="exampleFlow()">
@@ -1140,10 +1143,6 @@
                             <option>Ferrari 2 (Simultaneous area change and friction)</option>
                         </select>
                     </div>
-                </div>
-
-                <div class="gui-parameters">
-                <!-------------------------------- INLET TO OUTLET IMAGE ------------------------------------>
                     <canvas id="gui" style="display:None;"></canvas>
                     <img id = "flow-image" src = "./images/default.jpg">
                     <h4 class="InputHeaders">Parameters (including Surface 3)</h4>
