@@ -1001,7 +1001,9 @@ function exampleFlow(){
       document.getElementById("M1").value = 2;
       document.getElementById("A1").value = 1;
       document.getElementById("A2").value = 1;
-      document.getElementById("A2").style = "background-color: gray;";
+      //document.getElementById("A2").setAttribute('readonly', true);
+      //document.getElementById("A1").style = "background-color: gray;";
+      //document.getElementById("A2").style = "background-color: gray;";
       flow_img.src = "./images/normal-shock.jpg"
 
     } 
