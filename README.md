@@ -35,6 +35,8 @@ calcualteFlow
 |convertToSI
 ```
 #### Interfacing with Python and JavaScript
+
+![Tech Stack](flow-charts/TechStack.png)
 The Interface with the python code occurs in InterfaceUNI in the JavaScript Code.
 
 JavaScript Integrates with python through interaction with global objects:
