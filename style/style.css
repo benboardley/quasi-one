@@ -265,6 +265,7 @@ body {
     flex-direction: row;
     float:top;
     justify-content: space-evenly;
+    flex: 1;
   }
   
   .gui-parameters {
@@ -351,7 +352,8 @@ body {
     }
   }
   @media(min-width: 1900px){
+    .input-container,
     .output-container{
-      width: 50%;
+      width: 40%;
     }
   }
