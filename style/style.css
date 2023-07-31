@@ -152,7 +152,6 @@ body {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-
   }
   .Outlet{
     margin-top: 20px;
@@ -265,7 +264,7 @@ body {
     display: flex;
     flex-direction: row;
     float:top;
-    justify-content: ;
+    justify-content: space-evenly;
   }
   
   .gui-parameters {
@@ -315,6 +314,9 @@ body {
     .output-container {
       align-self: center;
       margin-top: 20px;
+    }
+    .abstract-container{
+      flex-direction: column;
     }
     .charts{
       display: flex;
