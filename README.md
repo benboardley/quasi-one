@@ -1,5 +1,3 @@
-# Project Name
-
 ## Table of Contents
 - [Introduction](#introduction)
 - [Flow Calculation](#flow-calculation)
@@ -7,13 +5,14 @@
   - [Unit Conversion](#unit-conversion)
   - [Interfacing Python and JavaScript](#Interfacing-with-Python-and-JavaScript)
   - [Output Graph](#output-graph)
+- [Flow Templates](#Flow-Templates)
 - [How to Add an Input](#how-to-add-an-input)
 - [How to Add an Output](#how-to-add-an-output)
 - [Changing Python Code](#changing-python-code)
 
 ## Introduction
 Web Calculator for Andrew A Oliva and Scott C Morris's Quasi Steady, quasi-one-dimensional, internal compressible flow with area change, heat addition and friction
-
+Author: Ben Boardley
 ## Calculation Work Flow
 
 ![Flow Diagram](flow-charts/calculate-flow.jpg)
@@ -116,6 +115,27 @@ Note:
 ![Flow Diagram](flow-charts/output-graph.jpg)
 
 This process is at the bottom of the script file.
+
+### Flow Templates
+Based upon the selected templates the default input values get assigned accordingly. If you want to make it so the box goes gray and can't be 
+edited when a template is selected, you would add lines like this:
+```
+      document.getElementById("A2").setAttribute('readonly', true);
+      document.getElementById("A2").style = "background-color: gray;";
+```
+In which "A2" comes from the html id `<input type="text" id="A2" oninput="imageGUI()">` in this section.
+```
+                    <div class="label-output-row" title="Outlet Area">
+                        <label for="A2">A<sub>2</sub>=</label>
+                        <input type="text" id="A2" oninput="imageGUI()">
+                        <select id="outlet-area-unit" onchange="imageGUI()">
+                            <option value="meters">m&sup2;</option>
+                            <option value="centimeters">cm&sup2;</option>
+                            <option value="feet">ft&sup2;</option>
+                            <option value="inches">in&sup2;</option>
+                        </select>
+                    </div>
+```
 
 ## How to Add an Input
 1. add to HTML section in either inlet, parameters or outlet:
@@ -297,3 +317,5 @@ def main():
     return()
 ```
 ## Also NOTE tqdm does not work in pyscript!
+
+Credits: Ben Boardley
