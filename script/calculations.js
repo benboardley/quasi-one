@@ -315,6 +315,7 @@ if (data.error) {
   document.getElementById("input-error").textContent = output.data.error;
 }
 
+// Don't include these if subelements > 1
 if (data.N === 1) {
   document.getElementById("Lambda").value = output.Lambda.toFixed(5);
   document.getElementById("b").value = output.b.toFixed(5);
@@ -779,14 +780,15 @@ function userChangedOutputUnit(){
 
 
 
-  /* ------------------------------------------------------------------------------------------------------------------------
-  -
-  -
-  -
-  -                                 User Interface Code
-  -
-  -
-  -------------------------------------------------------------------------------------------------------------------------*/
+/* ------------------------------------------------------------------------------------------------------------------------
+  
+  
+  
+                                   User Interface Code
+  
+  
+    
+-------------------------------------------------------------------------------------------------------------------------*/
 
 
 //-----------------------------------------Check Boxes--------------------------------------------
@@ -830,7 +832,7 @@ function toggleAbstract(){
     z.style.display = "block";
   }
 }
-//--------------------------------------Inlet->Outlet Graphic ----------------------------------
+//--------------------------------------Inlet->Outlet Graphic This is not used anymore----------------------------------
 var myChart;
 function imageGUI() {
     var ctx = document.getElementById('gui').getContext('2d');
@@ -1002,7 +1004,6 @@ function exampleFlow(){
       document.getElementById("A1").value = 1;
       document.getElementById("A2").value = 1;
       //document.getElementById("A2").setAttribute('readonly', true);
-      //document.getElementById("A1").style = "background-color: gray;";
       //document.getElementById("A2").style = "background-color: gray;";
       flow_img.src = "./images/normal-shock.jpg"
 
