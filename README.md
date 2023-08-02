@@ -155,11 +155,53 @@ In which "A2" comes from the html id `<input type="text" id="A2" oninput="imageG
                         </select>
                     </div>
   ```
-2. add to assignInputs in script:
-'''
+2. add to assignInputs in script make sure to use id. the || 0 is incase of the user not putting an input:
+```
+  function assignInputs() {
+  data.po1 = parseFloat(document.getElementById("Po1").value) || 0;
+  data.R = parseFloat(document.getElementById("R").value) || 0;
   data.to1 = parseFloat(document.getElementById("To1").value) || 0;
-'''
-3. add to python code in html `<py-script>` tags:
+  data.cd = parseFloat(document.getElementById("cd").value) || 0;
+  data.cf = parseFloat(document.getElementById("cf").value) || 0;
+  data.qr = parseFloat(document.getElementById("qr").value) || 0;
+  data.Af = parseFloat(document.getElementById("Af").value) || 0;
+  data.Ad = parseFloat(document.getElementById("Ad").value) || 0;
+  data.M1 = parseFloat(document.getElementById("M1").value) || 0;
+  data.A1 = parseFloat(document.getElementById("A1").value) || 0;
+  data.gamma = parseFloat(document.getElementById("gamma").value) || 0;
+  data.alpha1 = parseFloat(document.getElementById("alpha1").value) || 0;
+  data.beta1 = parseFloat(document.getElementById("beta1").value) || 0;
+  data.A2 = parseFloat(document.getElementById("A2").value) || 0;
+  data.xi = parseFloat(document.getElementById("xi").value) || 0;
+  data.nu = parseFloat(document.getElementById("nu").value) || 0;
+  data.alpha2 = parseFloat(document.getElementById("alpha2").value) || 0;
+  data.beta2 = parseFloat(document.getElementById("beta2").value) || 0;
+  data.N = parseFloat(document.getElementById("subelements").value) || 0;
+  data.isent = document.getElementById("isentropic").value;
+  convertToSI();
+}
+
+```
+3. Add a default value to the top of example flows. Then add any other template value.
+4. If a Dimensional Input add to converttoSI:
+```
+  var P1 = parseFloat(document.getElementById("Po1").value) || 0;
+  var pressureUnit = document.getElementById("pressure-unit").value;
+
+    switch(pressureUnit) {
+      case 'kpascals':
+          data.po1 = kpascalsToPascals(P1);
+          break;
+      case 'psi':
+        data.po1 = psiToPascals(P1);
+          break;
+      case 'psf':
+        data.po1 = psfToPascals(P1);
+          break;
+  }
+
+```
+5. add to python code in html `<py-script>` tags:
     implement it into args so that it can be pulled from your uniflow code.
     ```
         class Args:
@@ -187,7 +229,50 @@ In which "A2" comes from the html id `<input type="text" id="A2" oninput="imageG
 
         args = Args(AR=data.A2/data.A1, Ad = data.Ad/data.A1, Af = data.Af/data.A1, qr = data.qr, cd = data.cd, cf = data.cf, M1=data.M1, xi = data.xi, nu = data.nu, k = data.gamma, b1 = data.beta1, b2 = data.beta2, a1 = data.alpha1, a2 = data.alpha2 , N = data.N, isentropic=(data.isent == 'True'))
     ```
+6.  If you want it to be graphed add it into this selection section. Either y or x for output, input respectivley.
 
+  One thing to note is that it is decided based upon the selected values also make sure to note that the option values. `value="M2"` is the same as the variable name in output or data `output.M2`. The actual text for the option does not matter.
+  ```
+  <h4>Output Charts</h4>
+  <select class="selection-component" id="chart-y" onchange="outputGraph()">
+  <option value="M2">M&#8322; <!-- M subscript 2 --></option>
+  <option value="P2P1">P&#8322;/P&#8321; <!-- P subscript 2 divided by P subscript 1 --></option>
+  <option value="T2T1">T&#8322;/T&#8321; <!-- T subscript 2 divided by T subscript 1 --></option>
+  <option value="TR">To&#8322;/To&#8321; <!-- To subscript 2 divided by To subscript 1 --></option>
+  <option value="PR">Po&#8322;/Po&#8321; <!-- Po subscript 2 divided by Po subscript 1 --></option>
+  <option value="dsR">&Delta;s/R</option>
+  <option value="M2M1">M&#8322;/M&#8321; <!-- M subscript 2 divided by M subscript 1 --></option>
+  <option value="dsRKE">(ds/R)/(k/2*M&#8321;&sup2;) <!-- (delta s divided by R) divided by (k divided by 2 times M subscript 1 squared) --></option>
+  <option value="wloss">(Po&#8321;-Po&#8322;)/(Po&#8321;-P&#8321;) <!-- (Po subscript 1 minus Po subscript 2) divided by (Po subscript 1 minus P subscript 1) --></option>
+  <option value="cp">(P&#8322;-P&#8321;)/(Po&#8321;-P&#8321;) <!-- (P subscript 2 minus P subscript 1) divided by (Po subscript 1 minus P subscript 1) --></option>
+  <option value="T2">T&#8322; <!-- T subscript 2 --></option>
+  <option value="P2">P&#8322; <!-- P subscript 2 --></option>
+  <option value="to2">To&#8322; <!-- T subscript 2 o subscript 2 --></option>
+  <option value="po2">Po&#8322; <!-- P subscript 2 o subscript 2 --></option>
+  <option value="ds">&Delta;s</option>
+  </select>
+
+  <h4 style="margin-top: 0px;">vs</h4>
+
+  <select class="selection-component" id="chart-x" onchange="outputGraph()">
+  <option value="M1">M&#8321; <!-- M subscript 1 --></option>
+  <option value="A1">A&#8321; <!-- A subscript 1 --></option>
+  <option value="gamma">&#947; <!-- Gamma --></option>
+  <option value="cd">c&#8322;d <!-- c subscript d --></option>
+  <option value="cf">c&#8322;f <!-- c subscript f --></option>
+  <option value="twr">TWR</option>
+  <option value="alpha1">&#945;&#8321; <!-- Alpha subscript 1 --></option>
+  <option value="beta1">&#946;&#8321; <!-- Beta subscript 1 --></option>
+  <option value="qr">q&#8322;r <!-- q subscript r --></option>
+  <option value="Af">A&#8322;f <!-- A subscript f --></option>
+  <option value="Ad">A&#8322;d <!-- A subscript d --></option>
+  <option value="A2">A&#8322; <!-- A subscript 2 --></option>
+  <option value="xi">&xi; <!-- Xi --></option>
+  <option value="nu">&nu; <!-- Nu --></option>
+  <option value="alpha2">&alpha;&#8322; <!-- Alpha subscript 2 --></option>
+  <option value="beta2">&beta;&#8322; <!-- Beta subscript 2 --></option>
+  </select>
+  ```
 ## How to Add an Output
 1. Add to output section in HTML into either traditional-output or additional-output and then non-dimensional or dimensional:
 ```
@@ -221,7 +306,25 @@ In which "A2" comes from the html id `<input type="text" id="A2" oninput="imageG
     document.getElementById("P2P1").value = output.P2P1[0].toFixed(5);
     document.getElementById("P2P1Second").value = output.P2P1[1].toFixed(5);
     ```
-4. If you want it to be graphed add it into this selection section. Either y or x for output, input respectivley.
+
+4.  If a Dimensional Input add to convertFromSI make sure this is also in calculateRootswithUnits:
+```
+  var pressureUnit = document.getElementById("static-pressure1-unit").value;
+
+  switch (pressureUnit) {
+    case 'kpascals':
+      output.P1 = pascalsToKpascals(output.P1);
+      break;
+    case 'psi':
+      output.P1 = pascalsToPsi(output.P1);
+      break;
+    case 'psf':
+      output.P1 = pascalsToPsf(output.P1);
+      break;
+  }
+
+``` 
+5. If you want it to be graphed add it into this selection section. Either y or x for output, input respectivley.
 
   One thing to note is that it is decided based upon the selected values also make sure to note that the option values. `value="M2"` is the same as the variable name in output or data `output.M2`. The actual text for the option does not matter.
   ```
