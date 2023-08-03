@@ -84,6 +84,7 @@
         args = postProcess(args)
       except Exception as e:
         args.error = e
+      #printOutput(args)
       return()
 
     def intro(string,ver,date):
@@ -189,7 +190,7 @@
         print("{0:20s} {1: .6e}".format("In. Mom Flux Corr",np.float64(args.b1)),end="\n",sep='')
         print("{0:20s} {1: .6e}".format("Ex. Mom Flux Corr",np.float64(args.b2)),end="\n",sep='')
         print("{0:20s} {1: .6e}".format("In. Mass Flux Corr",np.float64(args.a1)),end="\n",sep='')
-        print("{0:20s} {1: .6e}".format("Ex. Mass Flux Corr",np.float64(args.a2)),end="\n",sep='')
+        print("{0:20s} {1: .6e}".format("Ex. Mass Flux",np.float64(args.a2)),end="\n",sep='')
         print("{0:20s} {1: .6e}".format("Wall P2 Weight",np.float64(args.xi)),end="\n",sep='')
         print("{0:20s} {1: .6e}".format("Wall Pt1 Weight",np.float64(args.nu)),end="\n",sep='')
         print("{0:20s} {1: .6e}".format("Area Ratio",np.float64(args.AR)),end="\n",sep='')
@@ -225,7 +226,11 @@
         alpha1 = args.a1
         alpha2 = args.a2
 
-        TR = np.float64(bool(k-1))*(1 + args.qr) + np.float64(not bool(k-1))*1
+        if(k == 1 ):
+            TR = 1.0
+        else:
+            TR = 1.0 + args.qr
+
 
         G = (k-1)/2
 
@@ -310,9 +315,9 @@
         args.f1    = f1
         args.f2    = f2
 
-        TR = np.float64(bool(k-1))*(1 + qr) + np.float64(not bool(k-1))*1
-
         if( k == 1):
+            TR = 1.0
+
             PR = alpha1/alpha2*np.sqrt(TR) * M1/M2 * 1/AR * np.exp(0.5*(M2*M2-M1*M1))
 
             dsR = - np.log(PR)
@@ -322,6 +327,8 @@
             P3P1 = ((1-xi-nu) + xi*P2P1 + nu * np.exp(M1*M1/2))*np.ones_like(M2)
 
         else:
+            TR = 1.0 + args.qr
+
             PR = alpha1/alpha2 * np.sqrt(TR) * M1/M2 * 1./AR * (f1/f2)**(-(k+1)/(2*(k-1)))
 
             dsR  = k/(k-1) *np.log(TR) - np.log(PR)
@@ -347,7 +354,6 @@
         args.dsRKE = dsR/(k/2*M1*M1)
         args.dsRKE2= dsR/(k/2*M2*M2)
         args.P3P1  = P3P1
-        args.P3Po1 = P3P1 / (args.f1 ** (k/(k-1)))
         args.wpv    = -np.log(P2P1*V2V1*AR)
         args.wrev    = -np.log(V2V1*AR)
 
@@ -372,10 +378,15 @@
             #return(trapezoid)
             return(midpoint)
 
-
-        args.dk    = k/(k-1+1e-16)*np.log(f2/f1) + k/2*get_approx(M2,M1,TR)
-        args.Iq    = k/2*get_approx(M2,M1,TR) \
-                        + k/(k-1+1e-16)*(np.log(TR) - 1/TwTo1*(TR-1))
+        
+        if( k == 1 ):
+            args.dk     = 0.5*(M2**2 - M1**2) + k/2 * get_approx(M2,M1,TR)
+            args.Iq     = np.zeros_like(M2)
+                
+        else:
+            args.dk    = k/(k-1)*np.log(f2/f1) + k/2*get_approx(M2,M1,TR)
+            args.Iq    = k/2*get_approx(M2,M1,TR) \
+                            + k/(k-1)*(np.log(TR) - 1/TwTo1*(TR-1))
 
         args.we    = args.wpv - args.dk
         args.I     = args.we - args.wrev + args.Iq
@@ -396,258 +407,70 @@
         G = (k-1)/2
         f1 = 1 + G*M1*M1
 
-        class soln():
-            def __init__(self):
-                self.iterations = np.uint32(0)
-                self.function_calls = np.uint32(1)
-                self.root = np.float64(0)
+        M2 = np.zeros(2,dtype=np.float64)
 
         def dsR(M2,M1=M1,AR=AR,f1=f1,k=k):
 
             f2 = 1 + (k-1)/2*M2*M2
 
-            dsR = np.float64(bool(k-1))*(np.log(M2/M1*AR) - (k+1)/(2*(k-1)) * np.log(f2/f1)) \
-                    + np.float64(not bool(k-1))*(np.log(M2/M1*AR) - 1/2*(M2*M2-M1*M1))
+            if( k == 1):
+                dsR = np.log(M2/M1*AR) - 1/2*(M2*M2-M1*M1)
+
+            else:
+                dsR = np.log(M2/M1*AR) - (k+1)/(2*(k-1)) * np.log(f2/f1)
 
             return(dsR)
 
-        #monatomicM2 = np.zeros((2,),dtype=np.float64)
-        infinatomicM2 = np.zeros((2,),dtype=np.float64)
-        diatomicM2 = np.zeros_like(infinatomicM2)
-        polyatomicM2 = np.zeros_like(infinatomicM2)
-        M2 = np.zeros_like(infinatomicM2)
+        if( not k == 1 and not k == 5/3 ):
+            soln1 = scopt.root_scalar(dsR,x0=0.5,method='toms748',bracket=(1e-12,1))
+            soln2 = scopt.root_scalar(dsR,x0=2.0,method='toms748',bracket=(1,1e12))
 
-        monatomicM2 = isentropicMonoatomicGas(args)
-        infinatomicM2 = isentropicInfinitatomicGas(args)
+            M2[0] = soln1.root
+            M2[1] = soln2.root
 
-        if( np.size(monatomicM2) == 1 ):
-            monatomicM2 = np.sort(np.array([monatomicM2[0],np.nan],dtype=np.float64))
-        elif( np.size(monatomicM2) == 0):
-            monatomicM2 = np.nan*np.ones((2,),dtype=np.float64)
+            f2 = 1 + G*M2*M2
 
+            P2P1 = 1/AR * M1/M2 *np.sqrt(f1/f2)
+            P3P1 = (P2P1*AR*(1+k*M2*M2) - (1+k*M1*M1))/(AR-1)
 
-        nanFlag = np.isnan(monatomicM2)
+            args.M2 = M2
+            args.xi = (P3P1 - 1)/(P2P1 - 1)
 
-        order2Lagrange = ((k-5/3)*infinatomicM2 / (1-5/3) \
-                + (k-1)*np.nan_to_num(monatomicM2,nan=1) / (5/3-1))
+            args.iter = np.array([soln1.iterations,soln2.iterations])
+            args.nfev = np.array([soln1.function_calls,soln2.function_calls])
 
-        llim = np.array([min(infinatomicM2[0],monatomicM2[0]),\
-                max(infinatomicM2[1],monatomicM2[1])])
+        elif( k == 1 ):
 
-        llim[1] = ~nanFlag[1]*llim[1] + nanFlag[1]
+            M2 = isentropicInfinitatomicGas(args)
+            args.M2 = M2
+            f2 = 1 + G*M2*M2
 
-        ulim = np.array([max(infinatomicM2[0],monatomicM2[0]),\
-                max(infinatomicM2[1],monatomicM2[1])])
+            P2P1 = 1/AR * M1/M2 *np.sqrt(f1/f2)
+            P3P1 = (P2P1*AR*(1+k*M2*M2) - (1+k*M1*M1))/(AR-1)
 
-        ulim[0] = ~nanFlag[0]*ulim[0] + nanFlag[0]
+            args.M2 = M2
+            args.xi = (P3P1 - 1)/(P2P1 - 1)
 
-        # use 2nd order Lagrange interpolation polynomial to estimate new bounds
-        # of solution for diatomic gas
-        diatomicM2[0] = isentropicDiatomicGasApprox(args, \
-                a=(llim[0]+order2Lagrange[0])/2,\
-                b=(ulim[0]+order2Lagrange[0])/2).min()
-
-        diatomicM2[1] = isentropicDiatomicGasApprox(args,\
-                a=(llim[1]+order2Lagrange[1])/2,\
-                b=(ulim[1]+order2Lagrange[1])/2).max()
-
-        # create 3rd order Lagrange interpolation polynomial
-        order3Lagrange = (k-7/5)*(k-5/3)*infinatomicM2 / (1-7/5)/(1-5/3) \
-                                    + (k-1)*(k-5/3)*diatomicM2 / (7/5-1)/(7/5-5/3) \
-                                    + (k-1)*(k-7/5)*monatomicM2 / (5/3-1)/(5/3-7/5)
-
-        # use 3rd order and 2nd order Lagrange interpolation polynomials to estimate
-        # new bounds of solution for diatomic gas
-        diatomicM2[0] = isentropicDiatomicGasApprox(args, \
-                a=order2Lagrange[0],\
-                b=order3Lagrange[0]).min()
-
-        diatomicM2[1] = isentropicDiatomicGasApprox(args,\
-                a=order2Lagrange[1],\
-                b=order3Lagrange[1]).max()
-
-        if( k == 7/5):
-
-            soln1 = soln()
-            soln2 = soln()
-            soln1.root = diatomicM2[0]
-            soln2.root = diatomicM2[1]
-
-            polyatomicM2 = diatomicM2
-
-            soln1 = scopt.root_scalar(dsR,x1=soln1.root,x0=order2Lagrange[0],\
-                    method='secant',\
-                    bracket=[min(llim[0],ulim[0]),\
-                            max(llim[0],ulim[0])])
-
-            soln2 = scopt.root_scalar(dsR,x1=soln2.root,x0=order2Lagrange[1],\
-                    method='secant',\
-                    bracket=[min(llim[1],ulim[1]),\
-                            max(llim[1],ulim[1])])
+            args.iter = np.zeros(2,dtype=np.int64)
+            args.nfev = np.zeros(2,dtype=np.int64)
 
         elif( k == 5/3 ):
 
-            soln1 = soln()
-            soln2 = soln()
-            soln1.root = monatomicM2[0]
-            soln2.root = monatomicM2[1]
+            M2 = isentropicMonoatomicGas(args)
+            args.M2 = M2
+            f2 = 1 + G*M2*M2
 
-            polyatomicM2 = monatomicM2
+            P2P1 = 1/AR * M1/M2 *np.sqrt(f1/f2)
+            P3P1 = (P2P1*AR*(1+k*M2*M2) - (1+k*M1*M1))/(AR-1)
 
-        elif( k == 9/7 ):
+            args.M2 = M2
+            args.xi = (P3P1 - 1)/(P2P1 - 1)
 
-            soln1 = soln()
-            soln2 = soln()
-
-            soln1.root = isentropicTriatomicGasApprox(args,a=order2Lagrange[0],b=order3Lagrange[0])[0]
-            soln2.root = isentropicTriatomicGasApprox(args,a=order2Lagrange[1],b=order3Lagrange[1])[1]
-
-            polyatomicM2 = np.array([soln1.root,soln2.root])
-
-            soln1 = scopt.root_scalar(dsR,x1=soln1.root,x0=order3Lagrange[0],\
-                    method='secant',\
-                    bracket=[min(llim[0],ulim[0]),\
-                            max(llim[0],ulim[0])])
-
-            soln2 = scopt.root_scalar(dsR,x1=soln2.root,x0=order3Lagrange[1],\
-                    method='secant',\
-                    bracket=[min(llim[1],ulim[1]),\
-                            max(llim[1],ulim[1])])
-
-        elif( args.k == 1):
-
-            soln1 = soln()
-            soln2 = soln()
-            soln1.root = infinatomicM2[0]
-            soln2.root = infinatomicM2[1]
-
-            polyatomicM2 = infinatomicM2
-
-        else:
-            polyatomicM2[0] = isentropicPolyatomicGasApprox(args,\
-                    a=order3Lagrange[0],b=order2Lagrange[0])[0]
-            polyatomicM2[1] = isentropicPolyatomicGasApprox(args,\
-                    a=order3Lagrange[1],b=order2Lagrange[1])[1]
-            #polyatomicM2[0]  = order3Lagrange[0]
-            #polyatomicM2[1] = order3Lagrange[1]
-
-            soln1 = scopt.root_scalar(dsR,x1=order3Lagrange[0],x0=order2Lagrange[0],\
-                    method='secant',\
-                    bracket=[min(llim[0],ulim[0]),\
-                            max(llim[0],ulim[0])])
-
-            soln2 = scopt.root_scalar(dsR,x1=order3Lagrange[1],x0=order2Lagrange[1],\
-                    method='secant',\
-                    bracket=[min(llim[1],ulim[1]),\
-                            max(llim[1],ulim[1])])
-
-        M2[0] = soln1.root
-        M2[1] = soln2.root
-
-        f2 = 1 + G*M2*M2
-
-        P2P1 = 1/AR * M1/M2 *np.sqrt(f1/f2)
-        P3P1 = (P2P1*AR*(1+k*M2*M2) - (1+k*M1*M1))/(AR-1)
-
-        args.M2 = M2
-        args.xi = (P3P1 - 1)/(P2P1 - 1)
-
-        args.initialM2 = polyatomicM2
-        args.monatomicM2 = monatomicM2
-        args.infinatomicM2 = infinatomicM2
-        args.diatomicM2 = diatomicM2
-        args.iter = np.array([soln1.iterations,soln2.iterations])
-        args.nfev = np.array([soln1.function_calls,soln2.function_calls])
+            args.iter = np.zeros(2,dtype=np.int64)
+            args.nfev = np.zeros(2,dtype=np.int64)
 
         return(args)
 
-    def isentropicPolyatomicGasApprox(args,a,b):
-        '''
-        weighted-residual method projection of generic non-linear term onto
-        4th order polynomial using collocation method
-
-        collocation points are chosen for convenience as a, b, and (a+b)/2
-        '''
-        M1 = args.M1
-        AR = args.AR
-        k = args.k
-        G = (k - 1)/2
-
-        f1 = 1 + G*M1*M1
-
-        A = G*a*a
-        B = G*b*b
-
-        # polynomial approximation for isentropic flow for arbitrary cp/cv
-        # this uses a coordinate transform: y= G*M**2
-        # this allows leveraging of properties of logarithms
-
-        C = (k-1)/(k+1)*np.log(G) - np.log(f1) -2*(k-1)/(k+1)*np.log(AR/M1)
-
-        c4 = 2*(A**2*np.log(B + 1) + A*B*np.log(A + 1) + A*B*np.log(B + 1) \
-                - 4*A*B*np.log(A/2 + B/2 + 1) + B**2*np.log(A + 1))\
-                /(A*B*(A**3 - A**2*B - A*B**2 + B**3))
-
-        c3 = (-3*A**2*np.log(B + 1) - A*B*np.log(A + 1) - A*B*np.log(B + 1) \
-                + 8*A*B*np.log(A/2 + B/2 + 1) - 3*B**2*np.log(A + 1)) \
-                /(A*B*(A**2 - 2*A*B + B**2))
-
-        c2 = (A*B*(A**3 - A**2*B - A*B**2 + B**3)*(-A*B*k*np.log(A) \
-                + A*B*k*np.log(B) + A*B*np.log(A) - A*B*np.log(B) + A*k*np.log(A) \
-                - A*np.log(A) - B*k*np.log(B) + B*np.log(B)) + (A**4*np.log(B + 1) \
-                + 2*A**3*B*np.log(B + 1) + A**2*B**2*np.log(A + 1) \
-                + A**2*B**2*np.log(B + 1) - 8*A**2*B**2*np.log(A/2 + B/2 + 1) \
-                + 2*A*B**3*np.log(A + 1) + B**4*np.log(A + 1))*(A**2*B*k + A**2*B \
-                - A**2*k - A**2 - A*B**2*k - A*B**2 + A*k + A + B**2*k + B**2 \
-                - B*k - B))\
-                /(A*B*(A**3 - A**2*B - A*B**2 + B**3)*(A**2*B*k \
-                + A**2*B - A**2*k - A**2 - A*B**2*k - A*B**2 + A*k + A + B**2*k \
-                + B**2 - B*k - B))
-
-        c1 = (-A**2*B*k*np.log(B) + A**2*B*np.log(B) + A*B**2*k*np.log(A) \
-                - A*B**2*np.log(A) - A*k*np.log(A) + A*np.log(A) + B*k*np.log(B) \
-                - B*np.log(B))/(A**2*B*k + A**2*B - A**2*k - A**2 - A*B**2*k \
-                - A*B**2 + A*k + A + B**2*k + B**2 - B*k - B) + C
-
-        c0 = A*B*(A*k*np.log(B) - A*np.log(B) - B*k*np.log(A) + B*np.log(A) \
-                + k*np.log(A) - k*np.log(B) - np.log(A) + np.log(B))\
-                /(A**2*B*k + A**2*B - A**2*k - A**2 - A*B**2*k - A*B**2 \
-                + A*k + A + B**2*k + B**2 - B*k - B)
-
-        # get roots in transformed coordinates then transform roots back to M2
-        # M2 = sqrt(y/G)
-        roots = np.sqrt(solveMonicQuartic(c3/c4,c2/c4,c1/c4,c0/c4)/G)
-
-        return(rejectNonphysicalRoots(roots))
-
-    def isentropicApprox(args,a,b,switch=False):
-        M1 = args.M1
-        AR = args.AR
-        k = args.k
-        G = (k - 1)/2
-        AoAs = 1/M1 * ((1+G)/(1+G*M1*M1))**(-(k+1)/(2*(k-1)))
-
-        AR = np.float64(switch) * AR*AoAs + np.float64(not switch)*AR
-        M1 = np.float64(switch) + np.float64(not switch) * M1
-
-        f1 = 1 + G*M1*M1
-
-        a0 = a**5/252 + 25*a**4*b/252 + 25*a**3*b**2/63 + 25*a**2*b**3/63 + 25*a*b**4/252 + b**5/252
-        a1 = -5*a**4/42 - 25*a**3*b/21 - 50*a**2*b**2/21 - 25*a*b**3/21 - 5*b**4/42
-        a2 = 5*a**3/6 + 25*a**2*b/6 + 25*a*b**2/6 + 5*b**3/6
-        a3 = -20*a**2/9 - 50*a*b/9 - 20*b**2/9
-        a4 = 5*a/2 + 5*b/2
-
-        c5 = G/3*AR**3*(5*k-11)
-        c4 = -3*G*(k+1)*M1*AR**2/c5 + a4
-        c3 = AR/3*(AR**2*((11*k - 5)*f1 + 5*k - 11) - 9*G*M1**2*(k+1))/c5 + a3
-        c2 = M1/3*(9*(k+1)*AR**2*(f1-1) + G*M1**2*(5-11*k))/c5 + a2
-        c1 = (3*(k+1)*AR*M1**2*(f1-1))/c5 + a1
-        c0 = 1/3*M1**3*(f1*(11-5*k) + (5-11*k))/c5 + a0
-
-        roots = solveMonicQuartic(c3/c4,c2/c4,c1/c4,c0/c4)
-
-        return(rejectNonphysicalRoots(roots))
 
     def rejectNonphysicalRoots(roots,keepNans=False):
 
@@ -719,80 +542,6 @@
         r4 = -(s/2) - np.sqrt((s/2)**2-t)
 
         return(np.array([r1,r2,r3,r4]))
-
-    def isentropicDiatomicGasApprox(args,a,b):
-        M1 = args.M1
-        k = np.float64(7/5)
-        AR = args.AR
-
-        G = (k-1)/2
-        f1 = 1 + G*M1*M1
-
-        # minimize L2norm between x**6 and sum(an*x**n,(n,0,4)) over domain (a,b)
-        a0 = 5*a**6/462 + 125*a**5*b/462 + 575*a**4*b**2/462 + 150*a**3*b**3/77 \
-                + 575*a**2*b**4/462 + 125*a*b**5/462 + 5*b**6/462
-        a1 = -24*a**5/77 - 250*a**4*b/77 - 650*a**3*b**2/77 - 650*a**2*b**3/77 \
-                - 250*a*b**4/77 - 24*b**5/77
-        a2 = 45*a**4/22 + 125*a**3*b/11 + 200*a**2*b**2/11 + 125*a*b**3/11 \
-                + 45*b**4/22
-        a3 = -160*a**3/33 - 500*a**2*b/33 - 500*a*b**2/33 - 160*b**3/33
-        a4 = 45*a**2/11 + 75*a*b/11 + 45*b**2/11
-
-        # normalize coefficients to form monic quartic polynomial
-        c3 = a3                         /(3/G + a4)
-        c2 = (3/(G*G)+ a2)               /(3/G + a4)
-        c1 = -(AR/M1/G**3 * f1**3 - a1) /(3/G + a4)
-        c0 = (1/G**3 + a0)              /(3/G + a4)
-
-        roots = solveMonicQuartic(c3,c2,c1,c0)
-
-        return(rejectNonphysicalRoots(roots))
-
-    def isentropicTriatomicGasApprox(args,a,b):
-
-        M1 = args.M1
-        k = np.float64(9/7)
-        AR = args.AR
-
-        G = (k-1)/2
-        f1 = 1 + G*M1**2
-
-        # minimize L2norm between x**8/2401 + 4*x**6/343 and sum(an*x**n,(n,0,4)) over domain (a,b)
-        a0 = 5*a**8/441441 + 125*a**7*b/441441 + 4625*a**6*b**2/3090087 + 10*a**6/79233 \
-                + 10375*a**5*b**3/3090087 + 250*a**5*b/79233 + 13225*a**4*b**4/3090087 \
-                + 1150*a**4*b**2/79233 + 10375*a**3*b**5/3090087 + 600*a**3*b**3/26411 \
-                + 4625*a**2*b**6/3090087 + 1150*a**2*b**4/79233 + 125*a*b**7/441441 \
-                + 250*a*b**5/79233 + 5*b**8/441441 + 10*b**6/79233
-
-        a1 = -320*a**7/1030029 - 500*a**6*b/147147 - 11500*a**5*b**2/1030029 \
-                - 96*a**5/26411 - 19000*a**4*b**3/1030029 - 1000*a**4*b/26411 \
-                - 19000*a**3*b**4/1030029 - 2600*a**3*b**2/26411 \
-                - 11500*a**2*b**5/1030029 - 2600*a**2*b**3/26411 - 500*a*b**6/147147 \
-                - 1000*a*b**4/26411 - 320*b**7/1030029 - 96*b**5/26411
-
-        a2 = 40*a**6/21021 + 250*a**5*b/21021 + 4000*a**4*b**2/147147 + 90*a**4/3773 \
-                + 1700*a**3*b**3/49049 + 500*a**3*b/3773 + 4000*a**2*b**4/147147 \
-                + 800*a**2*b**2/3773 + 250*a*b**5/21021 + 500*a*b**3/3773 \
-                + 40*b**6/21021 + 90*b**4/3773
-
-        a3 = -256*a**5/63063 - 1000*a**4*b/63063 - 11800*a**3*b**2/441441 \
-                - 640*a**3/11319 - 11800*a**2*b**3/441441 - 2000*a**2*b/11319 \
-                - 1000*a*b**4/63063 - 2000*a*b**2/11319 - 256*b**5/63063 \
-                - 640*b**3/11319
-
-        a4 = 20*a**4/7007 + 50*a**3*b/7007 + 450*a**2*b**2/49049 + 180*a**2/3773 \
-                + 50*a*b**3/7007 + 300*a*b/3773 + 20*b**4/7007 + 180*b**2/3773
-
-        # normalize coefficients to form monic quartic polynomial
-        c3 = a3/(6/49+a4)
-        c2 = (a2 + 4/7)/(6/49+a4)
-        c1 = (a1 - AR/M1*f1**4)/(6/49+a4)
-        c0 = (1 + a0)/(6/49+a4)
-
-        roots = solveMonicQuartic(c3,c2,c1,c0)
-
-        return(rejectNonphysicalRoots(roots))
-
 
     def solveMonicQuartic(c3,c2,c1,c0):
         '''
@@ -885,10 +634,10 @@
             if( args.isentropic):
                 print("{0:20s} {1: 13d} {2: 13d}".format("iter",args.iter[0],args.iter[1]))
                 print("{0:20s} {1: 13d} {2: 13d}".format("nfev",args.nfev[0],args.nfev[1]))
-                print("{0:20s} {1: .6e} {2: .6e}".format("M2 (apprx)",args.initialM2[0],args.initialM2[1]))
-                print("{0:20s} {1: .6e} {2: .6e}".format("M2 (k->1 )",args.infinatomicM2[0],args.infinatomicM2[1]))
-                print("{0:20s} {1: .6e} {2: .6e}".format("M2 (k~7/5)",args.diatomicM2[0],args.diatomicM2[1]))
-                print("{0:20s} {1: .6e} {2: .6e}".format("M2 (k=5/3)",args.monatomicM2[0],args.monatomicM2[1]))
+                #print("{0:20s} {1: .6e} {2: .6e}".format("M2 (apprx)",args.initialM2[0],args.initialM2[1]))
+                #print("{0:20s} {1: .6e} {2: .6e}".format("M2 (k->1 )",args.infinatomicM2[0],args.infinatomicM2[1]))
+                #print("{0:20s} {1: .6e} {2: .6e}".format("M2 (k~7/5)",args.diatomicM2[0],args.diatomicM2[1]))
+                #print("{0:20s} {1: .6e} {2: .6e}".format("M2 (k=5/3)",args.monatomicM2[0],args.monatomicM2[1]))
 
             print("{0:20s} {1: .6e} {2: .6e}".format("V2V1",args.V2V1[0],args.V2V1[1]))
             print("{0:20s} {1: .6e} {2: .6e}".format("v2v1",args.v2v1[0],args.v2v1[1]))
@@ -956,7 +705,7 @@
         def march(argn,root=0):
             tmp = copy.deepcopy(argn)
 
-            for i in range(1,argn.N):#tqdm(range(1,argn.N)):
+            for i in tqdm(range(1,argn.N)):
                 try:
                     tmp.M1 = np.nanmin(tmp.M2) * np.float64(1-root) + np.nanmax(tmp.M2) * np.float64(root)
                 except:
@@ -973,13 +722,13 @@
             except:
                 return(np.nan)
 
-        #print('Solving sub-elements for smaller Mach number branch...')
+        print('Solving sub-elements for smaller Mach number branch...')
         args.M2[0] = march(argn,root=0)
-        #print('',end='\n')
+        print('',end='\n')
 
-        #print('Solving sub-elements for larger Mach number branch...')
+        print('Solving sub-elements for larger Mach number branch...')
         args.M2[1] = march(argn,root=1)
-        #print('',end='\n')
+        print('',end='\n')
         if( args.M2[1] == args.M2[0] ): args.M2[1] = np.nan
 
         args.Lambda = np.zeros(2)
@@ -988,6 +737,9 @@
         args.discriminant = np.zeros(2)
 
         return(args)
+
+
+
 
 
   </py-script>

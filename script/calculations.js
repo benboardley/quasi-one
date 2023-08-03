@@ -152,9 +152,8 @@ function interfaceUNI(){
     output.zloss = js_args.zloss.toJs();
     output.CPinc = js_args.CPinc.toJs();
     output.P3P1 = js_args.P3P1.toJs();
-    output.P3Po1 = js_args.P3Po1.toJs();
+    output.P3Po1 = [output.P3P1[0]/(output.f1 ** (data.gamma/(data.gamma-1))), output.P3P1[1]/(output.f1 ** (data.gamma/(data.gamma-1)))]
     output.Lambda = js_args.Lambda; 
-    output.f1 = js_args.f1;
     output.b = js_args.b; 
     output.c = js_args.c;
     output.det = js_args.discriminant;
@@ -272,6 +271,7 @@ document.getElementById("P3P1Second").value = output.P3P1[1].toFixed(5);
 document.getElementById("P3P2").value = (output.P3P1[0] / output.P2P1[0]).toFixed(5);
 document.getElementById("P3P2Second").value = (output.P3P1[1] / output.P2P1[1]).toFixed(5);
 
+console.log(output.P3Po1)
 document.getElementById("P3Po1").value = (output.P3Po1[0] /*/ f1*/).toFixed(5);
 document.getElementById("P3Po1Second").value = (output.P3Po1[1]/* / f1*/).toFixed(5);
 
